@@ -12,7 +12,7 @@
         {
             "tag": "card-deck",
             "description": "Flippable card deck.",
-            "module": "card-deck/card-deck.js"
+            "module": "web-components/card-deck/card-deck.js"
         }
     ],
     "autoload": {},

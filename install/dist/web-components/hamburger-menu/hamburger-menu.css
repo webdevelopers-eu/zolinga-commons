@@ -16,8 +16,10 @@
     }
 
     & .hamburger-icon {
-        pointer-events: none; /* so it clicks on element directly - we check click.target */
         height: 1.5em;
+        min-width: 1.5em;
+        cursor: pointer;
+        pointer-events: visible; /* otherwise only visible lines are clickable */
     }
 
     &:not(.hamburger-active) {

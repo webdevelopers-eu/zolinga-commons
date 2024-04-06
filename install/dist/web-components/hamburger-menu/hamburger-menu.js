@@ -7,6 +7,7 @@
 export default class HamburgerMenu extends HTMLElement {
   #menu;
   #canary;
+  #hamburger;
   #observer;
 
   constructor() {
@@ -36,10 +37,11 @@ export default class HamburgerMenu extends HTMLElement {
 
     this.#observer.observe(this, {box: 'border-box'});
     this.#observer.observe(this.#menu, {box: 'border-box'});
+    this.#observer.observe(document.body, {box: 'border-box'}); /* screen flip */
     this.#makeCanary();
 
     this.addEventListener('click', (ev) => {
-      if (this.classList.contains('hamburger-active') && ev.target === this) {
+      if (this.classList.contains('hamburger-active') && ev.target === this.#hamburger || ev.target === this) {
         this.classList.toggle('hamburger-open');
       }
     });
@@ -52,7 +54,7 @@ export default class HamburgerMenu extends HTMLElement {
             <path stroke='currentColor' stroke-linecap='round' stroke-width='2' d='M4 18h16M4 12h16M4 6h16'/>
         </svg>
     `;
-    this.appendChild(svg.firstElementChild);
+    this.#hamburger = this.appendChild(svg.firstElementChild);
 
     if (document.querySelector('#hamburger-styles')) {
       return;

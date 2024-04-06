@@ -1,0 +1,45 @@
+hamburger-menu {
+    display: inline-flex;
+    overflow: visible;
+    max-width: 100%;
+    width: 100%;
+
+    &> .hamburger-canary {
+        bottom: 0px; 
+        right: 0px;
+        position: absolute;
+        visibility: hidden;
+        width: auto;
+        pointer-events: none;
+        opacity: 0.2;
+    }
+
+    &.hamburger-active {
+
+        &::before {
+            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23000' stroke-linecap='round' stroke-width='2' d='M4 18h16M4 12h16M4 6h16'/%3E%3C/svg%3E");
+            width: 1.5em;
+            height: 1.5em;
+        }
+
+        &> *:is(menu, ul, li, nav):not(.hamburger-canary) {
+            display: none;
+        }
+
+        &.hamburger-open {
+            &::after { /* clickable curtain */
+                content: '';
+                z-index: 99;
+                position: fixed;
+                inset: 0px;
+            }
+
+            &> *:is(menu, ul, li, nav):not(.hamburger-canary) {
+                position: absolute;
+                display: flex;
+                flex-direction: column;
+                z-index: 100;
+            }
+        }
+    }
+}

@@ -13,6 +13,11 @@
             "tag": "card-deck",
             "description": "Flippable card deck.",
             "module": "web-components/card-deck/card-deck.js"
+        },
+        {
+            "tag": "hamburger-menu",
+            "description": "Hamburger menu.",
+            "module": "web-components/hamburger-menu/hamburger-menu.js"
         }
     ],
     "autoload": {},

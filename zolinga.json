@@ -1,0 +1,20 @@
+{
+    "name": "Zolinga Commons",
+    "version": "1.0.0",
+    "description": "Zolinga PHP framework's common components.",
+    "authors": [
+        "Danny Sevcik <danny@zolinga.net>"
+    ],
+    "attributes": {},
+    "listen": [],
+    "emit": [],
+    "webComponents": [
+        {
+            "tag": "card-deck",
+            "description": "Flippable card deck.",
+            "module": "card-deck/card-deck.js"
+        }
+    ],
+    "autoload": {},
+    "config": {}
+}

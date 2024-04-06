@@ -11,6 +11,7 @@ export default class HamburgerMenu extends HTMLElement {
 
   constructor() {
     super();
+    this.classList.add('hamburger-menu');
     this.#init();
     this.dataset.ready = 'true';
   }
@@ -38,13 +39,21 @@ export default class HamburgerMenu extends HTMLElement {
     this.#makeCanary();
 
     this.addEventListener('click', (ev) => {
-        if (this.classList.contains('hamburger-active') && ev.target === this) {
-            this.classList.toggle('hamburger-open');
-        }
+      if (this.classList.contains('hamburger-active') && ev.target === this) {
+        this.classList.toggle('hamburger-open');
+      }
     });
   }
 
   async installStyles() {
+    const svg = document.createElement('div');
+    svg.innerHTML = `
+        <svg class="hamburger-icon" xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+            <path stroke='currentColor' stroke-linecap='round' stroke-width='2' d='M4 18h16M4 12h16M4 6h16'/>
+        </svg>
+    `;
+    this.appendChild(svg.firstElementChild);
+
     if (document.querySelector('#hamburger-styles')) {
       return;
     }

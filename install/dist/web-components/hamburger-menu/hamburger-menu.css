@@ -1,32 +1,40 @@
-hamburger-menu {
+.hamburger-menu {
     display: inline-flex;
     overflow: visible;
     max-width: 100%;
     width: 100%;
+    contain: inline-size; /* so it does not cause horizontal scroll */
 
     &> .hamburger-canary {
-        bottom: 0px; 
-        right: 0px;
-        position: absolute;
-        visibility: hidden;
-        width: auto;
-        pointer-events: none;
-        opacity: 0.2;
+        bottom: 0px !important; 
+        right: 0px !important;
+        position: absolute !important;
+        visibility: hidden !important;
+        width: auto !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+    }
+
+    & .hamburger-icon {
+        pointer-events: none; /* so it clicks on element directly - we check click.target */
+        height: 1.5em;
+    }
+
+    &:not(.hamburger-active) {
+        & .hamburger-icon {
+            display: none !important;
+        }
     }
 
     &.hamburger-active {
-
-        &::before {
-            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23000' stroke-linecap='round' stroke-width='2' d='M4 18h16M4 12h16M4 6h16'/%3E%3C/svg%3E");
-            width: 1.5em;
-            height: 1.5em;
-        }
+        position: relative;
 
         &> *:is(menu, ul, li, nav):not(.hamburger-canary) {
             display: none;
         }
 
         &.hamburger-open {
+
             &::after { /* clickable curtain */
                 content: '';
                 z-index: 99;
@@ -36,6 +44,7 @@ hamburger-menu {
 
             &> *:is(menu, ul, li, nav):not(.hamburger-canary) {
                 position: absolute;
+                top: 100%;
                 display: flex;
                 flex-direction: column;
                 z-index: 100;

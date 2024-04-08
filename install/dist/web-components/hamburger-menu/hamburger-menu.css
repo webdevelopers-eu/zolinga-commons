@@ -5,6 +5,10 @@
     width: 100%;
     contain: inline-size; /* so it does not cause horizontal scroll */
 
+    &:not(.hamburger-ready) {
+        visibility: hidden;
+    }
+
     &> .hamburger-canary {
         bottom: 0px !important; 
         right: 0px !important;

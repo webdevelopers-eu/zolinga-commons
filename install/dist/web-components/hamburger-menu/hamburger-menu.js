@@ -1,50 +1,43 @@
+import WebComponent from '/dist/system/lib/web-component.js';
+
 /**
  * Watch the element for overflow and add class "hamburger-active" if it is overflowing.
  *
  * @author Daniel Sevcik <sevcik@zolinga.net>
  * @since 2024-04-06
  */
-export default class HamburgerMenu extends HTMLElement {
+export default class HamburgerMenu extends WebComponent {
   #menu;
   #canary;
   #hamburger;
-  #observer;
+  #resizeObserver;
+  #mutationObserver;
 
   constructor() {
     super();
+
     this.classList.add('hamburger-menu');
-    this.#init();
-    this.dataset.ready = 'true';
+
+    this.ready(this.#init())
+      .then(() => this.classList.add('hamburger-ready'));
   }
 
   async #init() {
     await this.installStyles();
+    this.removeAttribute('hidden');
 
     this.#menu = this.querySelector(':scope > *:is(nav, ul, ol, menu)');
-    this.#observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === this.#menu) { // menu changed
-          this.#makeCanary();
-        } else if (entry.target === this) {
-          const isOverflowing = this.clientWidth < this.#canary.clientWidth;
-          console.log(this.clientWidth, entry.target.clientWidth, isOverflowing );
-          if (!this.classList.toggle('hamburger-active', isOverflowing)) {
-            this.classList.remove('hamburger-open'); // hamburger is inactive, reset it
-          }
-        }
-      }
-    });
 
-    this.#observer.observe(this, {box: 'border-box'});
-    this.#observer.observe(this.#menu, {box: 'border-box'});
-    this.#observer.observe(document.body, {box: 'border-box'}); /* screen flip */
+    this.#resizeObserver = new ResizeObserver((entries) => this.#updateOverflowClass());
+    this.#resizeObserver.observe(this, { box: 'border-box' });
+
+    this.#mutationObserver = new MutationObserver((mutations) => this.#makeCanary());
+    this.#mutationObserver.observe(this.#menu, { childList: true, subtree: true, attributes: true });
+
     this.#makeCanary();
+    this.#updateOverflowClass();
 
-    this.addEventListener('click', (ev) => {
-      if (this.classList.contains('hamburger-active') && ev.target === this.#hamburger || ev.target === this) {
-        this.classList.toggle('hamburger-open');
-      }
-    });
+    this.addEventListener('click', (ev) => this.classList.toggle('hamburger-open'));
   }
 
   async installStyles() {
@@ -74,7 +67,17 @@ export default class HamburgerMenu extends HTMLElement {
     return promise;
   }
 
+  #updateOverflowClass() {
+    const isOverflowing = this.clientWidth < this.#canary.clientWidth;
+    if (!this.classList.toggle('hamburger-active', isOverflowing)) {
+      this.classList.remove('hamburger-open'); // hamburger is inactive, reset it
+    }
+  }
+
   #makeCanary() {
+    if (this.#canary) {
+      this.#canary.remove();
+    }
     this.#canary = this.#menu.cloneNode(true);
     this.#canary.classList.add('hamburger-canary');
     this.appendChild(this.#canary);

@@ -17,7 +17,7 @@ To use the `card-deck` component, you need to include it in your HTML file and d
         background: #f0f0f0;
     }
 </style>
-<card-deck append-to="banner"  flip-speed="1" show-card="card-a" flip-perspective="1000">
+<card-deck flip-speed="1" show-card="card-a" flip-perspective="1000">
     <div card-name="card-a" style="height: 300px;"
         onclick="this.parentNode.showCard('card-b');">aaa</div>
     <div card-name="card-b" style="height: 350px;" 

@@ -1,0 +1,12 @@
+{
+    "revision": 1,
+    "list": [
+        {
+            "id": "forms/css",
+            "dependencies": [],
+            "resources": [
+                "/dist/zolinga-commons/c-resources/forms/forms.css"
+            ]
+        }
+    ]
+}

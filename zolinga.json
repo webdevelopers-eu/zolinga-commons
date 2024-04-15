@@ -6,7 +6,21 @@
         "Danny Sevcik <danny@zolinga.net>"
     ],
     "attributes": {},
-    "listen": [],
+    "listen": [
+        {
+            "event": "cms:content:c-resources",
+            "class": "Zolinga\\Commons\\Resources\\ResourcesElement",
+            "method": "onResources",
+            "origin": ["internal"]
+        },
+        {
+            "event": "system:install",
+            "class": "Zolinga\\Commons\\Resources\\ResourcesElement",
+            "method": "onInstall",
+            "origin": ["internal"],
+            "priority": 0.1
+        }
+    ],
     "emit": [],
     "webComponents": [
         {
@@ -18,8 +32,15 @@
             "tag": "hamburger-menu",
             "description": "Hamburger menu.",
             "module": "web-components/hamburger-menu/hamburger-menu.js"
+        },
+        {
+            "tag": "c-resources",
+            "description": "Resources element.",
+            "module": "web-components/c-resources/c-resources.js"
         }
     ],
-    "autoload": {},
+    "autoload": {
+        "\\Zolinga\\Commons\\": "src/"
+    },
     "config": {}
 }

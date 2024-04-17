@@ -1,24 +1,36 @@
 .c-form {
     --forms-radius: var(--radius, 5px);
     --forms-color-fg: var(--color-fg, currentColor);
-    --forms-color-bg: var(--color-bg, #ffffff);
+    --forms-color-bg: color-mix(in oklab, var(--color-bg) 95%, var(--color-fg) 5%);
     --forms-color-primary: var(--color-primary, #007bff);
     --forms-color-primary-fg: var(--color-primary-fg, #ffffff);
-    
-    color: var(--forms-color-fg);
-    display: flex;
-    gap: 0.5rem;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: 1em;
-    background-color: color-mix(in srgb, var(--forms-color-bg) 70%, transparent);
-    border-radius: var(--forms-radius, 5px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
-    & button, & input[type="submit"] {
+    --forms-field-border-width: 2px;
+    --forms-field-border-color: transparent;
+    --forms-field-border-color-active: color-mix(in srgb, currentColor 50%, transparent);
+    --forms-field-label-color: var(--forms-field-border-color-active);
+    --forms-field-color-bg: white;
+
+    color: var(--forms-color-fg);
+
+    &:is(form) {
+        display: flex;
+        gap: 0.5rem;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 1em;
+        background-color: var(--forms-color-bg);
+        border-radius: var(--forms-radius, 5px);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    &:is(button, .button),
+    & button,
+    & input[type="submit"] {
+        text-decoration: none;
         font-family: inherit;
         cursor: pointer;
         padding: 0.5em 1em;
@@ -28,14 +40,15 @@
         color: var(--forms-color-primary-fg);
         font-size: 1em;
         transition: background-color 0.5s;
-        margin: 0.5em 0em;
-    
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+
         &:hover {
             background-color: color-mix(in srgb, var(--forms-color-primary) 70%, transparent);
         }
     }
 
-    &> label:has(> input[type="checkbox"]) {
+    &>label:has(> input[type="checkbox"]) {
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -46,20 +59,20 @@
         }
     }
 
-    &> label:not(:has(> input[type="checkbox"])) {
+    &>label:not(:has(> input[type="checkbox"])) {
         display: flex;
         align-items: stretch;
         border-radius: var(--forms-radius, 5px);
-        background-color: var(--forms-color-bg);
-        border-width: 1px;
+        background-color: var(--forms-field-color-bg);
+        border-width: var(--forms-field-border-width);
         border-style: solid;
-        border-color: color-mix(in srgb, var(--forms-color-fg) 20%, transparent);
+        border-color: var(--forms-field-border-color);
         position: relative;
         margin: 0.5em 0em;
         width: 100%;
 
         &:has(input:focus, select:focus, textarea:focus) {
-            border-color: var(--forms-color-fg);
+            border-color: var(--forms-field-border-color-active);
         }
 
         &:has(input:placeholder-shown, select:placeholder-shown, textarea:placeholder-shown)>span {
@@ -92,7 +105,7 @@
             }
 
             &:is(span) {
-                user-select: none;
+                pointer-events: none;
                 position: absolute;
                 top: 0em;
                 left: 2em;
@@ -101,22 +114,37 @@
                 align-items: center;
                 transform: translateY(-50%);
                 padding: 0px 0.16em;
-                font-size: 0.7em;
-                animation: placeholder-to-label 0.5s ease-in-out;
+                font-size: 0.8em;
+                animation: placeholder-to-label 0.2s ease-in-out;
                 /* make text outline from bg color */
-                text-shadow: 2px 0 2px var(--forms-color-bg), -2px 0 2px var(--forms-color-bg), 0 2px 2px var(--forms-color-bg), 0 -2px 2px var(--forms-color-bg);
+                text-shadow: 2px 0 2px var(--forms-field-color-bg), -2px 0 2px var(--forms-field-color-bg), 0 2px 2px var(--forms-field-color-bg), 0 -2px 2px var(--forms-field-color-bg);
+                color: var(--forms-field-label-color);
 
                 &::before {
                     position: absolute;
                     content: "";
-                    top: calc(50% - 1px);
-                    left: 0px;
+                    top: calc(50% - var(--forms-field-border-width));
+                    left: -0.1em;
                     height: 0px;
-                    border-top: 2px solid var(--forms-color-bg, white);
-                    width: 100%;
+                    border-top: calc(var(--forms-field-border-width) + 1px) solid var(--forms-field-color-bg, white);
+                    width: calc(100% + 0.2em);
                     z-index: -1;
                 }
             }
         }
+    }
+}
+
+@keyframes placeholder-to-label {
+    from {
+        opacity: 0;
+        transform: translateY(calc(-50% + 1lh));
+        font-size: 1em;
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-50%);
+        font-size: 0.8em;
     }
 }

@@ -1,3 +1,122 @@
-* {
-    color: red;
+.c-form {
+    --forms-radius: var(--radius, 5px);
+    --forms-color-fg: var(--color-fg, currentColor);
+    --forms-color-bg: var(--color-bg, #ffffff);
+    --forms-color-primary: var(--color-primary, #007bff);
+    --forms-color-primary-fg: var(--color-primary-fg, #ffffff);
+    
+    color: var(--forms-color-fg);
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 1em;
+    background-color: color-mix(in srgb, var(--forms-color-bg) 70%, transparent);
+    border-radius: var(--forms-radius, 5px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    & button, & input[type="submit"] {
+        font-family: inherit;
+        cursor: pointer;
+        padding: 0.5em 1em;
+        border: none;
+        border-radius: var(--forms-radius, 5px);
+        background-color: var(--forms-color-primary);
+        color: var(--forms-color-primary-fg);
+        font-size: 1em;
+        transition: background-color 0.5s;
+        margin: 0.5em 0em;
+    
+        &:hover {
+            background-color: color-mix(in srgb, var(--forms-color-primary) 70%, transparent);
+        }
+    }
+
+    &> label:has(> input[type="checkbox"]) {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0.34em 0em;
+
+        &>input {
+            margin: 0px;
+        }
+    }
+
+    &> label:not(:has(> input[type="checkbox"])) {
+        display: flex;
+        align-items: stretch;
+        border-radius: var(--forms-radius, 5px);
+        background-color: var(--forms-color-bg);
+        border-width: 1px;
+        border-style: solid;
+        border-color: color-mix(in srgb, var(--forms-color-fg) 20%, transparent);
+        position: relative;
+        margin: 0.5em 0em;
+        width: 100%;
+
+        &:has(input:focus, select:focus, textarea:focus) {
+            border-color: var(--forms-color-fg);
+        }
+
+        &:has(input:placeholder-shown, select:placeholder-shown, textarea:placeholder-shown)>span {
+            display: none;
+        }
+
+        &>* {
+            color: var(--forms-color-fg);
+            min-height: 2.4em;
+
+            &:is(input, select, textarea) {
+                font-family: inherit;
+                padding: 0em 1em;
+                flex: 1;
+                border: none;
+                background-color: transparent;
+                font-size: 1em;
+
+                /* Disable active highlight */
+                outline: none !important;
+
+                &::placeholder {
+                    color: color-mix(in srgb, var(--forms-color-fg) 50%, transparent);
+                }
+
+                &:is(textarea) {
+                    resize: vertical;
+                    padding: 1em;
+                }
+            }
+
+            &:is(span) {
+                user-select: none;
+                position: absolute;
+                top: 0em;
+                left: 2em;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                transform: translateY(-50%);
+                padding: 0px 0.16em;
+                font-size: 0.7em;
+                animation: placeholder-to-label 0.5s ease-in-out;
+                /* make text outline from bg color */
+                text-shadow: 2px 0 2px var(--forms-color-bg), -2px 0 2px var(--forms-color-bg), 0 2px 2px var(--forms-color-bg), 0 -2px 2px var(--forms-color-bg);
+
+                &::before {
+                    position: absolute;
+                    content: "";
+                    top: calc(50% - 1px);
+                    left: 0px;
+                    height: 0px;
+                    border-top: 2px solid var(--forms-color-bg, white);
+                    width: 100%;
+                    z-index: -1;
+                }
+            }
+        }
+    }
 }

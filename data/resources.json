@@ -3,9 +3,18 @@
     "list": [
         {
             "id": "forms/css",
+            "description": "Common form styles",
             "dependencies": [],
             "resources": [
                 "/dist/zolinga-commons/c-resources/forms/forms.css"
+            ]
+        },
+        {
+            "id": "web-components",
+            "description": "Initialize Zolinga web-components - warning: this works only for server-side <c-resources> rendering",
+            "dependencies": [],
+            "resources": [
+                "/dist/system/web-components.js"
             ]
         }
     ]

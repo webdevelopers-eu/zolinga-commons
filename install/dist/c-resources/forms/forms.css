@@ -20,7 +20,7 @@
         grid-template-columns:
             [full-width-start] 0rem [content-start] 1fr [content-end] 0rem [full-width-end];
         grid-auto-flow: row;
-        gap: calc(var(--forms-gap-vertical) * 2) var(--forms-gap-horizontal);
+        gap: var(--forms-gap-vertical) var(--forms-gap-horizontal);
         align-items: center;
         justify-content: center;
         width: 100%;
@@ -32,11 +32,13 @@
 
         &::before {
             content: "";
+            height: var(--forms-gap-vertical);
             grid-row: 1 / span 1;
         }
 
         &::after {
             content: "";
+            height: var(--forms-gap-vertical);
         }
 
         &>*, &::after, &::before {
@@ -64,11 +66,14 @@
         }
     }
 
+    &>label, &>button, &>input {
+        margin-top: calc(var(--forms-gap-vertical) / 4);
+        margin-bottom: calc(var(--forms-gap-vertical) / 4);
+    }
+
     &>label {
         &:has(> input[type="checkbox"]) {
-            display: flex;
             align-items: center;
-            gap: 0.5rem;
         }
 
         &:not(:has(> input[type="checkbox"])) {

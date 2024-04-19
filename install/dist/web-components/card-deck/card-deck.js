@@ -26,7 +26,7 @@ class FlipCardDeck extends HTMLElement {
             /* make the self element a width to fit the contents */
             :host {
                 --flip-perspective: 300px;
-                --flip-speed: 1.0s;
+                --flip-speed: 0.5s;
                 --flip-speed-half: calc(var(--flip-speed, 0.5s) / 2);
 
                 display: inline-block;
@@ -50,10 +50,11 @@ class FlipCardDeck extends HTMLElement {
                 grid-row: 1;
                 backface-visibility: hidden;
                 transform-style: preserve-3d;
+                margin: 0px;
             }
             ::slotted(*:not(.card-active, .card-deactivated)) {
                 transform: rotateY(-180deg);
-                transition: margin var(--flip-speed-half) ease-in;
+                transition: margin var(--flip-speed-half) linear;
                 margin-top: 0%:
                 margin-left: 0%;
                 margin-bottom: -100%;
@@ -62,12 +63,12 @@ class FlipCardDeck extends HTMLElement {
             }
             ::slotted(.card-active) {
                 transform: rotateY(0deg);
-                transition: transform var(--flip-speed, 0.5s), margin var(--flip-speed-half) ease-out;
+                transition: transform var(--flip-speed, 0.5s) linear, margin var(--flip-speed-half) linear;
                 margin: 0% 0% 0% 0%;
             }
             ::slotted(.card-deactivated) {
                 transform: rotateY(180deg);
-                transition: transform var(--flip-speed, 0.5s);
+                transition: transform var(--flip-speed, 0.5s) linear;
             }
         `);
 

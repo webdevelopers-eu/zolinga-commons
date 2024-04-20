@@ -41,7 +41,7 @@
             height: var(--forms-gap-vertical);
         }
 
-        &>*, &::after, &::before {
+        &>*, &::after, &::before, &>::slotted(*) {
             grid-column: content;
             margin: 0px;
         }

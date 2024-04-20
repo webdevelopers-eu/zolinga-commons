@@ -37,6 +37,11 @@
             "tag": "c-resources",
             "description": "Resources element.",
             "module": "web-components/c-resources/c-resources.js"
+        },
+        {
+            "tag": "message-board",
+            "description": "Message board.",
+            "module": "web-components/message-board/message-board.js"
         }
     ],
     "autoload": {

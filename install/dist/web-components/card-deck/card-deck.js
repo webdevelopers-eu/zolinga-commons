@@ -80,6 +80,12 @@ class FlipCardDeck extends HTMLElement {
         `;
     this.#root.adoptedStyleSheets = [sheet];
     this.#installObserver();
+
+    if (!this.hasAttribute('show-card')) {
+      const firstCard = this.querySelector(':scope > *[card-name]')?.getAttribute('card-name');
+      firstCard && this.showCard(firstCard);
+    }
+
     this.dataset.ready = true;
   }
 

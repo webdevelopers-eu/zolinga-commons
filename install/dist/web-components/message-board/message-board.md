@@ -25,7 +25,15 @@ this.broadcast('message', {
 
 The message payload object may contain the following properties:
 
-- `message` - the message to display
-- `type` - the message type. Can be `info`, `warning`, `error`, `success`
-- `timeout` - the time in milliseconds to display the message
-- `id` - the unique message identifier. If not provided, the message will be displayed as a new message. If provided, the existing message will be replaced with the new one.
+- `message` - Optional. The message to display
+- `type` - Optional. The message type. Can be `info`, `warning`, `error`, `success`
+- `timeout` - Optional. The time in milliseconds to display the message
+- `id` - Optional. The unique message identifier. If not provided, the message will be displayed as a new message. If provided, the existing message will be replaced with the new one.
+
+# Removing Existing Message
+
+If you want to remove a message just broadcast a new message with the same id that has `null` message.
+
+```javascript
+api.broadcast('message', {id});
+```

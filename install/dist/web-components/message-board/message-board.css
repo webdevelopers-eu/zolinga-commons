@@ -79,7 +79,7 @@
         &:where(.error, .warning, .success, .info) {
             background-color: color-mix(in oklab, var(--color-bg, white), var(--base-color) 20%);
             color: color-mix(in oklab, var(--color-fg, black), var(--base-color) 40%);
-            border-color: color-mix(in oklab, var(--color-fg, black),var(--base-color) 60%);
+            border-color: color-mix(in oklab, var(--color-bg, black), var(--base-color) 40%);
         }
     }
 }

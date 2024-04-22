@@ -83,7 +83,7 @@ class FlipCardDeck extends HTMLElement {
 
     if (!this.hasAttribute('show-card')) {
       const firstCard = this.querySelector(':scope > *[card-name]')?.getAttribute('card-name');
-      firstCard && this.showCard(firstCard);
+      firstCard && this.#doShowCard(firstCard);
     }
 
     this.dataset.ready = true;
@@ -115,9 +115,10 @@ class FlipCardDeck extends HTMLElement {
    * @param {string} newValue - The new value of the attribute.
    */
   attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
     switch (name) {
       case 'show-card':
-        this.showCard(newValue);
+        this.#doShowCard(newValue);
         break;
       case 'flip-speed':
         this.style.setProperty('--flip-speed', newValue + 's');
@@ -129,14 +130,17 @@ class FlipCardDeck extends HTMLElement {
   }
 
   async showCard(newCardName) {
-    // we are triggered primarily by the attribute change
-    if (this.getAttribute('show-card') !== newCardName) {
-      this.setAttribute('show-card', newCardName);
-      return;
-    }
+    this.setAttribute('show-card', newCardName);
+  }
 
+  async #doShowCard(newCardName) {
     const {newCard, oldCard, otherCards} = this.#getCards(newCardName);
     if (!newCard || newCard === oldCard) return;
+
+    // Trigger card-change event
+    this.dispatchEvent(new CustomEvent('show-card', {
+      detail: {cardName: newCardName}
+    }));
 
     return new Promise(async (resolve) => {
       await this.#obtainLock();

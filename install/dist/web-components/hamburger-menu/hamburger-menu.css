@@ -4,6 +4,7 @@
     max-width: 100%;
     width: 100%;
     contain: inline-size; /* so it does not cause horizontal scroll */
+    white-space: nowrap;
 
     &:not(.hamburger-ready) {
         visibility: hidden;

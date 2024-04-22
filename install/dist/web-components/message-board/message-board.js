@@ -2,11 +2,13 @@ import WebComponent from '/dist/system/lib/web-component.js';
 
 export default class MessageBoard extends WebComponent {
     #messages;
+    #initPromise;
 
     constructor() {
         super();
 
-        this.ready(this.#init());
+        this.listen('message', this.showMessage.bind(this));
+        this.ready(); // we init the board on first usage to save resources
     }
 
     async #init() {
@@ -15,10 +17,14 @@ export default class MessageBoard extends WebComponent {
             mode: 'seamless'
         });
         this.#messages = root.querySelector('.messages');
-        this.listen('message', this.showMessage.bind(this));
     }
 
-    showMessage({message = null, type = 'info', id = null, timeout = 0}) {
+    async showMessage({message = null, type = 'info', id = null, timeout = 0}) {
+        if (!this.initPromise) { // First use of the board - init it
+            this.initPromise = this.#init();
+        }
+        await this.initPromise;
+
         if (id) {
             this.#messages.querySelectorAll(`#${id}.message:not(.removing)`)
                 .forEach(this.#hideMessage.bind(this));

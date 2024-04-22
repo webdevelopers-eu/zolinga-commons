@@ -12,7 +12,7 @@ export default class MessageBoard extends WebComponent {
     async #init() {
         const contentURL = import.meta.url.replace('message-board.js', 'message-board.html');
         const root = await this.loadContent(contentURL, {
-            mode: 'open'
+            mode: 'seamless'
         });
         this.#messages = root.querySelector('.messages');
         this.listen('message', this.showMessage.bind(this));

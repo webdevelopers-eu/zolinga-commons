@@ -1,4 +1,4 @@
-:host {
+:host, *:where(message-board) {
     contain: size;
     --message-animation-duration: 0.32s;
 
@@ -8,7 +8,7 @@
     --message-info-color: #0c5460;
 }
 
-.messages {
+*:where(.messages) {
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -24,7 +24,7 @@
         display: none !important;
     }
 
-    &>.message {
+    &>:where(.message) {
         display: flex;
         position: relative;
         gap: 0.5rem;
@@ -64,16 +64,16 @@
             }
         }
 
-        &.error {
+        &:where(.error) {
             --base-color: var(--message-error-color);
         }
-        &.warning {
+        &:where(.warning) {
             --base-color: var(--message-warning-color);
         }
-        &.success {
+        &:where(.success) {
             --base-color: var(--message-success-color);
         }
-        &.info {
+        &:where(.info) {
             --base-color: var(--message-info-color);
         }
         &:where(.error, .warning, .success, .info) {

@@ -39,23 +39,23 @@ export default class ResourcesElement extends HTMLElement {
         resource += `?v=${this.#resources.revision}`;
         switch (resType) {
             case 'js':
-                const script = document.createElement('script');
-                script.src = resource;
-                el = this.appendChild(script);
+                el = document.createElement('script');
+                el.src = resource;
                 break;
             case 'css':
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = resource;
-                el = this.appendChild(link);
+                el = document.createElement('link');
+                el.rel = 'stylesheet';
+                el.href = resource;
                 break;
             default:
                 throw new Error(`Unknown resource type: ${resType}`);
         }
-        await new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             el.onload = resolve;
             el.onerror = reject;
         });
+        this.appendChild(el);
+        await promise;
     }
 
     #getAssetAtom(asset) {

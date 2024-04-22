@@ -16,37 +16,46 @@ export default class ResourcesElement extends HTMLElement {
     async #init() {
         this.#resources = await ResourcesElement.#resourcesPromise;
 
+        let promises = [];
         this.getAttribute('assets').split(/\s+/)
-            .forEach(asset => this.#appendAsset(asset));
+            .forEach(asset => promises.push(this.#appendAsset(asset)));
 
+        await Promise.all(promises);
         this.dataset.ready = true;
+        this.dispatchEvent(new CustomEvent('web-component-ready'));
     }
 
-    #appendAsset(asset) {
+    async #appendAsset(asset) {
+        let promises = [];
         const atom = this.#getAssetAtom(asset);
-        atom.dependencies.forEach(r => this.#appendAsset(r));
-        atom.resources.forEach(r => this.#appendResource(r));
-        const el = document.createElement(atom.tag);
+        atom.dependencies.forEach(r => promises.push(this.#appendAsset(r)));
+        atom.resources.forEach(r => promises.push(this.#appendResource(r)));
+        await Promise.all(promises);
     }
 
-    #appendResource(resource) {
+    async #appendResource(resource) {
         const resType = resource.split('.').pop();
+        let el;
         resource += `?v=${this.#resources.revision}`;
         switch (resType) {
             case 'js':
                 const script = document.createElement('script');
                 script.src = resource;
-                this.appendChild(script);
+                el = this.appendChild(script);
                 break;
             case 'css':
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
                 link.href = resource;
-                this.appendChild(link);
+                el = this.appendChild(link);
                 break;
             default:
                 throw new Error(`Unknown resource type: ${resType}`);
         }
+        await new Promise((resolve, reject) => {
+            el.onload = resolve;
+            el.onerror = reject;
+        });
     }
 
     #getAssetAtom(asset) {

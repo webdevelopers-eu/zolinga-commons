@@ -1,4 +1,4 @@
-import WebComponent from '/dist/system/lib/web-component.js';
+import WebComponent from '/dist/system/js/web-component.js';
 
 /**
  * Watch the element for overflow and add class "hamburger-active" if it is overflowing.
@@ -37,7 +37,11 @@ export default class HamburgerMenu extends WebComponent {
     this.#makeCanary();
     this.#updateOverflowClass();
 
-    this.addEventListener('click', (ev) => this.classList.toggle('hamburger-open'));
+    this.addEventListener('click', (ev) => {
+      if (this.matches('.hamburger-active')) {
+        this.classList.toggle('hamburger-open');
+      }
+    });
   }
 
   async installStyles() {

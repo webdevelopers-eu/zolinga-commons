@@ -14,7 +14,7 @@
             "description": "Initialize Zolinga web-components - warning: this works only for server-side <c-resources> rendering",
             "dependencies": [],
             "resources": [
-                "/dist/system/web-components.js"
+                "/dist/system/js/web-components.js"
             ]
         }
     ]

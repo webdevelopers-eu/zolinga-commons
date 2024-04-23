@@ -1,4 +1,4 @@
-import WebComponent from '/dist/system/lib/web-component.js';
+import WebComponent from '/dist/system/js/web-component.js';
 
 export default class MessageBoard extends WebComponent {
     #messages;

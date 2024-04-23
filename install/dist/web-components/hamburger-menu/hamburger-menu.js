@@ -45,7 +45,9 @@ export default class HamburgerMenu extends WebComponent {
   }
 
   async installStyles() {
+    const doc = this.getRootNode();
     const svg = document.createElement('div');
+
     svg.innerHTML = `
         <svg class="hamburger-icon" xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
             <path stroke='currentColor' stroke-linecap='round' stroke-width='2' d='M4 18h16M4 12h16M4 6h16'/>
@@ -53,20 +55,19 @@ export default class HamburgerMenu extends WebComponent {
     `;
     this.#hamburger = this.appendChild(svg.firstElementChild);
 
-    if (document.querySelector('#hamburger-styles')) {
-      return;
+    let promise = Promise.resolve();
+    if (!doc.querySelector('#hamburger-styles')) {
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = new URL(import.meta.url.replace(/\.js$/, '.css'));
+      style.id = 'hamburger-styles';
+
+      promise = new Promise((resolve) => {
+        style.addEventListener('load', resolve);
+      });
+
+      (doc.querySelector('head') || doc).appendChild(style);
     }
-
-    const style = document.createElement('link');
-    style.rel = 'stylesheet';
-    style.href = new URL(import.meta.url.replace(/\.js$/, '.css'));
-    style.id = 'hamburger-styles';
-
-    const promise = new Promise((resolve) => {
-      style.addEventListener('load', resolve);
-    });
-
-    document.head.appendChild(style);
 
     return promise;
   }

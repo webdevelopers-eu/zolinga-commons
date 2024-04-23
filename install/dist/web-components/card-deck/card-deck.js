@@ -43,6 +43,8 @@ class FlipCardDeck extends HTMLElement {
                 perspective: var(--flip-perspective, 600px);
                 justify-items: stretch;
                 align-items: stretch;
+                width: var(--card-deck-width, auto);
+                height: var(--card-deck-height, auto);
             }
             /* place all slotted children to the first cell */
             ::slotted(*) {
@@ -52,8 +54,8 @@ class FlipCardDeck extends HTMLElement {
                 transform-style: preserve-3d;
                 margin: 0px;
             }
-            ::slotted(*:not(.card-active, .card-deactivated)) {
-                transform: rotateY(-180deg);
+            ::slotted(*:not(.card-active, .card-inactive)) {
+                transform: rotateY(-180deg) var(--flip-transform-others, scale(0.5));
                 transition: margin var(--flip-speed-half) linear;
                 margin-top: 0%:
                 margin-left: 0%;
@@ -62,12 +64,12 @@ class FlipCardDeck extends HTMLElement {
                 visibility: hidden;
             }
             ::slotted(.card-active) {
-                transform: rotateY(0deg);
+                transform: rotateY(0deg) var(--flip-transform-active, scale(1));
                 transition: transform var(--flip-speed, 0.5s) linear, margin var(--flip-speed-half) linear;
                 margin: 0% 0% 0% 0%;
             }
-            ::slotted(.card-deactivated) {
-                transform: rotateY(180deg);
+            ::slotted(.card-inactive) {
+                transform: rotateY(180deg) var(--flip-transform-inactive, scale(0.5));
                 transition: transform var(--flip-speed, 0.5s) linear;
             }
         `);
@@ -147,7 +149,7 @@ class FlipCardDeck extends HTMLElement {
       newCard.classList.add('card-active');
 
       const callback = () => {
-        oldCard?.classList.remove('card-deactivated');
+        oldCard?.classList.remove('card-inactive');
         this.#releaseLock();
         resolve();
       };
@@ -162,7 +164,7 @@ class FlipCardDeck extends HTMLElement {
         resolve();
       }
 
-      oldCard?.classList.add('card-deactivated');
+      oldCard?.classList.add('card-inactive');
       oldCard?.classList.remove('card-active');
 
       otherCards.forEach((el) => el.classList.remove('card-active'));

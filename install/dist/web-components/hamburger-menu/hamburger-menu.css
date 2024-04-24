@@ -31,6 +31,10 @@
         & .hamburger-icon {
             display: none !important;
         }
+
+        & *:is(menu, ul, ol, nav):not(.hamburger-canary) .for-active {
+            display: none !important;
+        }
     }
 
     &.hamburger-active {
@@ -40,6 +44,10 @@
             display: none;
             background-color: var(--color-bg, white);
             border: 1px solid color-mix(in srgb, var(--color-fg, white) 20%, transparent);
+
+            & .for-inactive {
+                display: none !important;
+            }
         }
 
         &.hamburger-open {

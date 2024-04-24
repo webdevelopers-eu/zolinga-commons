@@ -36,8 +36,10 @@
     &.hamburger-active {
         position: relative;
 
-        &> *:is(menu, ul, li, nav):not(.hamburger-canary) {
+        &> *:is(menu, ul, ol, nav):not(.hamburger-canary) {
             display: none;
+            background-color: var(--color-bg, white);
+            border: 1px solid color-mix(in srgb, var(--color-fg, white) 20%, transparent);
         }
 
         &.hamburger-open {
@@ -49,12 +51,32 @@
                 inset: 0px;
             }
 
-            &> *:is(menu, ul, li, nav):not(.hamburger-canary) {
+            &> *:is(menu, ul, ol, nav):not(.hamburger-canary) {
                 position: absolute;
                 top: 100%;
                 display: flex;
                 flex-direction: column;
                 z-index: 100;
+                gap: 0px;
+                align-items: stretch;
+                list-style: none;
+                margin: 0px;
+                padding: 0px;
+                font: inherit;
+
+                &> li {
+                    padding: 0.8em 2em;
+                    text-align: start;
+                    margin: 0px;
+
+                    &:hover {
+                        background-color: color-mix(in srgb, var(--color-fg, white) 20%, transparent);
+
+                        & a {
+                            text-decoration: none !important;
+                        }
+                    }
+                }
             }
         }
     }

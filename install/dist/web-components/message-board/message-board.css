@@ -35,12 +35,12 @@
         border-style: solid;
         border-width: 1px;
         background-color: #f5f5f5;
-        box-shadow: 4px 0 8px rgba(0, 0, 0, 0.6);
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.6);
         animation-name: message-in;
         animation-duration: var(--message-animation-duration, 0.5s);
         animation-timing-function: ease-in-out;
         width: 100%;
-        max-width: var(--content-width, 1024px);
+        max-width: calc(var(--content-width, 1024px) - 2em);
 
         &.removing {
             animation-name: message-out;

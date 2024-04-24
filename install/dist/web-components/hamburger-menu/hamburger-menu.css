@@ -65,17 +65,22 @@
                 font: inherit;
 
                 &> li {
-                    padding: 0.8em 2em;
                     text-align: start;
                     margin: 0px;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: stretch;
 
                     &:hover {
                         background-color: color-mix(in srgb, var(--color-fg, white) 20%, transparent);
-
-                        & a {
-                            text-decoration: none !important;
-                        }
                     }
+
+                    & a {
+                        flex: 1 1 auto;
+                        padding: 0.8em 2em;
+                        text-decoration: none !important;
+                    }
+
                 }
             }
         }

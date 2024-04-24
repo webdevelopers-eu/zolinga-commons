@@ -2,6 +2,11 @@ import WebComponent from '/dist/system/js/web-component.js';
 
 /**
  * Watch the element for overflow and add class "hamburger-active" if it is overflowing.
+ * 
+ * Special supported classes:
+ * 
+ *  .for-active - visible only when hamburger is active and menu is collapsed into pull down menu
+ *  .for-inactive - visible only when hamburger is inactive and menu is displayed in full width
  *
  * @author Daniel Sevcik <sevcik@zolinga.net>
  * @since 2024-04-06

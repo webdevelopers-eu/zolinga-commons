@@ -43,7 +43,8 @@
         &> *:is(menu, ul, ol, nav):not(.hamburger-canary) {
             display: none;
             background-color: var(--color-bg, white);
-            border: 1px solid color-mix(in srgb, var(--color-fg, white) 20%, transparent);
+            border: 1px solid color-mix(in srgb, var(--color-fg, white) 40%, transparent);
+            border-radius: var(--radius, 5px);
 
             & .for-inactive {
                 display: none !important;

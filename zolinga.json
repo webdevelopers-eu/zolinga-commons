@@ -19,6 +19,11 @@
             "method": "onInstall",
             "origin": ["internal"],
             "priority": 0.1
+        },
+        {
+            "description": "Various URL-related functions.",
+            "service": "url",
+            "class": "Zolinga\\Commons\\UrlService"
         }
     ],
     "emit": [],

@@ -133,11 +133,15 @@ class Email
      */
     public function __construct($subject = false, $text = false, $html = false)
     {
-        if (@$_SERVER["HTTP_HOST"]) {
-            [$this->httpHost] = explode(':', $_SERVER["HTTP_HOST"]);
+        global $api;
+
+        if ($_SERVER["HTTP_HOST"] ?? false) {
+            [$this->httpHost] = explode(':', $_SERVER["HTTP_HOST"] ?? '');
+        } else {
+            $this->httpHost = 'localhost';
         }
 
-        $this->htmlBaseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http') . '://' . (@$_SERVER["HTTP_HOST"] ?: 'localhost') . (@$_SERVER["REQUEST_URI"] ?: '/');
+        $this->htmlBaseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http') . '://' . $this->httpHost . ($_SERVER["REQUEST_URI"] ?? '/');
         $this->boundary = $this->mkUniqueId('E2Email-Boundary-');
         $this->messageId = $this->mkUniqueId();
         $this->rootHeaders[] = array('Message-ID', '<' . $this->messageId . '>');
@@ -702,7 +706,7 @@ class Email
     private function notifyAdmin($subject, $message)
     {
         //$mail='info@'.preg_replace('/^(www\d*)\./', '', strtolower($this->httpHost));
-        $mail = 'error@' . $_SERVER['HTTP_HOST'];
+        $mail = 'error@' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
         return mail($mail, $subject, $message);
     }
 

@@ -24,6 +24,11 @@
             "description": "Various URL-related functions.",
             "service": "url",
             "class": "Zolinga\\Commons\\UrlService"
+        },
+        {
+            "description": "Various conversion and formatting functions.",
+            "service": "convert",
+            "class": "Zolinga\\Commons\\ConvertService"
         }
     ],
     "emit": [],

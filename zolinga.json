@@ -8,6 +8,11 @@
     "attributes": {},
     "listen": [
         {
+            "description": "PingJoe monitoring service.",
+            "service": "pingjoe",
+            "class": "Zolinga\\Commons\\PingJoe\\PingJoeService"
+        },
+        {
             "event": "cms:content:c-resources",
             "class": "Zolinga\\Commons\\Resources\\ResourcesElement",
             "method": "onResources",
@@ -57,5 +62,11 @@
     "autoload": {
         "\\Zolinga\\Commons\\": "src/"
     },
-    "config": {}
+    "config": {
+        "# pingjoe": "PingJoe monitoring service. Register for free at https://pingjoe.com/ to get your user and password.",
+        "pingjoe": {
+            "user": "",
+            "password": ""
+        }
+    }
 }

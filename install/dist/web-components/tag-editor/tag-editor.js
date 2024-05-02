@@ -283,7 +283,7 @@ export default class TagEditor extends HTMLElement {
                         content: '';
                         position: fixed;
                         inset: 0px;
-                        backdrop-filter: brightness(0.9) saturate(0.3);
+                        z-index: 100;
                     }
 
                     &:not(.removing) > .remove-confirm {
@@ -297,7 +297,7 @@ export default class TagEditor extends HTMLElement {
                         text-align: center;
                         background-color: darkred;
                         color: white;
-                        z-index: 10;
+                        z-index: 100;
                         cursor: pointer;
                         display: flex;
                         align-items: center;

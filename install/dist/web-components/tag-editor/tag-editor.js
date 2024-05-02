@@ -58,7 +58,7 @@ export default class TagEditor extends HTMLElement {
             this.setValue(this.#editor.textContent);
         });
 
-        this.querySelector('.remove').addEventListener('click', () => {
+        this.querySelector('.remove').addEventListener('click', (event) => {
             this.#confirmRemoval();
         });
 
@@ -67,7 +67,7 @@ export default class TagEditor extends HTMLElement {
             this.focus();
         });
 
-        this.querySelector('.remove-confirm').addEventListener('click', () => {
+        this.querySelector('.remove-confirm').addEventListener('click', (event) => {
             this.#remove();
         });
 
@@ -123,7 +123,9 @@ export default class TagEditor extends HTMLElement {
     #confirmRemoval() {
         this.classList.add('removing');
         document.body.addEventListener('click', (event) => {
-            if (event.target !== this && !this.contains(event.target)) {
+            if (event.target.matches(':invalid')) { // browser triggers click on first invalid input in the form?
+                this.#confirmRemoval();
+            } else if (event.target !== this && !this.contains(event.target)) {
                 this.classList.remove('removing');
             }
         }, { once: true, capture: true });

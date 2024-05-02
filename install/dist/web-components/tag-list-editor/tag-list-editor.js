@@ -4,6 +4,9 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
  * Tag list editor - allows editing of list of tags.
  * 
  * <tag-list-editor [max="number"] [name="name"] [readonly] [no-remove] [no-edit]>TAGS...</tag-list-editor>
+ * 
+ * @author Daniel Sevcik <danny@zolinga.net>
+ * @date 2024-05-02
  */
 export default class TagListEditor extends HTMLElement {
     #root;
@@ -80,6 +83,7 @@ export default class TagListEditor extends HTMLElement {
 
         const tag = document.createElement('tag-editor');
         this.appendChild(tag);
+        tag.setAttribute('autofocus', 'true');
         this.#propagateAttributes();
         tag.focus();
     }
@@ -112,7 +116,6 @@ export default class TagListEditor extends HTMLElement {
                     cursor: pointer;
 
                     & .text {
-                        font-style: italic;
                         opacity: 0.5;    
                     }
 

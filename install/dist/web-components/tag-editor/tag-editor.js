@@ -4,6 +4,9 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
  * Tag editor - allows editing of tags that are displayed as pills.
  * 
  * <tag-editor [value="VALUE"] [name="name"] [autofocus] [readonly] [no-remove] [no-edit]>VALUE</tag-editor>
+ * 
+ * @author Daniel Sevcik <danny@zolinga.net>
+ * @date 2024-05-02
  */
 export default class TagEditor extends HTMLElement {
     #input;
@@ -172,7 +175,7 @@ export default class TagEditor extends HTMLElement {
                     display: inline-grid;
                     grid-template-columns: 0px [main-start] auto [main-end remove-start] auto [remove-end];
                     border-radius: var(--radius, 3px);
-                    background-color: color-mix(in srgb, var(--color-fg, #f0f0f0), transparent);
+                    background-color: color-mix(in srgb, var(--color-primary, #f0f0f0) 70%, transparent);
                     color: var(--color-bg, #333);
                     min-height: 1lh;
                     padding: 0px;
@@ -238,7 +241,7 @@ export default class TagEditor extends HTMLElement {
                     }
 
                     &:hover, &:focus-within {
-                        background-color: color-mix(in srgb, var(--color-fg, #f0f0f0) 70%, transparent);
+                        background-color: color-mix(in srgb, var(--color-primary, #f0f0f0) 100%, transparent);
                     }
                 }
             `;

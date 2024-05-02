@@ -23,3 +23,13 @@ The editor will automatically create hidden `<input>` element with the same name
 - `readonly` - if present the tag will be displayed as a read-only pill without the remove icon and ability to edit or remove the tag. Same as setting `no-edit` and `no-remove` at the same time.
 - `no-edit` - if present the tag will be displayed as a read-only pill with the remove icon but without the ability to edit the tag.
 - `no-remove` - if present the tag will be displayed as an editable pill without the remove icon.
+
+## Example
+
+```html
+<form>
+  <tag-editor name="tags[]">tag1</tag-editor>
+  <tag-editor name="tags[]">tag2</tag-editor>
+  <tag-editor name="tags[]">tag3</tag-editor>
+</form>
+```

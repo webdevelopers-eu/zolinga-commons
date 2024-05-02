@@ -110,13 +110,11 @@ export default class TagEditor extends HTMLElement {
     }
 
     validate() {
+        this.#input.setCustomValidity('');
         if (this.#input.validity.valid) {
             return true;
         } else {
-            this.#input.focus();
-            if (this.hasAttribute('errormsg')) {
-                this.#input.setCustomValidity(this.getAttribute('errormsg'));
-            }
+            this.#input.setCustomValidity(this.getAttribute('validation-error') || "");
             this.#input.reportValidity();
             return false;
         }
@@ -207,9 +205,6 @@ export default class TagEditor extends HTMLElement {
                     break;
                 case 'type':
                     this.#input.type = newValue;
-                    break;
-                case 'validation-error':
-                    this.#input.setCustomValidity(newValue);
                     break;
             }
         });

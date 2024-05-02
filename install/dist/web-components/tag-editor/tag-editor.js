@@ -11,6 +11,7 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
 export default class TagEditor extends HTMLElement {
     #input;
     #editor;
+    #removeButton;
     #resolve;
     #readyPromise = new Promise((resolve) => { this.#resolve = resolve; });
     // #internals;
@@ -42,6 +43,7 @@ export default class TagEditor extends HTMLElement {
         this.#input.value = value;
         this.#editor = this.querySelector('.editor');
         this.#editor.textContent = value;
+        this.#removeButton = this.querySelector('.remove-confirm');
 
         this.setValue(value);
 
@@ -67,7 +69,7 @@ export default class TagEditor extends HTMLElement {
             this.focus();
         });
 
-        this.querySelector('.remove-confirm').addEventListener('click', (event) => {
+        this.#removeButton.addEventListener('click', (event) => {
             this.#remove();
         });
 
@@ -123,9 +125,9 @@ export default class TagEditor extends HTMLElement {
     #confirmRemoval() {
         this.classList.add('removing');
         document.body.addEventListener('click', (event) => {
-            if (event.target.matches(':invalid')) { // browser triggers click on first invalid input in the form?
+            if (event.target.matches(':invalid, input, textarea, select')) { // browser triggers click on first invalid input in the form?
                 this.#confirmRemoval();
-            } else if (event.target !== this && !this.contains(event.target)) {
+            } else if (event.target !== this.#removeButton && !this.#removeButton.contains(event.target)) {
                 this.classList.remove('removing');
             }
         }, { once: true, capture: true });
@@ -277,6 +279,13 @@ export default class TagEditor extends HTMLElement {
                         }
                     }
 
+                    &.removing::before {
+                        content: '';
+                        position: fixed;
+                        inset: 0px;
+                        backdrop-filter: brightness(0.9) saturate(0.3);
+                    }
+
                     &:not(.removing) > .remove-confirm {
                         display: none;
                     }
@@ -288,7 +297,7 @@ export default class TagEditor extends HTMLElement {
                         text-align: center;
                         background-color: darkred;
                         color: white;
-                        z-index: 1;
+                        z-index: 10;
                         cursor: pointer;
                         display: flex;
                         align-items: center;

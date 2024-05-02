@@ -1,4 +1,4 @@
-import {gettext, ngettext} from "/dist/zolinga-intl/gettext.js?zolinga-commons";
+import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons";
 
 /**
  * Tag editor - allows editing of tags that are displayed as pills.
@@ -24,10 +24,8 @@ export default class TagEditor extends HTMLElement {
         this.innerHTML = `
         <input type="hidden" />
         <div class="editor" contenteditable="true" spellcheck="false"></div>
-        <div class="remove-confirm">Remove?</div>
-        <div class="actions">
-            <div class="remove">⨯</div>
-        </div>
+        <div class="remove-confirm action">${gettext("Remove?")}</div>
+        <div class="remove action">⨯</div>
         `;
 
         this.#input = this.querySelector('input[type="hidden"]');
@@ -53,6 +51,19 @@ export default class TagEditor extends HTMLElement {
         this.querySelector('.remove-confirm').addEventListener('click', () => {
             this.remove();
         });
+
+        // Intercept all TAB, ENTER, and COMMA keys
+        this.#editor.addEventListener('keydown', (event) => {
+            if (event.key === 'Tab' || event.key === 'Enter' || event.key === ',') {
+                event.preventDefault();
+                this.#editor.blur();
+            }
+        });
+        // Watch editor for any elements and remove them using mutation observer
+        const observer = new MutationObserver((mutations) => {
+            this.#editor.textContent = this.#editor.textContent.trim();
+        });
+        observer.observe(this.#editor, { childList: true });
     }
 
     #confirmRemoval() {
@@ -61,10 +72,12 @@ export default class TagEditor extends HTMLElement {
             if (event.target !== this && !this.contains(event.target)) {
                 this.classList.remove('removing');
             }
-        }, {once: true, capture: true});
+        }, { once: true, capture: true });
     }
 
     setValue(value) {
+        value = value.trim();
+        
         if (this.#input.value !== value) {
             this.#input.value = value;
         }
@@ -98,7 +111,7 @@ export default class TagEditor extends HTMLElement {
             el.textContent = `
                 tag-editor {
                     display: inline-grid;
-                    grid-template-columns: auto auto;
+                    grid-template-columns: 0px [main-start] auto [main-end remove-start] auto [remove-end];
                     border-radius: var(--radius, 3px);
                     background-color: color-mix(in srgb, var(--color-fg, #f0f0f0), transparent);
                     color: var(--color-bg, #333);
@@ -106,7 +119,8 @@ export default class TagEditor extends HTMLElement {
                     padding: 0px;
                     margin: 1px;
                     max-width: 100%;
-                    gap: 0px;
+                    gap: .5em;
+                    overflow: hidden;
 
                     &> .editor {
                         outline: none !important;
@@ -117,24 +131,23 @@ export default class TagEditor extends HTMLElement {
                         overflow: hidden;
                         word-wrap: break-word;
                         white-space: normal;
-                        margin: 0px 0.5em;
+                        margin: 0px;
                         cursor: text;
-                        grid-column: 1 / span 1;
+                        grid-column: main-start / main-end;
                         grid-row: 1 / span 1;
                     }
 
-                    &> .actions {
-                        grid-column: 2 / span 1;
+                    &> .remove {
+                        grid-column: remove-start / remove-end;
                         grid-row: 1 / span 1;
+                        cursor: pointer;
+                        padding: 0px 0.2em;
+                        opacity: 0.5;
 
-                        &> * {
-                            cursor: pointer;
-                            margin: 0px 0.5em 0px 0px;
-                            opacity: 0.5;
-
-                            &:hover {
-                                opacity: 1;
-                            }
+                        &:hover {
+                            opacity: 1;
+                            background-color: darkred;
+                            color: white;
                         }
                     }
 
@@ -143,18 +156,17 @@ export default class TagEditor extends HTMLElement {
                     }
 
                     &> .remove-confirm {
-                        grid-column: 1 / span 2;
+                        grid-column: 1 / -1;
                         grid-row: 1 / span 1;
                         padding: 0em 0.5em;
                         text-align: center;
                         background-color: var(--color-secondary, orange);
                         color: var(--color-bg, white);
                         z-index: 1;
-                        border-radius: var(--radius, 3px);
                         cursor: pointer;
                     }
 
-                    &[readonly] .actions > * {
+                    &[readonly] > .action {
                         display: none;
                     }
 

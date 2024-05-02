@@ -19,6 +19,7 @@ export default class TagListEditor extends HTMLElement {
 
     async #init() {
         this.#root = this.attachShadow({ mode: 'open' });
+        // .trap is good for TAB navigation - when it lands there we create new tag
         this.#root.innerHTML = `
             <slot></slot>
             <span class="add">
@@ -114,6 +115,7 @@ export default class TagListEditor extends HTMLElement {
                 }
                 .add {
                     cursor: pointer;
+                    display: inline-block;
 
                     & .text {
                         opacity: 0.5;    

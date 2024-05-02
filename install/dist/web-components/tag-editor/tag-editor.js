@@ -21,7 +21,7 @@ export default class TagEditor extends HTMLElement {
         const value = this.getAttribute('value') || this.textContent;
 
         this.innerHTML = `
-        <input type="hidden" />
+        <input role="tag" class="input-tag" type="hidden" />
         <div class="editor" contenteditable="true" spellcheck="false"></div>
         <div class="remove-confirm action">${gettext("Remove?")}</div>
         <div class="remove action">⨯</div>
@@ -84,6 +84,14 @@ export default class TagEditor extends HTMLElement {
 
     get value() {
         return this.#input.value;
+    }
+
+    set name(value) {
+        this.setAttribute('name', value);
+    }
+
+    get name() {
+        return this.getAttribute('name');
     }
 
     setValue(value) {

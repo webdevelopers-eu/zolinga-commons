@@ -37,5 +37,6 @@ The editor will automatically create hidden `<input>` element with the same name
 ## Methods and Properties
 
 - `element.value` - set/get the value of the tag
+- `element.name` - set/get the name of the tag
 - `element.focus()` - focus the tag editor
 

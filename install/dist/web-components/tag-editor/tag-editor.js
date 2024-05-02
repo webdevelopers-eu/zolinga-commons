@@ -3,13 +3,12 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
 /**
  * Tag editor - allows editing of tags that are displayed as pills.
  * 
- * <tag-editor [value="text"] [name="name"] [readonly]></tag-editor>
- * <tag-editor [name="name"] [readonly]>text</tag-editor>
+ * <tag-editor [value="VALUE"] [name="name"] [readonly] [no-remove] [no-edit]>VALUE</tag-editor>
  */
 export default class TagEditor extends HTMLElement {
     #input;
     #editor;
-    static observedAttributes = ['value', 'name', 'readonly'];
+    static observedAttributes = ['value', 'name', 'readonly', 'no-edit', 'no-remove'];
 
 
     constructor() {
@@ -91,6 +90,7 @@ export default class TagEditor extends HTMLElement {
 
     attributeChangedCallback(name, oldValue, newValue) {
         switch (name) {
+            case 'no-edit':
             case 'readonly':
                 this.#editor.setAttribute('contenteditable', newValue === null ? 'true' : 'false');
                 break;
@@ -160,13 +160,13 @@ export default class TagEditor extends HTMLElement {
                         grid-row: 1 / span 1;
                         padding: 0em 0.5em;
                         text-align: center;
-                        background-color: var(--color-secondary, orange);
-                        color: var(--color-bg, white);
+                        background-color: darkred;
+                        color: white;
                         z-index: 1;
                         cursor: pointer;
                     }
 
-                    &[readonly] > .action {
+                    &:is([readonly], [no-remove]) > .action {
                         display: none;
                     }
 

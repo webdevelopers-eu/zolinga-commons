@@ -57,11 +57,19 @@
             "tag": "message-board",
             "description": "Message board.",
             "module": "web-components/message-board/message-board.js"
+        },
+        {
+            "tag": "tag-editor",
+            "description": "Pill-like editable tag.",
+            "module": "web-components/tag-editor/tag-editor.js"
         }
     ],
     "autoload": {
         "\\Zolinga\\Commons\\": "src/"
     },
+    "dependencies": [
+        "zolinga-intl"
+    ],
     "config": {
         "# pingjoe": "PingJoe monitoring service. Register for free at https://pingjoe.com/ to get your user and password.",
         "pingjoe": {

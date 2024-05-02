@@ -74,6 +74,18 @@ export default class TagEditor extends HTMLElement {
         }, { once: true, capture: true });
     }
 
+    focus() {
+        this.#editor.focus();
+    }
+
+    set value(value) {
+        this.setValue(value);
+    }
+
+    get value() {
+        return this.#input.value;
+    }
+
     setValue(value) {
         value = value.trim();
         
@@ -164,6 +176,9 @@ export default class TagEditor extends HTMLElement {
                         color: white;
                         z-index: 1;
                         cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                     }
 
                     &:is([readonly], [no-remove]) > .action {

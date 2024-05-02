@@ -33,3 +33,9 @@ The editor will automatically create hidden `<input>` element with the same name
   <tag-editor name="tags[]">tag3</tag-editor>
 </form>
 ```
+
+## Methods and Properties
+
+- `element.value` - set/get the value of the tag
+- `element.focus()` - focus the tag editor
+

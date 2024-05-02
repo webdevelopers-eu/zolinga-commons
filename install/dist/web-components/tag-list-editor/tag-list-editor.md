@@ -6,8 +6,15 @@ This web component allows you to edit and remove multiple [<tag-editor>](:ref:wc
 
 ```html
 <tag-list-editor 
-    [name="{NAME}"] 
-    [max="{MAX}"]
+    [name="{NAME}"]
+    [type="{TYPE}"] 
+    [max-tags="{MAX}"]
+    [pattern="{PATTERN}"]
+    [minlength="{MIN_LENGTH}"]
+    [maxlength="{MAX_LENGTH}"]
+    [min="{MIN_NUMBER}"]
+    [max="{MAX_NUMBER}"]
+    [step="{STEP}"]
     [readonly]
     [no-edit]
     [no-remove]

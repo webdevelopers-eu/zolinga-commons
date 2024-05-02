@@ -3,14 +3,14 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
 /**
  * Tag list editor - allows editing of list of tags.
  * 
- * <tag-list-editor [max="number"] [name="name"] [readonly] [no-remove] [no-edit]>TAGS...</tag-list-editor>
+ * <tag-list-editor [max-tags="number"] [name="name"] [readonly] [no-remove] [no-edit]>TAGS...</tag-list-editor>
  * 
  * @author Daniel Sevcik <danny@zolinga.net>
  * @date 2024-05-02
  */
 export default class TagListEditor extends HTMLElement {
     #root;
-    static observedAttributes = ['name', 'readonly', 'no-edit', 'no-remove'];
+    static observedAttributes = ['name', 'readonly', 'type', 'no-edit', 'no-remove', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'];
 
     constructor() {
         super();
@@ -53,11 +53,10 @@ export default class TagListEditor extends HTMLElement {
     #propagateAttributes() {
         this.querySelectorAll('tag-editor')
             .forEach(tag => {
-                ['readonly', 'no-edit', 'no-remove'].forEach(attr => {
-                    if (this.hasAttribute(attr)) tag.setAttribute(attr, '');
-                    else tag.removeAttribute(attr);
+                ['readonly', 'name', 'no-edit', 'no-remove', 'type', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'].forEach(attr => {
+                    if (this.hasAttribute(attr)) tag.setAttribute(attr, this.getAttribute(attr));
+                    else if (attr !== 'type') tag.removeAttribute(attr);
                 });
-                tag.setAttribute('name', this.getAttribute('name'));
             });
     }
 
@@ -71,7 +70,7 @@ export default class TagListEditor extends HTMLElement {
     }
 
     #isMaxReached() {
-        const max = parseInt(this.getAttribute('max') || 0);
+        const max = parseInt(this.getAttribute('max-tags') || 0);
         const count = parseInt(this.getAttribute('count') || 0);
         return max && count >= max;
     }

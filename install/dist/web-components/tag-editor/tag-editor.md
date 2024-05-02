@@ -9,7 +9,14 @@ The editor will automatically create hidden `<input>` element with the same name
 ```html
 <tag-editor 
     [name="{NAME}"] 
-    [value="{VALUE}"] 
+    [value="{VALUE}"]
+    [type="{TYPE}"]
+    [pattern="{PATTERN}"]
+    [minlength="{MIN_LENGTH}"]
+    [maxlength="{MAX_LENGTH}"]
+    [min="{MIN_NUMBER}"]
+    [max="{MAX_NUMBER}"]
+    [step="{STEP}"]
     [readonly]
     [no-edit]
     [no-remove]
@@ -25,6 +32,7 @@ The editor will automatically create hidden `<input>` element with the same name
 - `no-edit` - if present the tag will be displayed as a read-only pill with the remove icon but without the ability to edit the tag.
 - `no-remove` - if present the tag will be displayed as an editable pill without the remove icon.
 - `autofocus` - place the cursor in the input field when the page is loaded.
+- `{PATTERN}` - a regular expression pattern that the tag must match. If the tag does not match the pattern it will be displayed as invalid and the form will not be submitted.
 
 ## Example
 

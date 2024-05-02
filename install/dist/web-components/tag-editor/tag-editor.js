@@ -14,7 +14,7 @@ export default class TagEditor extends HTMLElement {
     #resolve;
     #readyPromise = new Promise((resolve) => { this.#resolve = resolve; });
     // #internals;
-    static observedAttributes = ['value', 'name', 'readonly', 'no-edit', 'no-remove'];
+    static observedAttributes = ['value', 'name', 'readonly', 'type', 'no-edit', 'no-remove', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'];
 
 
     constructor() {
@@ -32,7 +32,7 @@ export default class TagEditor extends HTMLElement {
         const value = this.getAttribute('value') || this.textContent;
 
         this.innerHTML = `
-        <input role="tag" class="input-tag" type="hidden" />
+        <input role="tag" class="input-tag" type="hidden" tabindex="-1" required />
         <div class="editor" contenteditable="true" spellcheck="false"></div>
         <div class="remove-confirm action">${gettext("Remove?")}</div>
         <div class="remove action">⨯</div>
@@ -62,8 +62,18 @@ export default class TagEditor extends HTMLElement {
             this.#confirmRemoval();
         });
 
+        // On validation it is focused and error displayed
+        this.#input.addEventListener('keydown', (event) => {
+            this.focus();
+        });
+
         this.querySelector('.remove-confirm').addEventListener('click', () => {
             this.#remove();
+        });
+
+        // On blur run validation on this.#input
+        this.#editor.addEventListener('blur', () => {
+            this.#input.reportValidity();
         });
 
         // Intercept all TAB, ENTER, and COMMA keys
@@ -161,6 +171,27 @@ export default class TagEditor extends HTMLElement {
                 case 'name':
                     this.#input.name = newValue;
                     break;
+                case 'pattern':
+                    this.#input.pattern = newValue;
+                    break;
+                case 'min':
+                    this.#input.min = newValue;
+                    break;
+                case 'max':
+                    this.#input.max = newValue;
+                    break;
+                case 'step':
+                    this.#input.step = newValue;
+                    break;
+                case 'minlength':
+                    this.#input.minLength = newValue;
+                    break;
+                case 'maxlength':
+                    this.#input.maxLength = newValue;
+                    break;
+                case 'type':
+                    this.#input.type = newValue;
+                    break;
             }
         });
     }
@@ -183,6 +214,21 @@ export default class TagEditor extends HTMLElement {
                     max-width: 100%;
                     gap: .5em;
                     overflow: hidden;
+                    position: relative;
+
+                    &:has(input:invalid):not(:focus-within) {
+                        outline: 2px solid red;
+                    }
+
+                    & .input-tag {
+                        opacity: 0;
+                        position: absolute;
+                        pointer-events: none;
+                        width: 0px;
+                        height: 0px;
+                        bottom: 0px;
+                        left: 50%;
+                    }
 
                     &[value=""] .editor::before {
                         content: '...';

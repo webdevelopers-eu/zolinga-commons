@@ -84,7 +84,7 @@ export default class TagEditor extends HTMLElement {
                 } else {
                     this.classList.remove('removing');
                 }
-            } else if (event.key === 'Tab' || event.key === 'Enter' || event.key === ',') {
+            } else if (event.key === 'Tab' || event.key === 'Enter') {
                 if (this.validate()) {
                     this.#editor.blur();
                 } else {

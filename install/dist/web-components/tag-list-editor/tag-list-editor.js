@@ -61,12 +61,14 @@ export default class TagListEditor extends HTMLElement {
     }
 
     #addListeners() {
-        this.#root.querySelector('.add').addEventListener('click', () => {
-            this.#addNewTag();
-        });
-        this.#root.querySelector('.trap').addEventListener('focus', () => {
-            this.#root.querySelector('.add').click();
-        });
+        this.#root.querySelector('.add')
+            .addEventListener('click', (event) => {
+                this.#addNewTag();
+            });
+        this.#root.querySelector('.trap')
+            .addEventListener('focus', (event) => {
+                this.#root.querySelector('.add').click();
+            });
     }
 
     #isMaxReached() {

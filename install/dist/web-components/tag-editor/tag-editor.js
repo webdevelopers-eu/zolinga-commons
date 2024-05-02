@@ -33,7 +33,7 @@ export default class TagEditor extends HTMLElement {
         const value = this.getAttribute('value') || this.textContent;
 
         this.innerHTML = `
-        <input role="tag" class="input-tag" type="text" tabindex="-1" required />
+        <input role="tag" class="input-tag" type="hidden" tabindex="-1" required />
         <div class="editor" contenteditable="true" spellcheck="false"></div>
         <div class="remove-confirm action">${gettext("Remove?")}</div>
         <div class="remove action">⨯</div>
@@ -212,7 +212,10 @@ export default class TagEditor extends HTMLElement {
                     this.#input.maxLength = newValue;
                     break;
                 case 'type':
-                    this.#input.type = newValue;
+                    // When type!="hidden" there is a problem with focus - 
+                    // clicking on the second focuses the first, don't know why
+                    // it fires "click" event on the first tag's <input> element
+                    this.#input.type = newValue === 'text' ? 'hidden' : newValue;
                     break;
             }
         });

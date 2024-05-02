@@ -3,7 +3,7 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
 /**
  * Tag editor - allows editing of tags that are displayed as pills.
  * 
- * <tag-editor [value="VALUE"] [name="name"] [autofocus] [readonly] [no-remove] [no-edit]>VALUE</tag-editor>
+ * <tag-editor [errormsg="ERROR"] [value="VALUE"] [name="name"] [autofocus] [readonly] [no-remove] [no-edit]>VALUE</tag-editor>
  * 
  * @author Daniel Sevcik <danny@zolinga.net>
  * @date 2024-05-02
@@ -14,7 +14,7 @@ export default class TagEditor extends HTMLElement {
     #resolve;
     #readyPromise = new Promise((resolve) => { this.#resolve = resolve; });
     // #internals;
-    static observedAttributes = ['value', 'name', 'readonly', 'type', 'no-edit', 'no-remove', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'];
+    static observedAttributes = ['value', 'name', 'readonly', 'type', 'validation-error', 'no-edit', 'no-remove', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'];
 
 
     constructor() {
@@ -73,7 +73,7 @@ export default class TagEditor extends HTMLElement {
 
         // On blur run validation on this.#input
         this.#editor.addEventListener('blur', () => {
-            this.#input.reportValidity();
+            this.validate();
         });
 
         // Intercept all TAB, ENTER, and COMMA keys
@@ -85,8 +85,11 @@ export default class TagEditor extends HTMLElement {
                     this.classList.remove('removing');
                 }
             } else if (event.key === 'Tab' || event.key === 'Enter' || event.key === ',') {
-                //event.preventDefault();
-                this.#editor.blur();
+                if (this.validate()) {
+                    this.#editor.blur();
+                } else {
+                    event.preventDefault();
+                }
             }
             // Backspace on empty editor should remove the tag
             if (event.key === 'Backspace' && this.#editor.textContent === '') {
@@ -96,14 +99,27 @@ export default class TagEditor extends HTMLElement {
         // Watch editor for any elements and remove them using mutation observer
         const observer = new MutationObserver((mutations) => {
             // Filter only element additions and removals
-            const filtered = mutations.filter(m => 
+            const filtered = mutations.filter(m =>
                 Array.from(m.addedNodes).some(n => n.nodeType === Node.ELEMENT_NODE) ||
                 Array.from(m.removedNodes).some(n => n.nodeType === Node.ELEMENT_NODE)
             );
             if (filtered.length === 0) return;
             this.#editor.textContent = this.#editor.textContent.trim();
         });
-        observer.observe(this.#editor, { childList: true, subtree: false,  });
+        observer.observe(this.#editor, { childList: true, subtree: false, });
+    }
+
+    validate() {
+        if (this.#input.validity.valid) {
+            return true;
+        } else {
+            this.#input.focus();
+            if (this.hasAttribute('errormsg')) {
+                this.#input.setCustomValidity(this.getAttribute('errormsg'));
+            }
+            this.#input.reportValidity();
+            return false;
+        }
     }
 
     #confirmRemoval() {
@@ -191,6 +207,9 @@ export default class TagEditor extends HTMLElement {
                     break;
                 case 'type':
                     this.#input.type = newValue;
+                    break;
+                case 'validation-error':
+                    this.#input.setCustomValidity(newValue);
                     break;
             }
         });

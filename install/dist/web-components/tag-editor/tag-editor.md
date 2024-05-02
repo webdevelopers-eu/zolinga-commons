@@ -11,6 +11,7 @@ The editor will automatically create hidden `<input>` element with the same name
     [name="{NAME}"] 
     [value="{VALUE}"]
     [type="{TYPE}"]
+    [validation-error="{ERROR_MESSAGE}"]
     [pattern="{PATTERN}"]
     [minlength="{MIN_LENGTH}"]
     [maxlength="{MAX_LENGTH}"]

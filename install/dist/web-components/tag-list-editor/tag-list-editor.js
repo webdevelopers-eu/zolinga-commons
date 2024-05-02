@@ -10,7 +10,7 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
  */
 export default class TagListEditor extends HTMLElement {
     #root;
-    static observedAttributes = ['name', 'readonly', 'type', 'no-edit', 'no-remove', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'];
+    static observedAttributes = ['name', 'readonly', 'type', 'validation-error', 'no-edit', 'no-remove', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'];
 
     constructor() {
         super();
@@ -53,7 +53,7 @@ export default class TagListEditor extends HTMLElement {
     #propagateAttributes() {
         this.querySelectorAll('tag-editor')
             .forEach(tag => {
-                ['readonly', 'name', 'no-edit', 'no-remove', 'type', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'].forEach(attr => {
+                ['readonly', 'name', 'no-edit', 'validation-error', 'no-remove', 'type', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'].forEach(attr => {
                     if (this.hasAttribute(attr)) tag.setAttribute(attr, this.getAttribute(attr));
                     else if (attr !== 'type') tag.removeAttribute(attr);
                 });

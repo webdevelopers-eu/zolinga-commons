@@ -32,13 +32,13 @@ export default class TagEditor extends HTMLElement {
         const value = this.getAttribute('value') || this.textContent;
 
         this.innerHTML = `
-        <input role="tag" class="input-tag" type="hidden" tabindex="-1" required />
+        <input role="tag" class="input-tag" type="text" tabindex="-1" required />
         <div class="editor" contenteditable="true" spellcheck="false"></div>
         <div class="remove-confirm action">${gettext("Remove?")}</div>
         <div class="remove action">⨯</div>
         `;
 
-        this.#input = this.querySelector('input[type="hidden"]');
+        this.#input = this.querySelector('input.input-tag');
         this.#input.value = value;
         this.#editor = this.querySelector('.editor');
         this.#editor.textContent = value;
@@ -189,13 +189,10 @@ export default class TagEditor extends HTMLElement {
                     this.#input.pattern = newValue;
                     break;
                 case 'min':
-                    this.#input.min = newValue;
-                    break;
                 case 'max':
-                    this.#input.max = newValue;
-                    break;
                 case 'step':
-                    this.#input.step = newValue;
+                    this.#input[name] = newValue;
+                    this.#input.type = 'number';
                     break;
                 case 'minlength':
                     this.#input.minLength = newValue;

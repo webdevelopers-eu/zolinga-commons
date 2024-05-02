@@ -16,13 +16,17 @@
             "event": "cms:content:c-resources",
             "class": "Zolinga\\Commons\\Resources\\ResourcesElement",
             "method": "onResources",
-            "origin": ["internal"]
+            "origin": [
+                "internal"
+            ]
         },
         {
             "event": "system:install",
             "class": "Zolinga\\Commons\\Resources\\ResourcesElement",
             "method": "onInstall",
-            "origin": ["internal"],
+            "origin": [
+                "internal"
+            ],
             "priority": 0.1
         },
         {
@@ -62,6 +66,11 @@
             "tag": "tag-editor",
             "description": "Pill-like editable tag.",
             "module": "web-components/tag-editor/tag-editor.js"
+        },
+        {
+            "tag": "tag-list-editor",
+            "description": "Pill-like editable tag list.",
+            "module": "web-components/tag-list-editor/tag-list-editor.js"
         }
     ],
     "autoload": {

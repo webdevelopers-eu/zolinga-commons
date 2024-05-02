@@ -13,6 +13,7 @@ The editor will automatically create hidden `<input>` element with the same name
     [readonly]
     [no-edit]
     [no-remove]
+    [autofocus]
     >{VALUE}</tag-editor>
 ```
 
@@ -23,6 +24,7 @@ The editor will automatically create hidden `<input>` element with the same name
 - `readonly` - if present the tag will be displayed as a read-only pill without the remove icon and ability to edit or remove the tag. Same as setting `no-edit` and `no-remove` at the same time.
 - `no-edit` - if present the tag will be displayed as a read-only pill with the remove icon but without the ability to edit the tag.
 - `no-remove` - if present the tag will be displayed as an editable pill without the remove icon.
+- `autofocus` - place the cursor in the input field when the page is loaded.
 
 ## Example
 

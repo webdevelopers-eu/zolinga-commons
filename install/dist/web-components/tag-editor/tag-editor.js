@@ -3,20 +3,28 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
 /**
  * Tag editor - allows editing of tags that are displayed as pills.
  * 
- * <tag-editor [value="VALUE"] [name="name"] [readonly] [no-remove] [no-edit]>VALUE</tag-editor>
+ * <tag-editor [value="VALUE"] [name="name"] [autofocus] [readonly] [no-remove] [no-edit]>VALUE</tag-editor>
  */
 export default class TagEditor extends HTMLElement {
     #input;
     #editor;
+    #resolve;
+    #readyPromise = new Promise((resolve) => { this.#resolve = resolve; });
+    // #internals;
     static observedAttributes = ['value', 'name', 'readonly', 'no-edit', 'no-remove'];
 
 
     constructor() {
         super();
-        this.#init();
     }
 
-    async #init() {
+    connectedCallback() {
+        this.#init()
+            .then(() => this.#resolve());
+    }
+
+    async #init() {        // this.#internals = this.attachInternals();
+
         this.#addStyles();
         const value = this.getAttribute('value') || this.textContent;
 
@@ -36,6 +44,10 @@ export default class TagEditor extends HTMLElement {
 
         this.#initListeners();
         this.dataset.ready = true;
+
+        if (this.hasAttribute('autofocus')) {
+            this.focus();
+        }
     }
 
     #initListeners() {
@@ -48,14 +60,24 @@ export default class TagEditor extends HTMLElement {
         });
 
         this.querySelector('.remove-confirm').addEventListener('click', () => {
-            this.remove();
+            this.#remove();
         });
 
         // Intercept all TAB, ENTER, and COMMA keys
         this.#editor.addEventListener('keydown', (event) => {
-            if (event.key === 'Tab' || event.key === 'Enter' || event.key === ',') {
-                event.preventDefault();
+            if (this.classList.contains('removing')) {
+                if (event.key === 'Enter' || event.key === 'Backspace') {
+                    this.#remove();
+                } else {
+                    this.classList.remove('removing');
+                }
+            } else if (event.key === 'Tab' || event.key === 'Enter' || event.key === ',') {
+                //event.preventDefault();
                 this.#editor.blur();
+            }
+            // Backspace on empty editor should remove the tag
+            if (event.key === 'Backspace' && this.#editor.textContent === '') {
+                this.#confirmRemoval();
             }
         });
         // Watch editor for any elements and remove them using mutation observer
@@ -74,8 +96,17 @@ export default class TagEditor extends HTMLElement {
         }, { once: true, capture: true });
     }
 
+    #remove() {
+        if (!this.hasAttribute('no-remove') && !this.hasAttribute('readonly')) {
+            this.previousElementSibling?.focus();
+            this.remove();
+        }
+    }
+
     focus() {
-        this.#editor.focus();
+        this.#readyPromise.then(() => {
+            this.#editor.focus();
+        });
     }
 
     set value(value) {
@@ -96,7 +127,7 @@ export default class TagEditor extends HTMLElement {
 
     setValue(value) {
         value = value.trim();
-        
+
         if (this.#input.value !== value) {
             this.#input.value = value;
         }
@@ -109,18 +140,20 @@ export default class TagEditor extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        switch (name) {
-            case 'no-edit':
-            case 'readonly':
-                this.#editor.setAttribute('contenteditable', newValue === null ? 'true' : 'false');
-                break;
-            case 'value':
-                this.setValue(newValue);
-                break;
-            case 'name':
-                this.#input.name = newValue;
-                break;
-        }
+        this.#readyPromise.then(() => {
+            switch (name) {
+                case 'no-edit':
+                case 'readonly':
+                    this.#editor.setAttribute('contenteditable', newValue === null ? 'true' : 'false');
+                    break;
+                case 'value':
+                    this.setValue(newValue);
+                    break;
+                case 'name':
+                    this.#input.name = newValue;
+                    break;
+            }
+        });
     }
 
     #addStyles() {
@@ -141,6 +174,11 @@ export default class TagEditor extends HTMLElement {
                     max-width: 100%;
                     gap: .5em;
                     overflow: hidden;
+
+                    &[value=""] .editor::before {
+                        content: '...';
+                        opacity: 0.5;
+                    }
 
                     &> .editor {
                         outline: none !important;
@@ -201,7 +239,7 @@ export default class TagEditor extends HTMLElement {
             document.head.appendChild(el);
         }
         let doc = this.getRootNode();
-        if (doc !== document) {
+        if (doc instanceof ShadowRoot) {
             doc.adoptedStyleSheets.push(el.styleSheet);
         }
     }

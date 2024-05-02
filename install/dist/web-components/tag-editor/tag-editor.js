@@ -52,11 +52,13 @@ export default class TagEditor extends HTMLElement {
 
         if (this.hasAttribute('autofocus')) {
             this.focus();
+            this.removeAttribute('autofocus');
         }
     }
 
     #initListeners() {
-        this.#editor.addEventListener('input', () => {
+        this.#editor.addEventListener('input', (event) => {
+            console.log(`Event ${event.type} on %o`, this.#editor);
             this.setValue(this.#editor.textContent);
         });
 
@@ -66,20 +68,24 @@ export default class TagEditor extends HTMLElement {
 
         // On validation it is focused and error displayed
         this.#input.addEventListener('keydown', (event) => {
+            console.log(`Event ${event.type} on %o`, this.#input);
             this.focus();
         });
 
         this.#removeButton.addEventListener('click', (event) => {
+            console.log(`Event ${event.type} on %o`, this.#removeButton);
             this.#remove();
         });
 
         // On blur run validation on this.#input
-        this.#editor.addEventListener('blur', () => {
+        this.#editor.addEventListener('blur', (event) => {
+            console.log(`Event ${event.type} on %o`, this.#editor);
             this.validate();
         });
 
         // Intercept all TAB, ENTER, and COMMA keys
         this.#editor.addEventListener('keydown', (event) => {
+            console.log(`Event ${event.type} on %o`, this.#editor);
             if (this.classList.contains('removing')) {
                 if (event.key === 'Enter' || event.key === 'Backspace') {
                     this.#remove();
@@ -125,6 +131,7 @@ export default class TagEditor extends HTMLElement {
     #confirmRemoval() {
         this.classList.add('removing');
         document.body.addEventListener('click', (event) => {
+            console.log(`Event ${event.type} on %o`, document.body);
             if (event.target.matches(':invalid, input, textarea, select')) { // browser triggers click on first invalid input in the form?
                 this.#confirmRemoval();
             } else if (event.target !== this.#removeButton && !this.#removeButton.contains(event.target)) {
@@ -307,8 +314,8 @@ export default class TagEditor extends HTMLElement {
                     &:is([readonly], [no-remove]) > .action {
                         display: none;
                     }
-
-                    &:hover, &:focus-within {
+                    
+                    &:focus-within {
                         background-color: color-mix(in srgb, var(--color-primary, #f0f0f0) 100%, transparent);
                     }
                 }

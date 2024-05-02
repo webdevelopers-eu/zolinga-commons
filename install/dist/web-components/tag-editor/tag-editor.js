@@ -82,9 +82,15 @@ export default class TagEditor extends HTMLElement {
         });
         // Watch editor for any elements and remove them using mutation observer
         const observer = new MutationObserver((mutations) => {
+            // Filter only element additions and removals
+            const filtered = mutations.filter(m => 
+                Array.from(m.addedNodes).some(n => n.nodeType === Node.ELEMENT_NODE) ||
+                Array.from(m.removedNodes).some(n => n.nodeType === Node.ELEMENT_NODE)
+            );
+            if (filtered.length === 0) return;
             this.#editor.textContent = this.#editor.textContent.trim();
         });
-        observer.observe(this.#editor, { childList: true });
+        observer.observe(this.#editor, { childList: true, subtree: false,  });
     }
 
     #confirmRemoval() {
@@ -170,7 +176,7 @@ export default class TagEditor extends HTMLElement {
                     color: var(--color-bg, #333);
                     min-height: 1lh;
                     padding: 0px;
-                    margin: 1px;
+                    margin: 0.1em;
                     max-width: 100%;
                     gap: .5em;
                     overflow: hidden;

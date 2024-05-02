@@ -27,12 +27,17 @@ export default class TagListEditor extends HTMLElement {
         this.#addStyles();
         this.#root.querySelector('.add .text').textContent = this.getAttribute('placeholder') || gettext('Add tag...');
 
-        this.dataset.ready = true;
-
         const observer = new MutationObserver(this.#onContentChange.bind(this));
         observer.observe(this, { childList: true });
         this.#onContentChange();
         this.#addListeners();
+
+        // Remove text nodes (spaces) between tags
+        this.childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) node.remove();
+        });
+
+        this.dataset.ready = true;
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

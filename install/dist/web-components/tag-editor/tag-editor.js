@@ -86,6 +86,7 @@ export default class TagEditor extends HTMLElement {
         // Intercept all TAB, ENTER, and COMMA keys
         this.#editor.addEventListener('keydown', (event) => {
             console.log(`Event ${event.type} on %o`, this.#editor);
+            const sel = window.getSelection();
             if (this.classList.contains('removing')) {
                 if (event.key === 'Enter' || event.key === 'Backspace') {
                     this.#remove();
@@ -98,9 +99,16 @@ export default class TagEditor extends HTMLElement {
                 } else {
                     event.preventDefault();
                 }
+            } else if (event.key === 'ArrowLeft' && sel.focusOffset === 0) {
+                this.#focusPrev();
+                event.preventDefault();
+            } else if (event.key === 'ArrowRight' && sel.focusOffset === sel.focusNode.length) {
+                this.#focusNext();
+                event.preventDefault();
             }
+
             // Backspace on empty editor should remove the tag
-            if (event.key === 'Backspace' && this.#editor.textContent === '') {
+            if ((event.key === 'Backspace' || event.key === 'Delete') && this.#editor.textContent === '') {
                 this.#confirmRemoval();
             }
         });
@@ -142,14 +150,18 @@ export default class TagEditor extends HTMLElement {
 
     #remove() {
         if (!this.hasAttribute('no-remove') && !this.hasAttribute('readonly')) {
-            this.previousElementSibling?.focus();
+            this.#focusPrev();
             this.remove();
         }
     }
 
-    focus() {
+    focus(position = 'start') {        
         this.#readyPromise.then(() => {
             this.#editor.focus();
+            if (position === 'end') { 
+                const sel = window.getSelection();
+                sel.collapse(this.#editor, this.#editor.childNodes.length);
+            }
         });
     }
 
@@ -219,6 +231,14 @@ export default class TagEditor extends HTMLElement {
                     break;
             }
         });
+    }
+
+    #focusPrev() {
+        this.previousElementSibling?.focus('end');
+    }
+
+    #focusNext() {
+        this.nextElementSibling?.focus('start');
     }
 
     #addStyles() {

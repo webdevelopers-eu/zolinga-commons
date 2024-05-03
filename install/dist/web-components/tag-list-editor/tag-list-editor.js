@@ -26,7 +26,7 @@ export default class TagListEditor extends HTMLElement {
             <slot></slot>
             <span class="add">
                 <span class="icon">+</span>
-                <span class="text">...</span>
+                <span class="text placeholder">...</span>
             </span>
             <span class="trap" contenteditable="true"></span>
             `;
@@ -124,7 +124,7 @@ export default class TagListEditor extends HTMLElement {
                     display: inline-block;
 
                     & .text {
-                        opacity: 0.5;    
+                        color: var(--color-placeholder, color-mix(in srgb, currentColor, transparent)); 
                     }
 
                     & .icon {

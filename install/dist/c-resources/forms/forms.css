@@ -100,6 +100,7 @@
             &>* {
                 color: var(--forms-color-fg);
                 min-height: 2.4em;
+                --color-placeholder: color-mix(in srgb, var(--forms-color-fg) 36%, transparent);
 
                 &:where(input, select, textarea) {
                     font-family: inherit;
@@ -113,7 +114,8 @@
                     outline: none !important;
 
                     &::placeholder {
-                        color: color-mix(in srgb, var(--forms-color-fg) 50%, transparent);
+                        opacity: 1;
+                        color: var(--color-placeholder);
                     }
 
                     &:where(textarea) {

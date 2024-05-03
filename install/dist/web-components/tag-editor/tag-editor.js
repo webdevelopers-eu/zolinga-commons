@@ -304,7 +304,7 @@ export default class TagEditor extends HTMLElement {
 
                         &:hover {
                             opacity: 1;
-                            background-color: darkred;
+                            background-color: color-mix(in srgb, darkred, transparent);
                             color: white;
                         }
                     }
@@ -325,13 +325,14 @@ export default class TagEditor extends HTMLElement {
                         grid-row: 1 / span 1;
                         padding: 0em 0.5em;
                         text-align: center;
-                        background-color: darkred;
+                        background-color: color-mix(in srgb, darkred, transparent);
                         color: white;
                         z-index: 100;
                         cursor: pointer;
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        backdrop-filter: blur(1px) saturate(0%);
                     }
 
                     &:is([readonly], [no-remove]) > .action {

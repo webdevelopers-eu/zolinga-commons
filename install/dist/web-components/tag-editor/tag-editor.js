@@ -58,7 +58,6 @@ export default class TagEditor extends HTMLElement {
 
     #initListeners() {
         this.#editor.addEventListener('input', (event) => {
-            console.log(`Event ${event.type} on %o`, this.#editor);
             this.setValue(this.#editor.textContent);
         });
 
@@ -68,24 +67,24 @@ export default class TagEditor extends HTMLElement {
 
         // On validation it is focused and error displayed
         this.#input.addEventListener('keydown', (event) => {
-            console.log(`Event ${event.type} on %o`, this.#input);
             this.focus();
         });
 
         this.#removeButton.addEventListener('click', (event) => {
-            console.log(`Event ${event.type} on %o`, this.#removeButton);
             this.#remove();
         });
 
         // On blur run validation on this.#input
         this.#editor.addEventListener('blur', (event) => {
-            console.log(`Event ${event.type} on %o`, this.#editor);
-            this.validate();
+            if (this.#editor.textContent.trim() === '') {
+                this.#remove();
+            } else {         
+                this.validate();
+            }
         });
 
         // Intercept all TAB, ENTER, and COMMA keys
         this.#editor.addEventListener('keydown', (event) => {
-            console.log(`Event ${event.type} on %o`, this.#editor);
             const sel = window.getSelection();
             if (this.classList.contains('removing')) {
                 if (event.key === 'Enter' || event.key === 'Backspace') {

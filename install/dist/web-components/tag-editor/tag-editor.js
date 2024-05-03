@@ -102,10 +102,11 @@ export default class TagEditor extends HTMLElement {
             } else if (event.key === 'ArrowLeft' && sel.focusOffset === 0) {
                 this.#focusPrev();
                 event.preventDefault();
-            } else if (event.key === 'ArrowRight' && sel.focusOffset === sel.focusNode.length) {
+            } else if (event.key === 'ArrowRight' && (sel.focusOffset === sel.focusNode.length || sel.focusNode === this.#editor)) {
                 this.#focusNext();
                 event.preventDefault();
             }
+
 
             // Backspace on empty editor should remove the tag
             if ((event.key === 'Backspace' || event.key === 'Delete') && this.#editor.textContent === '') {
@@ -155,10 +156,10 @@ export default class TagEditor extends HTMLElement {
         }
     }
 
-    focus(position = 'start') {        
+    focus(position = 'start') {
         this.#readyPromise.then(() => {
             this.#editor.focus();
-            if (position === 'end') { 
+            if (position === 'end') {
                 const sel = window.getSelection();
                 sel.collapse(this.#editor, this.#editor.childNodes.length);
             }

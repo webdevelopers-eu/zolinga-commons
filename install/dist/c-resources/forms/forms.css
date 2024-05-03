@@ -93,7 +93,7 @@
                 border-color: var(--forms-field-border-color-active);
             }
 
-            &:has(input:placeholder-shown, select:placeholder-shown, textarea:placeholder-shown)>span {
+            &:has(input:placeholder-shown, select:placeholder-shown, textarea:placeholder-shown, *.placeholder-shown)>span {
                 display: none;
             }
 

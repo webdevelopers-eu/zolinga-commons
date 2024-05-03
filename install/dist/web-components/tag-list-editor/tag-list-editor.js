@@ -10,10 +10,12 @@ import { gettext, ngettext } from "/dist/zolinga-intl/gettext.js?zolinga-commons
  */
 export default class TagListEditor extends HTMLElement {
     #root;
+    //#internals;
     static observedAttributes = ['name', 'readonly', 'type', 'validation-error', 'no-edit', 'no-remove', 'pattern', 'min', 'max', 'step', 'minlength', 'maxlength'];
 
     constructor() {
         super();
+        //this.#internals = this.attachInternals();
         this.#init();
     }
 
@@ -91,7 +93,10 @@ export default class TagListEditor extends HTMLElement {
     }
 
     #onContentChange() {
-        this.setAttribute('count', this.querySelectorAll('tag-editor').length);
+        const count = this.querySelectorAll(':scope > tag-editor').length;
+        this.setAttribute('count', count);
+        this.classList.toggle('empty', count === 0);
+        this.classList.toggle('placeholder-shown', count === 0);
         this.classList.toggle('max-tag-reached', this.#isMaxReached());
     }
 

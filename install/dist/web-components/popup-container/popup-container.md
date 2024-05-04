@@ -30,3 +30,11 @@ The `popup-container` component creates a popup layer with a default layout.
 - `nav-back`: Use it to add a back button or disable it to the popup.
 - `nav-menu`: Place where a menu is usually placed.
 
+
+## Events
+
+The widget fires following DOM events:
+
+- `popup-close`: Fired when the popup is closed.
+- `popup-open`: Fired when the popup is opened.
+- `popup-remove`: Fired when the popup is removed.

@@ -152,7 +152,7 @@ export default class TagEditor extends HTMLElement {
     #remove() {
         if (!this.hasAttribute('no-remove') && !this.hasAttribute('readonly')) {
             this.#focusPrev();
-            this.remove();
+            if (this.parentNode) this.remove();
         }
     }
 

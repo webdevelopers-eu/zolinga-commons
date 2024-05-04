@@ -1,3 +1,7 @@
+:host([closed]) {
+    display: none !important;
+}
+
 .popup-container {
     position: fixed;
     top: 0;
@@ -85,6 +89,8 @@
             overflow: hidden;
             text-overflow: ellipsis;
             text-align: center;
+            font-size: 1.2em;
+            color: color-mix(in srgb, currentColor 80%, transparent);
         }
 
         & ::slotted([slot="nav-menu"]),
@@ -99,6 +105,8 @@
             scrollbar-width: thin;
             background-color: transparent !important;
             box-shadow: none !important;
+            height: auto !important;
+            align-self: start;
         }
 
         & ::slotted([slot="actions"]),

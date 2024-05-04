@@ -26,7 +26,7 @@ export default class MessageBoard extends WebComponent {
         await this.initPromise;
 
         if (id) {
-            this.#messages.querySelectorAll(`#${id}.message:not(.removing)`)
+            this.#messages.querySelectorAll(`*[id="${id}"].message:not(.removing)`)
                 .forEach(this.#hideMessage.bind(this));
         }
 

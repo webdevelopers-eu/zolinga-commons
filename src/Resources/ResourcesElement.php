@@ -150,8 +150,10 @@ class ResourcesElement implements ListenerInterface
             'list' => $list
         ];
 
-        // Here we will fire some event to let other modules integrate with 
+        // @todo Here we will fire some event to let other modules integrate with 
         // <c-resources> element.
+        // ...
+
         file_put_contents('public://zolinga-commons/resources.json', json_encode($data))
             or throw new \Exception('Failed to write resources list: ' . $file);
     }

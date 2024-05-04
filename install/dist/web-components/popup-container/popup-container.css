@@ -1,0 +1,122 @@
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2px);
+
+    & .popup-container-content {
+        display: grid;
+        background-color: var(--color-bg, white);
+        border-radius: var(--radius, 0.5em);
+        grid-template-columns: [start] 2em 1fr 2em [end];
+        grid-template-rows: [header-start] auto [header-end content-start] 1fr [content-end footer-start] auto [footer-end];
+        grid-template-areas:
+            "nav-back title nav-menu"
+            "content content content"
+            "actions actions actions";
+        justify-content: center;
+        align-items: center;
+        justify-items: center;
+        max-height: 100dvh;
+        max-width: 100dvw;
+
+        &>.bg {
+            width: 100%;
+            height: 100%;
+            grid-column: start / end;
+
+            &.header {
+                grid-row: header-start / header-end;
+                background-color: color-mix(in srgb, var(--color-fg) 5%, transparent);
+            }
+
+            &.content {
+                grid-row: content-start / content-end;
+            }
+
+            &.footer {
+                grid-row: footer-start / footer-end;
+                background-color: color-mix(in srgb, var(--color-fg) 5%, transparent);
+            }
+        }
+
+        & ::slotted(*),
+        & slot>* {
+            padding: 0.5em;
+        }
+
+        & ::slotted([slot="nav-menu"]),
+        & slot[name="nav-menu"]>*,
+        & ::slotted([slot="nav-back"]),
+        & slot[name="nav-back"]>* {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+
+            &:is(svg),
+            & svg {
+                height: 1em;
+            }
+        }
+
+        & ::slotted([slot="nav-back"]),
+        & slot[name="nav-back"]>* {
+            grid-area: nav-back;
+        }
+
+        & ::slotted([slot="title"]),
+        & slot[name="title"]>* {
+            grid-area: title;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+        }
+
+        & ::slotted([slot="nav-menu"]),
+        & slot[name="nav-menu"]>* {
+            grid-area: nav-menu;
+        }
+
+        & ::slotted([slot="content"]),
+        & slot[name="content"]>* {
+            grid-area: content;
+            overflow: hidden auto;
+            scrollbar-width: thin;
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+
+        & ::slotted([slot="actions"]),
+        & slot[name="actions"]>* {
+            grid-area: actions;
+            display: flex;
+            width: 100%;
+            justify-content: space-evenly;
+        }
+    }
+}
+
+/* mobile phones */
+@media (max-width: 600px) {
+    .popup-container {
+        & .popup-container-content {
+            width: 100dvw;
+            height: 100dvh;
+            border-radius: 0;
+        }
+    }
+}

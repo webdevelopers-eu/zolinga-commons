@@ -1,0 +1,36 @@
+<html>
+<head>
+    <title>Popup Container</title>
+    <meta name="gettext" content="translate" />
+    <link rel="stylesheet" href="popup-container.css" />
+</head>
+<body>
+    <main class="popup-container">
+        <!--
+            supported slots:
+
+            nav-back
+            title
+            nav-menu
+            content / default
+            actions
+        -->
+        <div class="popup-container-content">
+            <div class="header bg"></div>
+            <div class="content bg"></div>
+            <div class="footer bg"></div>
+            
+            <slot name="nav-back">
+                <svg role="popup-close" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" viewBox="0 0 298 511.9">
+                    <path fill-rule="nonzero" d="M285.8 441a41.5 41.5 0 0 1-58.6 58.9l-215-214.5a41.5 41.5 0 0 1-.1-58.7L227.2 12.1a41.5 41.5 0 1 1 58.6 58.8L100.3 256l185.5 185z"/>
+                </svg>
+            </slot>
+            <slot name="title"></slot>
+            <slot name="nav-menu"></slot>
+            <slot name="content">Content...</slot>
+            <slot name="actions"></slot>
+        </div>
+
+    </main>
+</body>
+</html>

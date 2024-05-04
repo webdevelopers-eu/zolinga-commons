@@ -71,6 +71,11 @@
             "tag": "tag-list-editor",
             "description": "Pill-like editable tag list.",
             "module": "web-components/tag-list-editor/tag-list-editor.js"
+        },
+        {
+            "tag": "popup-container",
+            "description": "Popup container.",
+            "module": "web-components/popup-container/popup-container.js"
         }
     ],
     "autoload": {

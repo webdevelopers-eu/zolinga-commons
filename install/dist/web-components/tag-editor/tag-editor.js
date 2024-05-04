@@ -79,6 +79,7 @@ export default class TagEditor extends HTMLElement {
             if (this.#editor.textContent.trim() === '') {
                 this.#remove();
             } else {
+                this.#editor.textContent = this.#editor.textContent.trim();
                 this.validate();
             }
         });
@@ -113,16 +114,16 @@ export default class TagEditor extends HTMLElement {
             }
         });
         // Watch editor for any elements and remove them using mutation observer
-        const observer = new MutationObserver((mutations) => {
-            // Filter only element additions and removals
-            const filtered = mutations.filter(m =>
-                Array.from(m.addedNodes).some(n => n.nodeType === Node.ELEMENT_NODE) ||
-                Array.from(m.removedNodes).some(n => n.nodeType === Node.ELEMENT_NODE)
-            );
-            if (filtered.length === 0) return;
-            this.#editor.textContent = this.#editor.textContent.trim();
-        });
-        observer.observe(this.#editor, { childList: true, subtree: false, });
+        // const observer = new MutationObserver((mutations) => {
+        //     // Filter only element additions and removals
+        //     const filtered = mutations.filter(m =>
+        //         Array.from(m.addedNodes).some(n => n.nodeType === Node.ELEMENT_NODE) ||
+        //         Array.from(m.removedNodes).some(n => n.nodeType === Node.ELEMENT_NODE)
+        //     );
+        //     if (filtered.length === 0) return;
+        //     this.#editor.textContent = this.#editor.textContent.trim();
+        // });
+        // observer.observe(this.#editor, { childList: true, subtree: false, });
     }
 
     validate() {
@@ -187,7 +188,7 @@ export default class TagEditor extends HTMLElement {
         if (this.#input.value !== value) {
             this.#input.value = value;
         }
-        if (this.#editor.textContent !== value) {
+        if (this.#editor.textContent.trim() !== value) {
             this.#editor.textContent = value;
         }
         if (this.getAttribute('value') !== value) {
@@ -294,6 +295,10 @@ export default class TagEditor extends HTMLElement {
                         cursor: text;
                         grid-column: main-start / main-end;
                         grid-row: 1 / span 1;
+
+                        & * {
+                            display: contents !important;
+                        }
                     }
 
                     &> .remove {

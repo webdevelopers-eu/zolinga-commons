@@ -3,10 +3,18 @@
 The `popup-container` component creates a popup layer with a default layout.
 
 
+## Syntax
+
+```html
+<popup-container [width="{WIDTH}"]>
+  <div slot="title|content|actions|nav-back|nav-menu">...</div>+
+</popup-container>
+```
+
 ## Usage
 
 ```html
-<popup-container>
+<popup-container width="480px">
   <div slot="title">This is the title</div>
   <div slot="content">
     <!-- Your content here -->

@@ -13,7 +13,7 @@
     background-color: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(2px);
 
-    & .popup-container-content {
+    & .grid {
         display: grid;
         background-color: var(--color-bg, white);
         border-radius: var(--radius, 0.5em);
@@ -28,6 +28,7 @@
         justify-items: center;
         max-height: 100dvh;
         max-width: 100dvw;
+        width: var(--popup-width, clamp(480px, 80%, 720px));
 
         &>.bg {
             width: 100%;
@@ -113,7 +114,7 @@
 /* mobile phones */
 @media (max-width: 600px) {
     .popup-container {
-        & .popup-container-content {
+        & .grid {
             width: 100dvw;
             height: 100dvh;
             border-radius: 0;

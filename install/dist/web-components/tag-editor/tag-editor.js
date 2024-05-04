@@ -78,14 +78,14 @@ export default class TagEditor extends HTMLElement {
         this.#editor.addEventListener('blur', (event) => {
             if (this.#editor.textContent.trim() === '') {
                 this.#remove();
-            } else {         
+            } else {
                 this.validate();
             }
         });
 
         // Intercept all TAB, ENTER, and COMMA keys
         this.#editor.addEventListener('keydown', (event) => {
-            const sel = window.getSelection();
+            const sel = this.getRootNode().getSelection();
             if (this.classList.contains('removing')) {
                 if (event.key === 'Enter' || event.key === 'Backspace') {
                     this.#remove();
@@ -159,7 +159,7 @@ export default class TagEditor extends HTMLElement {
         this.#readyPromise.then(() => {
             this.#editor.focus();
             if (position === 'end') {
-                const sel = window.getSelection();
+                const sel = this.getRootNode().getSelection();
                 sel.collapse(this.#editor, this.#editor.childNodes.length);
             }
         });
@@ -242,11 +242,12 @@ export default class TagEditor extends HTMLElement {
     }
 
     #addStyles() {
-        let el = document.querySelector('style[id="tag-editor-styles"]');
-        if (!el) {
-            let el = document.createElement('style');
-            el.id = 'tag-editor-styles';
-            el.textContent = `
+        let doc = this.getRootNode();
+        if (!doc.tagEditorStylesInjected) {
+            doc.tagEditorStylesInjected = true;
+
+            const sheet = new CSSStyleSheet();
+            sheet.replaceSync(`
                 tag-editor {
                     display: inline-grid;
                     grid-template-columns: 0px [main-start] auto [main-end remove-start] auto [remove-end];
@@ -343,12 +344,8 @@ export default class TagEditor extends HTMLElement {
                         background-color: color-mix(in srgb, var(--color-primary, #f0f0f0) 100%, transparent);
                     }
                 }
-            `;
-            document.head.appendChild(el);
-        }
-        let doc = this.getRootNode();
-        if (doc instanceof ShadowRoot) {
-            doc.adoptedStyleSheets.push(el.styleSheet);
+                `);
+            doc.adoptedStyleSheets.push(sheet);
         }
     }
 }

@@ -9,6 +9,8 @@ import WebComponent from '/dist/system/js/web-component.js';
 export default class PopupContainer extends WebComponent {
     #root;
     #main;
+    #grid;
+    static observedAttributes = [...WebComponent.observedAttributes, 'width'];
 
     constructor() {
         super();
@@ -27,6 +29,14 @@ export default class PopupContainer extends WebComponent {
         }
     }
 
+    attributeChangedCallback(name, oldValue, newValue) {
+        switch (name) {
+            case 'width':
+                this.style.setProperty('--popup-width', newValue);
+                break;
+        }
+    }
+
     async #init() {
         this.#root = await this.loadContent(import.meta.url.replace('.js', '.html'), {
             mode: "closed",
@@ -34,6 +44,7 @@ export default class PopupContainer extends WebComponent {
             inheritStyles: false
         });
         this.#main = this.#root.querySelector('main');
+        this.#grid = this.#root.querySelector('.grid');
 
         // It is recommended to have overflow-y:overlay; or scrollbar-gutter:stable; to avoid reflows.
         if (!document.popupContainerCssInstalled) {

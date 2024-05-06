@@ -71,6 +71,7 @@ export default class TagEditor extends HTMLElement {
         });
 
         this.#removeButton.addEventListener('click', (event) => {
+            this.#focusPrev();
             this.#remove();
         });
 
@@ -86,9 +87,11 @@ export default class TagEditor extends HTMLElement {
 
         // Intercept all TAB, ENTER, and COMMA keys
         this.#editor.addEventListener('keydown', (event) => {
-            const sel = this.getRootNode().getSelection();
+            const root = this.getRootNode();
+            const sel = root.getSelection ? root.getSelection() : document.getSelection();
             if (this.classList.contains('removing')) {
                 if (event.key === 'Enter' || event.key === 'Backspace') {
+                    this.#focusPrev();
                     this.#remove();
                 } else {
                     this.classList.remove('removing');
@@ -150,9 +153,12 @@ export default class TagEditor extends HTMLElement {
     }
 
     #remove() {
-        if (!this.hasAttribute('no-remove') && !this.hasAttribute('readonly')) {
-            this.#focusPrev();
-            if (this.parentNode) this.remove();
+        if (this.parentNode && !this.hasAttribute('no-remove') && !this.hasAttribute('readonly')) {
+            try {
+                    this.parentNode?.removeChild(this);
+            } catch (e) {
+                console.error(e);
+            }
         }
     }
 
@@ -197,6 +203,8 @@ export default class TagEditor extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) return;
+        
         this.#readyPromise.then(() => {
             switch (name) {
                 case 'no-edit':

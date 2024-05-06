@@ -70,7 +70,8 @@
 
             &:is(svg),
             & svg {
-                height: 1em;
+                height: 1.2em;
+                overflow: visible;
             }
         }
 

@@ -65,7 +65,7 @@ export default class TagListEditor extends HTMLElement {
     #addListeners() {
         this.#root.querySelector('.add')
             .addEventListener('click', (event) => {
-                this.#addNewTag();
+                this.addNewTag();
             });
         this.#root.querySelector('.trap')
             .addEventListener('focus', (event) => {
@@ -79,15 +79,19 @@ export default class TagListEditor extends HTMLElement {
         return max && count >= max;
     }
 
-    #addNewTag() {
+    addNewTag(value) {
         if (this.#isMaxReached()) {
             console.warn(`Max tags limit reached (${max})`);
             return;
         }
 
         const tag = document.createElement('tag-editor');
+        if (typeof value === 'string') {
+            tag.textContent = value;
+        } else {
+            tag.setAttribute('autofocus', 'true');
+        }
         this.appendChild(tag);
-        tag.setAttribute('autofocus', 'true');
         this.#propagateAttributes();
         tag.focus();
     }
@@ -98,6 +102,7 @@ export default class TagListEditor extends HTMLElement {
         this.classList.toggle('empty', count === 0);
         this.classList.toggle('placeholder-shown', count === 0);
         this.classList.toggle('max-tag-reached', this.#isMaxReached());
+        this.#propagateAttributes();
     }
 
     #addStyles() {

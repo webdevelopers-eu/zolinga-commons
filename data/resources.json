@@ -10,6 +10,15 @@
             ]
         },
         {
+            "id": "z-template",
+            "description": "Zolinga template system https://github.com/webdevelopers-eu/z-template",
+            "dependencies": [],
+            "resources": [
+                "/dist/system/js/z-template.css",
+                "/dist/system/js/z-template.js"
+            ]
+        },
+        {
             "id": "web-components",
             "description": "Initialize Zolinga web-components - warning: this works only for server-side <c-resources> rendering",
             "dependencies": [],

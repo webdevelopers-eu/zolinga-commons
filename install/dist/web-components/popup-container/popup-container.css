@@ -33,6 +33,7 @@
         max-height: 100dvh;
         max-width: 100dvw;
         width: var(--popup-width, clamp(480px, 80%, 720px));
+        box-shadow: .5em .5em 1em rgba(0, 0, 0, 0.3);
 
         &>.bg {
             width: 100%;
@@ -41,7 +42,9 @@
 
             &.header {
                 grid-row: header-start / header-end;
-                background-color: color-mix(in srgb, var(--color-fg) 5%, transparent);
+                background-color: var(--color-primary);
+                border-top-left-radius: var(--radius, 0.5em);
+                border-top-right-radius: var(--radius, 0.5em);
             }
 
             &.content {
@@ -57,6 +60,17 @@
         & ::slotted(*),
         & slot>* {
             padding: 0.5em;
+        }
+
+
+        & ::slotted([slot="nav-menu"]),
+        & slot[name="nav-menu"]>*,
+        & ::slotted([slot="nav-back"]),
+        & slot[name="nav-back"]>*,
+        & ::slotted([slot="title"]),
+        & slot[name="title"]>* {
+            color: var(--color-bg);
+            fill: currentColor;
         }
 
         & ::slotted([slot="nav-menu"]),
@@ -91,7 +105,6 @@
             text-overflow: ellipsis;
             text-align: center;
             font-size: 1.2em;
-            color: color-mix(in srgb, currentColor 80%, transparent);
         }
 
         & ::slotted([slot="nav-menu"]),
@@ -107,6 +120,7 @@
             background-color: transparent !important;
             box-shadow: none !important;
             height: auto !important;
+            max-height: 100%;
             align-self: start;
         }
 

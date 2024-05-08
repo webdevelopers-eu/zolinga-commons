@@ -76,6 +76,11 @@
             "tag": "popup-container",
             "description": "Popup container.",
             "module": "web-components/popup-container/popup-container.js"
+        },
+        {
+            "tag": "input-toggle",
+            "description": "Toggle input.",
+            "module": "web-components/input-toggle/input-toggle.js"
         }
     ],
     "autoload": {

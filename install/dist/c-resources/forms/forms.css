@@ -83,6 +83,10 @@
             &:has(input-toggle) {
                 width: 100%;
                 justify-content: space-between;
+
+                &:has(input-toggle input:not(:checked)) {
+                    color: color-mix(in srgb, currentColor 50%, transparent);
+                }
             }
         }
 

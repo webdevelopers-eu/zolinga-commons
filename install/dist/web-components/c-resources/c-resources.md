@@ -16,3 +16,4 @@ The full list of supported assets is compiled dynamically and stored in `/data/z
 
 - `web-components`: include support for web components. Note that without this asset, web components will not work on the front-end including the `<c-resources>`. Specifying this asset makes sense only for server-side parsed content as `<c-resources>` tag is also server-side parsed. On front-end the support for [Web Components](:Zolinga Core:Web Components) must be already present in order for `<c-resources>` to work so this asset is not needed.
 - `forms/css`: include standardized CSS for forms.
+- `touch/swipe`: include support for swipe gestures. New events `swipeleft`, `swiperight`, `swipeup`, `swipedown` are now supported. Also two-finger and N-finger swipes are supported using `swipeleft-2`, `swipeleft-3`, etc. events.

@@ -1,6 +1,6 @@
 {
     "name": "Zolinga Commons",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Zolinga PHP framework's common components.",
     "authors": [
         "Danny Sevcik <danny@zolinga.net>"

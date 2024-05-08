@@ -25,6 +25,15 @@
             "resources": [
                 "/dist/system/js/web-components.js"
             ]
+        },
+        {
+            "id": "touch/swipe",
+            "description": "Support for swipe events.",
+            "dependencies": [
+            ],
+            "resources": [
+                "/dist/zolinga-commons/c-resources/touch/swipe.js" 
+            ]
         }
     ]
 }

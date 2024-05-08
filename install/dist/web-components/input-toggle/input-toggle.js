@@ -17,19 +17,45 @@ export default class InputToggle extends HTMLElement {
             .then(() => this.dataset.ready = true);
     }
 
-    async #init() {
-        this.#initShadowDom();
+    // Lifecycle hooks
+    connectedCallback() {
         this.#initInput();
+    }
+
+    // removed from dom
+    disconnectedCallback() {
+        this.#input.removeEventListener('click', this.#syncInputToToggle);
+        this.#input.removeEventListener('change', this.#syncInputToToggle);
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (!this.#input) return; // not yet initialized
+
+        if (oldValue === newValue) return;
+        if (this.#input.getAttribute(name) === newValue) return;
+
+        if (newValue === null) {
+            this.#input.removeAttribute(name);
+        } else {
+            this.#input.setAttribute(name, newValue);
+        }
+    }
+
+    async #init() {
+        await this.#initShadowDom();
+        await this.#initInput();
     }
 
     async #initInput() {
         this.#input = this.querySelector('input');
-        if (!this.#input) {
+        if (this.#input) {
+            this.#syncInputToToggle();
+        } else {
             this.#input = document.createElement('input');
             this.#input.type = 'checkbox';
             this.appendChild(this.#input);
+            this.#syncAttrs(this, this.#input);
         }
-        this.#syncInputToToggle();
         const observer = new MutationObserver(this.#syncInputToToggle.bind(this));
         observer.observe(this.#input, { attributes: true });
 
@@ -40,18 +66,25 @@ export default class InputToggle extends HTMLElement {
     #syncInputToToggle() {
         if (this.#input.checked && !this.#input.hasAttribute('checked')) {
             this.#input.setAttribute('checked', '');
+            // console.log('TOGGLE: checked', this.#input);
         } else if (!this.#input.checked && this.#input.hasAttribute('checked')) {
             this.#input.removeAttribute('checked');
+            // console.log('TOGGLE: unchecked', this.#input);
         }
+        this.#syncAttrs(this.#input, this);
+    }
 
+    #syncAttrs(source, target) {
         InputToggle.observedAttributes.forEach(attr => {
-            if (this.#input.hasAttribute(attr)) {
-                if (this.getAttribute(attr) !== this.#input.getAttribute(attr)) {
-                    this.setAttribute(attr, this.#input.getAttribute(attr));
+            if (source.hasAttribute(attr)) {
+                if (target.getAttribute(attr) !== source.getAttribute(attr)) {
+                    target.setAttribute(attr, source.getAttribute(attr));
+                    // console.log('TOGGLE: set', attr, source.getAttribute(attr));
                 }
-            } else if (this.hasAttribute(attr)) {
-                this.removeAttribute(attr);
-            } 
+            } else if (target.hasAttribute(attr)) {
+                target.removeAttribute(attr);
+                // console.log('TOGGLE: remove', attr);
+            }
         });
     }
 
@@ -73,6 +106,7 @@ export default class InputToggle extends HTMLElement {
                     user-select: none;
                     border-radius: var(--toggle-size);
                     background-color: var(--toggle-color-off);
+                    transition: background-color 0.3s;
 
                     & .knob {
                         display: flex;
@@ -131,16 +165,5 @@ export default class InputToggle extends HTMLElement {
             <div>
         `;
         this.#toggle = this.#root.querySelector('#input');
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue === newValue) return;
-        if (this.#input.getAttribute(name) === newValue) return;
-
-        if (newValue === null) {
-            this.#input.removeAttribute(name);
-        } else {
-            this.#input.setAttribute(name, newValue);
-        }
     }
 }

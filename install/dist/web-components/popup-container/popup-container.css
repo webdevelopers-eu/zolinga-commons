@@ -137,10 +137,10 @@
 /* mobile phones */
 @media (max-width: 600px) {
     .popup-container {
-        & .grid {
+        & .grid, & .header, & .footer {
             width: 100dvw;
             height: 100dvh;
-            border-radius: 0;
+            border-radius: 0 !important;
         }
     }
 }

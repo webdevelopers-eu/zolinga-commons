@@ -74,11 +74,19 @@
     }
 
     &>label {
-        &:has(> input[type="checkbox"]) {
+        &:has(> input[type="checkbox"], > input-toggle) {
             align-items: center;
+            justify-content: center;
+            display: flex;
+            gap: 0.32em;
+
+            &:has(input-toggle) {
+                width: 100%;
+                justify-content: space-between;
+            }
         }
 
-        &:not(:has(> input[type="checkbox"])) {
+        &:not(:has(> input[type="checkbox"], > input-toggle)) {
             display: flex;
             align-items: stretch;
             border-radius: var(--forms-radius, 5px);

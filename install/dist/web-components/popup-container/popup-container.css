@@ -105,6 +105,7 @@
             text-overflow: ellipsis;
             text-align: center;
             font-size: 1.2em;
+            word-break: break-word;
         }
 
         & ::slotted([slot="nav-menu"]),
@@ -122,6 +123,7 @@
             height: auto !important;
             max-height: 100%;
             align-self: start;
+            justify-self: stretch;
         }
 
         & ::slotted([slot="actions"]),

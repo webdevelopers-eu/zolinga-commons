@@ -4,6 +4,10 @@
     --forms-color-bg: var(--color-bg);
     --forms-color-primary: var(--color-primary, #007bff);
     --forms-color-primary-fg: var(--color-primary-fg, #ffffff);
+    --forms-color-secondary: var(--color-secondary, #6c757d);
+    --forms-color-secondary-fg: var(--color-secondary-fg, #ffffff);
+    --forms-color-important: var(--color-important, #dc3545);
+    --forms-color-important-fg: var(--color-important-fg, #ffffff);
     --forms-gap-vertical: var(--gap-vertical, 1em);
     --forms-gap-horizontal: var(--gap-horizontal, 2em);
 
@@ -58,10 +62,20 @@
         line-height: 1.2em;
         border: none;
         border-radius: var(--forms-radius, 5px);
-        background-color: var(--forms-color-primary);
-        color: var(--forms-color-primary-fg);
+        background-color: var(--forms-color-secondary);
+        color: var(--forms-color-secondary-fg);
         font-size: 1em;
         transition: background-color 0.5s;
+
+        &.primary, &[type="submit"]:not(.secondary, .important) {
+            background-color: var(--forms-color-primary);
+            color: var(--forms-color-primary-fg);
+        }
+
+        &.important {
+            background-color: var(--forms-color-important);
+            color: var(--forms-color-important-fg);
+        }
 
         &:hover {
             background-color: color-mix(in srgb, var(--forms-color-primary) 70%, transparent);

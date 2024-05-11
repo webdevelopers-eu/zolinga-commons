@@ -74,6 +74,7 @@ export default class PopupContainer extends WebComponent {
     close() {
         this.dispatchEvent(new CustomEvent('popup-close'));
         this.setAttribute('closed', '');
+        this.resolveModal();
     }
 
     open() {

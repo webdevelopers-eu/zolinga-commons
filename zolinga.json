@@ -81,6 +81,11 @@
             "tag": "input-toggle",
             "description": "Toggle input.",
             "module": "web-components/input-toggle/input-toggle.js"
+        },
+        {
+            "tag": "slide-carousel",
+            "description": "Slide carousel.",
+            "module": "web-components/slide-carousel/slide-carousel.js"
         }
     ],
     "autoload": {

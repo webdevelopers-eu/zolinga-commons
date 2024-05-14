@@ -124,6 +124,7 @@
             max-height: 100%;
             align-self: start;
             justify-self: stretch;
+            mask-image: linear-gradient(to bottom, black calc(100% - 3em), transparent 100%);
         }
 
         & ::slotted([slot="actions"]),

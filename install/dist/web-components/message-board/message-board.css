@@ -12,12 +12,12 @@
     position: fixed;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    width: max-content;
     gap: 0.1rem;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    padding: 20px;
+    top: 1em;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 1100;
 
     &:empty {
@@ -25,6 +25,7 @@
     }
 
     &>:where(.message) {
+        flex: 1 1 max-content;
         display: flex;
         position: relative;
         gap: 0.5rem;
@@ -40,7 +41,7 @@
         animation-duration: var(--message-animation-duration, 0.5s);
         animation-timing-function: ease-in-out;
         width: 100%;
-        max-width: calc(var(--content-width, 1024px) - 2em);
+        max-width: min(calc(var(--content-width, 1024px) - 2em), 90vw);
 
         &.removing {
             animation-name: message-out;

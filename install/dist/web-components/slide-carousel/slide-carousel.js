@@ -65,7 +65,7 @@ export default class SlideCarousel extends HTMLElement {
         if (this.dataset.active != this.#lastActiveNames) {
             this.dataset.active = this.#lastActiveNames;
             this.dispatchEvent(new CustomEvent('slide-carousel:change', { detail: { active: active }, bubbles: true, composed: true }));
-            console.log("SlideCarousel: active = %s", this.dataset.active);
+            // console.log("SlideCarousel: active = %s", this.dataset.active);
         }
     }
 

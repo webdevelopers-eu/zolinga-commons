@@ -18,7 +18,7 @@ main#fu {
     justify-content: space-between;
 
     & slot {
-        padding: 2em 1em 0em 1em;
+        padding: 2em 1em 1em 1em;
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -58,6 +58,7 @@ main#fu {
 }
 
 .fu-drop-target {
+    user-select: none;
     padding: 1em;
     display: flex;
     flex-direction: column;
@@ -88,7 +89,7 @@ main#fu {
     inset: 0px;
     pointer-events: none;
     margin: 0px !important;
-    background-color: color-mix(in srgb, var(--color-bg, white) 70%, transparent);
+    background-color: color-mix(in srgb, var(--color-bg, white) 70%, white);
     backdrop-filter: blur(3px);
 }
 :host(.fu-dragover) .fu-drop-target-inline {

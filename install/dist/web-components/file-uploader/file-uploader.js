@@ -24,6 +24,8 @@ export default class FileUploader extends WebComponent {
     #file;
     #uploadPromise;
     #uploadBatchPromise;
+    #dragoverDelay;
+    #dropCover;
 
     constructor() {
         super();
@@ -51,6 +53,7 @@ export default class FileUploader extends WebComponent {
         this.#template = this.querySelector('template') || this.#root.querySelector('template');
         this.#file = this.#root.querySelector('input[role~="new-file"]');
         this.#file.accept = this.getAttribute('accept') || '*/*';
+        this.#dropCover = this.#root.querySelector('.fu-drop-target-cover');
 
         this.#installListeners();
 
@@ -76,28 +79,32 @@ export default class FileUploader extends WebComponent {
             this.#file.value = '';
 
             this.#uploadBatchPromise = Promise.all(
-                files.map(async (file) => this.#addNewFile(file))
+                files.map((file) => this.#addNewFile(file))
             );
         });
 
         // On drag&drop files
         this.addEventListener('dragover', (ev) => {
+            // console.log("Uploader: Dragging over %s files", ev.dataTransfer.files.length);
             ev.preventDefault();
             ev.dataTransfer.dropEffect = 'copy';
+            ev.dataTransfer.effectAllowed = 'copy';
             this.classList.add('fu-dragover');
         });
 
         this.addEventListener('dragleave', (ev) => {
-            ev.preventDefault();
-            this.classList.remove('fu-dragover');
+            // console.log("Uploader: Drag leave with %s files", ev.dataTransfer.files.length);
+            clearTimeout(this.#dragoverDelay);
+            this.#dragoverDelay = setTimeout(() => this.classList.remove('fu-dragover'), 100);
         });
 
         this.addEventListener('drop', (ev) => {
-            this.classList.remove('fu-dragover');
             ev.preventDefault();
+            const files = Array.from(ev.dataTransfer.files);
+            console.log("Uploader: Drop %s files", files.length);
+            this.classList.remove('fu-dragover');
             this.#uploadBatchPromise = Promise.all(
-                Array.from(ev.dataTransfer.files)
-                    .map(file => this.#addNewFile(file))
+                files.map(file => this.#addNewFile(file))
             );
         });
 

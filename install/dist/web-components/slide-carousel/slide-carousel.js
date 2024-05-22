@@ -24,10 +24,11 @@ export default class SlideCarousel extends HTMLElement {
         if (!this.dataset.active) { // otherwise it will be called from attributeChangedCallback automatically
             this.#markActiveSlide();
         }
-        this.#slides.addEventListener('scroll', this.#markActiveSlide.bind(this), { passive: true });
+        this.#slides.addEventListener('scroll', (ev) => this.#markActiveSlide(ev, false), { passive: true });
+        this.#slides.addEventListener('scrollend', (ev) => this.#markActiveSlide(ev, true), { passive: true });
     }
 
-    #markActiveSlide(ev) {
+    #markActiveSlide(ev, removeDisabledAttribute = true) {
         if (ev && ev.target != this.#slides) return;
 
         const slides = this.querySelectorAll(':scope > *');
@@ -44,7 +45,7 @@ export default class SlideCarousel extends HTMLElement {
 
             const slideLeft = Math.ceil(slide.offsetLeft);
             const slideRight = Math.floor(slide.offsetLeft + slide.offsetWidth);
-            
+
             if (scrollLeft < slideRight && slideLeft < scrollRight) {
                 slide.dataset.active = true;
                 active.push(slide);
@@ -58,8 +59,10 @@ export default class SlideCarousel extends HTMLElement {
             // console.log("slide: %o (%s, %s), scroll (%s, %s) = %o", slide, slideLeft, slideRight, scrollLeft, scrollRight, slide.dataset.active);
         });
 
-        this.querySelectorAll(':scope > [data-active="true"] [disabled].auto-enable')
-            .forEach(el => el.removeAttribute('disabled'));
+        if (removeDisabledAttribute) {
+            this.querySelectorAll(':scope > [data-active="true"] [disabled].auto-enable')
+                .forEach(el => el.removeAttribute('disabled'));
+        }
 
         this.#lastActiveNames = active.map(slide => slide.dataset.name).join(' ');
         if (this.dataset.active != this.#lastActiveNames) {

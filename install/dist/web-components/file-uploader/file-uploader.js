@@ -238,7 +238,7 @@ export default class FileUploader extends WebComponent {
             return result.id;
         } catch (error) {
             this.broadcast('message', {
-                message: error.message,
+                message: "Uploader: " + error.message,
                 type: 'error',
                 timeout: 15000,
                 id: 'file-uploader'

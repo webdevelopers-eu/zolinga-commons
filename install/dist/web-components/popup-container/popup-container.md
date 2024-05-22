@@ -38,3 +38,10 @@ The widget fires following DOM events:
 - `popup-close`: Fired when the popup is closed.
 - `popup-open`: Fired when the popup is opened.
 - `popup-remove`: Fired when the popup is removed.
+
+## Methods
+- `open()`: Opens the popup.
+- `close()`: Closes the popup.
+- `remove()`: Removes the popup from the DOM.
+- `cover()`: Covers the popup with a transparent layer. This is useful when you want to prevent the user from interacting with the page behind the popup. In essence it adds `cover` class to the popup.
+- `uncover()`: Removes the cover layer from the popup. This is useful when you want to allow the user to interact with the page behind the popup. In essence it removes `cover` class from the popup.

@@ -38,6 +38,20 @@
             "description": "Various conversion and formatting functions.",
             "service": "convert",
             "class": "Zolinga\\Commons\\ConvertService"
+        },
+        {
+            "description": "Uploader service.",
+            "service": "uploader",
+            "class": "Zolinga\\Commons\\Uploader\\UploaderService"
+        },
+        {
+            "description": "Uploader API",
+            "event": "uploader",
+            "class": "Zolinga\\Commons\\Uploader\\UploaderService",
+            "method": "onUploader",
+            "origin": [
+                "remote"
+            ]
         }
     ],
     "emit": [],
@@ -86,6 +100,11 @@
             "tag": "slide-carousel",
             "description": "Slide carousel.",
             "module": "web-components/slide-carousel/slide-carousel.js"
+        },
+        {
+            "tag": "file-uploader",
+            "description": "File uploader.",
+            "module": "web-components/file-uploader/file-uploader.js"
         }
     ],
     "autoload": {

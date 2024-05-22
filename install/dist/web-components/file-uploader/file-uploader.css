@@ -1,0 +1,111 @@
+:host(file-uploader) {
+    flex: 1 1 auto;
+    --preview-height: 60px;
+    --preview-width: 80px;
+    --drop-border: 1px dashed color-mix(in srgb, currentColor 40%, transparent);
+}
+
+:host([data-count="0"]) slot {
+    display: none !important;
+}
+
+main#fu {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+
+    & slot {
+        padding: 2em 1em 0em 1em;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-width: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+
+        &::slotted(*) {
+            flex: 0 1 auto;
+            height: var(--preview-height);
+            width: var(--preview-width);
+            max-width: 100%;
+        }
+    }
+}
+
+.fu-file {
+
+    & img.fu-object {
+        display: block;
+        object-fit: cover;
+        overflow: hidden;
+        width: 100%;
+        max-width: 100%;
+        aspect-ratio: var(--preview-aspect-ratio, 4 / 3);
+        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    &.fu-loading {
+        filter: blur(3px) grayscale(100%);
+    }
+
+    & [role~="remove-file"] {
+        cursor: pointer;
+    }
+}
+
+.fu-drop-target {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    border: var(--drop-border);
+    border-radius: var(--radius, 10px);
+    margin: 0px;
+    color: color-mix(in srgb, currentColor 60%, transparent);
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg, white);
+    white-space: auto;
+    text-align: center;
+
+    & input {
+        position: absolute;
+        display: block;
+        inset: 0px;
+        z-index: 1;
+        opacity: 0;
+    }
+}
+
+.fu-drop-target-cover {
+    position: absolute;
+    z-index: 1;
+    inset: 0px;
+    pointer-events: none;
+    margin: 0px !important;
+    background-color: color-mix(in srgb, var(--color-bg, white) 70%, transparent);
+    backdrop-filter: blur(3px);
+}
+:host(.fu-dragover) .fu-drop-target-inline {
+    visibility: hidden;
+}
+
+:host(:not(.fu-dragover)) .fu-drop-target-cover {
+    display: none !important;
+}
+
+:popover-open {
+    border: 1px solid var(--color-primary) !important;
+    border-radius: var(--radius);
+    padding: 1em 2em;
+
+    &::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+        filter: blur(2px);
+    }
+}

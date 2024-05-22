@@ -1,5 +1,5 @@
 :host, *:where(message-board) {
-    contain: size;
+    /* contain: size; no because when included/inherited it screws up the components */
     --message-animation-duration: 0.32s;
 
     --message-error-color: #721c24;

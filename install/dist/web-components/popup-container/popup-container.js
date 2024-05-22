@@ -86,4 +86,14 @@ export default class PopupContainer extends WebComponent {
         this.dispatchEvent(new CustomEvent('popup-remove'));
         super.remove();
     }
+
+    cover() {
+        // this.dispatchEvent(new CustomEvent('popup-cover'));
+        this.classList.add('cover');
+    }
+
+    uncover() {
+        // this.dispatchEvent(new CustomEvent('popup-uncover'));
+        this.classList.remove('cover');
+    }
 }

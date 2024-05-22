@@ -115,7 +115,7 @@ export default class FileUploader extends WebComponent {
                     if (uri.match(/^zolinga:uploader:/)) {
                         api.dispatchEvent('uploader', { op: "remove", uri });
                     }
-                    this.removeItem(uri);
+                    this.removeFile(uri);
                     break;
             }
         });
@@ -138,7 +138,7 @@ export default class FileUploader extends WebComponent {
     }
 
     reset() {
-        this.querySelectorAll(':scope > .fu-file[data-uri]').forEach(el => this.removeItem(el.dataset.uri));
+        this.querySelectorAll(':scope > .fu-file[data-uri]').forEach(el => this.removeFile(el.dataset.uri));
         this.#file.value = '';
     }
 
@@ -176,7 +176,7 @@ export default class FileUploader extends WebComponent {
                 .catch(error => {
                     console.log(`Uploader: Removing upload element due to error: ${error.message}`, el);
                     el.dataset.uri = 'uploader:error:' + Math.random();
-                    this.removeItem(el.dataset.uri);
+                    this.removeFile(el.dataset.uri);
                 })
             );
 

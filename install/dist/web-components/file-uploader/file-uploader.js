@@ -1,4 +1,4 @@
-import WebComponent from '/dist/system/js/web-component.js';
+import WebComponent from '/dist/zolinga-intl/js/web-component-intl.js';
 import zTemplate from '/dist/system/js/z-template.js';
 import api from '/dist/system/js/api.js';
 

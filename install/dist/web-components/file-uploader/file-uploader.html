@@ -12,7 +12,8 @@
             <template>
                 <div class="fu-file">
                     <input type="hidden" z-var="fieldName @name, uri =" />
-                    <img role="remove-file-confirm" class="fu-object" title="${name} (${sizeHR})" z-var="name @title, sizeHR @title, url @src, type @type" />
+                    <img role="remove-file-confirm" class="fu-object" title="${name} (${sizeHR})"
+                        z-var="name @title, sizeHR @title, url @src, type @type" />
                     <!-- <div class="fu-file-name" z-var="name .">Name</div>  -->
                     <!-- <div class="fu-file-size" z-var="size .">Size</div> -->
                     <!-- <div class="fu-file-last-modified" z-var="lastModified .">Modified</div> -->
@@ -20,21 +21,28 @@
                 </div>
             </template>
         </slot>
-        
+
         <div class="fu-drop-target fu-drop-target-cover">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                <path d="M11.8 5.8a.8.8 0 0 1-1 0l-2-2v7.5a.8.8 0 0 1-1.6 0V3.8l-2 2a.8.8 0 0 1-1-1.1l3.3-3.3L8 1l.5.5 3.3 3.3a.8.8 0 0 1 0 1zm-9.3 4a.8.8 0 0 0-1.5 0V13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9.7a.8.8 0 0 0-1.5 0V13a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V9.7z"/>
+            </svg>
             <span gettext=".">Drop files here to upload</span>
         </div>
 
         <div class="fu-drop-target fu-drop-target-inline">
             <input type="file" role="new-file" accept="*/*" multiple />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                <path d="M11.8 5.8a.8.8 0 0 1-1 0l-2-2v7.5a.8.8 0 0 1-1.6 0V3.8l-2 2a.8.8 0 0 1-1-1.1l3.3-3.3L8 1l.5.5 3.3 3.3a.8.8 0 0 1 0 1zm-9.3 4a.8.8 0 0 0-1.5 0V13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9.7a.8.8 0 0 0-1.5 0V13a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V9.7z"/>
+            </svg>
             <span gettext=".">Click or drag files here to upload</span>
         </div>
-        
+
         <div popover id="fu-confirm-removal">
             <div gettext="." style="padding-bottom: 1em;">Really remove this file?</div>
             <div>
                 <button popovertarget="fu-confirm-removal" class="c-form" gettext=".">Cancel</button>
-                <button popovertarget="fu-confirm-removal" role="remove-file" class="c-form primary" gettext="." autofocus>Remove</button>
+                <button popovertarget="fu-confirm-removal" role="remove-file" class="c-form primary" gettext="."
+                    autofocus>Remove</button>
             </div>
         </div>
 

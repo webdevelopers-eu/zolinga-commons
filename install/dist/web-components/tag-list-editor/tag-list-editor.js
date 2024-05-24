@@ -16,7 +16,26 @@ export default class TagListEditor extends HTMLElement {
     constructor() {
         super();
         //this.#internals = this.attachInternals();
-        this.#init();
+        const origTags = this.tags;
+
+        this.#init()
+            .then(() => {
+                if (origTags) {
+                    console.log('TagListEditor: setting tags', origTags);
+                    this.setTags(origTags);
+                }
+            });
+    }
+
+    get tags() {
+        return Array.from(this.querySelectorAll('tag-editor input')).map(tag => tag.value).filter((t) => t);
+    }
+
+    set tags(values) {
+        if (!Array.isArray(values)) {
+            throw new Error('Tags must be an array');
+        }
+        this.setTags(values);
     }
 
     async #init() {
@@ -79,6 +98,11 @@ export default class TagListEditor extends HTMLElement {
         return max && count >= max;
     }
 
+    setTags(values) {
+        this.innerHTML = '';
+        values.forEach(value => this.addNewTag(value));
+    }
+
     addNewTag(value) {
         if (this.#isMaxReached()) {
             console.warn(`Max tags limit reached (${max})`);
@@ -94,6 +118,10 @@ export default class TagListEditor extends HTMLElement {
         this.appendChild(tag);
         this.#propagateAttributes();
         tag.focus();
+    }
+
+    reset() {
+        this.querySelectorAll('tag-editor').forEach(tagEditor => tagEditor.remove());
     }
 
     #onContentChange() {

@@ -30,6 +30,16 @@ This web component allows you to edit and remove multiple [<tag-editor>](:ref:wc
 - `no-edit` - if present the tag list will be displayed as a read-only list with the remove icon but without the ability to edit the tags.
 - `no-remove` - if present the tag list will be displayed as an editable list without the remove icon.
 
+## Properties
+
+- `tags: string[]` - the list of tags in the editor. This is a read-write property that can be set even before the component is defined. Example: `document.querySelector('tag-list-editor').tags = ['Tag 1', 'Tag 2', 'Tag 3']`.
+
+## Methods
+
+- `addTag(tag: string)` - adds a new tag to the list. Example: `document.querySelector('tag-list-editor').addTag('My Tag')`.
+- `setTags(tags: string[])` - sets the tags in the list. Example: `document.querySelector('tag-list-editor').setTags(['Tag 1', 'Tag 2', 'Tag 3'])`.
+- `reset()` - removes all tags from the list.
+
 ## Example
 
 ```html

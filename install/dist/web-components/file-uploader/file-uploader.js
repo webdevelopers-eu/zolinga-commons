@@ -93,6 +93,9 @@ export default class FileUploader extends WebComponent {
         });
 
         this.addEventListener('dragleave', (ev) => {
+            ev.preventDefault();
+            ev.dataTransfer.dropEffect = 'copy';
+            ev.dataTransfer.effectAllowed = 'copy';
             // console.log("Uploader: Drag leave with %s files", ev.dataTransfer.files.length);
             clearTimeout(this.#dragoverDelay);
             this.#dragoverDelay = setTimeout(() => this.classList.remove('fu-dragover'), 100);

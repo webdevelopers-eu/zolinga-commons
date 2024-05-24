@@ -9,4 +9,4 @@ CREATE TABLE `uploads` (
   `size` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `hash_UNIQUE` (`hash`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

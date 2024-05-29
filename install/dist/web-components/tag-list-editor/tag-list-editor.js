@@ -16,11 +16,11 @@ export default class TagListEditor extends HTMLElement {
     constructor() {
         super();
         //this.#internals = this.attachInternals();
-        const origTags = this.tags;
+        const origTags = this.tags; // this is only before the class is loaded the first time
 
         this.#init()
             .then(() => {
-                if (origTags) {
+                if (origTags && origTags.length) {
                     console.log('TagListEditor: setting tags', origTags);
                     this.setTags(origTags);
                 }
@@ -99,6 +99,7 @@ export default class TagListEditor extends HTMLElement {
     }
 
     setTags(values) {
+        console.log("Tag List Editor: setting tags", values);
         this.querySelectorAll(':scope > tag-editor').forEach(tagEditor => tagEditor.remove());
         values.forEach(value => this.addNewTag(value));
     }

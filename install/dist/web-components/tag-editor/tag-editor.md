@@ -22,7 +22,7 @@ The editor will automatically create hidden `<input>` element with the same name
     [no-edit]
     [no-remove]
     [autofocus]
-    >{VALUE}</tag-editor>
+    ></tag-editor>
 ```
 
 ### Properties

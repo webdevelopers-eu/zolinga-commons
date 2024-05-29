@@ -23,6 +23,7 @@
         display: grid;
         grid-template-columns:
             [full-width-start] 0rem [content-start] 1fr [content-end] 0rem [full-width-end];
+        grid-auto-rows: min-content;
         grid-auto-flow: row;
         gap: var(--forms-gap-vertical) var(--forms-gap-horizontal);
         align-items: center;
@@ -32,7 +33,7 @@
         padding: 0em;
         background-color: var(--forms-color-bg);
         border-radius: var(--forms-radius, 5px);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 
         &::before {
             content: "";
@@ -45,7 +46,10 @@
             height: var(--forms-gap-vertical);
         }
 
-        &>*, &::after, &::before, &>::slotted(*) {
+        &>*,
+        &::after,
+        &::before,
+        &>::slotted(*) {
             grid-column: content;
             margin: 0px;
         }
@@ -67,7 +71,8 @@
         font-size: 1em;
         transition: background-color 0.5s;
 
-        &.primary, &[type="submit"]:not(.secondary, .important) {
+        &.primary,
+        &[type="submit"]:not(.secondary, .important) {
             background-color: var(--forms-color-primary);
             color: var(--forms-color-primary-fg);
         }
@@ -82,7 +87,9 @@
         }
     }
 
-    &>label, &>button, &>input {
+    &>label,
+    &>button,
+    &>input {
         margin-top: calc(var(--forms-gap-vertical) / 4);
         margin-bottom: calc(var(--forms-gap-vertical) / 4);
     }
@@ -127,6 +134,10 @@
                 color: var(--forms-color-fg);
                 min-height: 2.4em;
                 --color-placeholder: color-mix(in srgb, var(--forms-color-fg) 36%, transparent);
+
+                &:where(tag-list-editor, tag-editor) {
+                    padding: 1em;
+                }
 
                 &:where(input, select, textarea) {
                     font-family: inherit;

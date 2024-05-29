@@ -10,6 +10,7 @@ export default class PopupContainer extends WebComponent {
     #root;
     #main;
     #grid;
+    #lastPopupState = -1;
     static observedAttributes = [...WebComponent.observedAttributes, 'width'];
 
     constructor() {
@@ -18,15 +19,23 @@ export default class PopupContainer extends WebComponent {
     }
 
     connectedCallback() {
-        document.documentElement.popupContainerCount = (document.documentElement.popupContainerCount || 0) + 1;
-        document.documentElement.classList.add('popup-container-open');
+        this.#countPopups(1);
     }
 
     disconnectedCallback() {
-        document.documentElement.popupContainerCount--;
-        if (document.documentElement.popupContainerCount === 0) {
-            document.documentElement.classList.remove('popup-container-open');
-        }
+        this.#countPopups(-1);
+    }
+
+    #countPopups(inc) {
+        if (this.#lastPopupState === inc) return; // already counted/closed/opened
+        this.#lastPopupState = inc;
+
+        document.documentElement.popupContainerCount = (document.documentElement.popupContainerCount || 0);
+        document.documentElement.popupContainerCount += inc;
+
+        console.log(`popupContainerCount: ${document.documentElement.popupContainerCount} remaining popups`);
+        
+        document.documentElement.classList.toggle('popup-container-open', !!document.documentElement.popupContainerCount);
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -75,16 +84,19 @@ export default class PopupContainer extends WebComponent {
         this.dispatchEvent(new CustomEvent('popup-close'));
         this.setAttribute('closed', '');
         this.resolveModal();
+        this.#countPopups(-1);
     }
 
     open() {
         this.dispatchEvent(new CustomEvent('popup-open'));
         this.removeAttribute('closed');
+        this.#countPopups(1);
     }
 
     remove() {
         this.dispatchEvent(new CustomEvent('popup-remove'));
         super.remove();
+        this.#countPopups(-1);
     }
 
     cover() {

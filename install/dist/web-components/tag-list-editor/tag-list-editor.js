@@ -99,7 +99,7 @@ export default class TagListEditor extends HTMLElement {
     }
 
     setTags(values) {
-        this.innerHTML = '';
+        this.querySelectorAll(':scope > tag-editor').forEach(tagEditor => tagEditor.remove());
         values.forEach(value => this.addNewTag(value));
     }
 

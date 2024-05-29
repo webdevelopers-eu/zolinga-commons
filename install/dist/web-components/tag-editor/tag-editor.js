@@ -49,11 +49,6 @@ export default class TagEditor extends HTMLElement {
 
         this.#initListeners();
         this.dataset.ready = true;
-
-        if (this.hasAttribute('autofocus')) {
-            this.focus();
-            this.removeAttribute('autofocus');
-        }
     }
 
     #initListeners() {
@@ -77,12 +72,12 @@ export default class TagEditor extends HTMLElement {
 
         // On blur run validation on this.#input
         this.#editor.addEventListener('blur', (event) => {
-            if (this.#editor.textContent.trim() === '') {
-                this.#remove();
-            } else {
+            // if (this.#editor.textContent.trim() === '') {
+            //     this.#remove();
+            // } else {
                 this.#editor.textContent = this.#editor.textContent.trim();
                 this.validate();
-            }
+            // }
         });
 
         // Intercept all TAB, ENTER, and COMMA keys
@@ -142,20 +137,23 @@ export default class TagEditor extends HTMLElement {
 
     #confirmRemoval() {
         this.classList.add('removing');
-        document.body.addEventListener('click', (event) => {
-            console.log(`Event ${event.type} on %o`, document.body);
-            if (event.target.matches(':invalid, input, textarea, select')) { // browser triggers click on first invalid input in the form?
-                this.#confirmRemoval();
-            } else if (event.target !== this.#removeButton && !this.#removeButton.contains(event.target)) {
-                this.classList.remove('removing');
-            }
-        }, { once: true, capture: true });
+        setTimeout(() => {
+            this.classList.remove('removing');
+        }, 3000);
+        // document.body.addEventListener('click', (event) => {
+        //     console.log(`Event ${event.type} on %o`, event.target);
+        //     if (event.target.matches(':invalid, input, textarea, select')) { // browser triggers click on first invalid input in the form?
+        //         this.#confirmRemoval();
+        //     } else if (event.target !== this.#removeButton && !this.#removeButton.contains(event.target)) {
+        //         this.classList.remove('removing');
+        //     }
+        // }, { once: true, capture: true });
     }
 
     #remove() {
         if (this.parentNode && !this.hasAttribute('no-remove') && !this.hasAttribute('readonly')) {
             try {
-                    this.parentNode?.removeChild(this);
+                this.parentNode?.removeChild(this);
             } catch (e) {
                 console.error(e);
             }
@@ -164,11 +162,19 @@ export default class TagEditor extends HTMLElement {
 
     focus(position = 'start') {
         this.#readyPromise.then(() => {
+            // focus this.#editor and place the cursor at the end or start
             this.#editor.focus();
+            const range = document.createRange();
             if (position === 'end') {
-                const sel = this.getRootNode().getSelection();
-                sel.collapse(this.#editor, this.#editor.childNodes.length);
+                range.selectNodeContents(this.#editor);
+            } else {
+                range.setStart(this.#editor, 0);
             }
+
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            this.#editor.focus();
         });
     }
 
@@ -203,9 +209,10 @@ export default class TagEditor extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue === newValue) return;
-        
+
         this.#readyPromise.then(() => {
+            newValue = this.getAttribute(name); // there was some delay in the attribute changes so read fresh.
+            if (oldValue === newValue) return;
             switch (name) {
                 case 'no-edit':
                 case 'readonly':
@@ -243,11 +250,13 @@ export default class TagEditor extends HTMLElement {
     }
 
     #focusPrev() {
-        this.previousElementSibling?.focus('end');
+        const el = this.previousElementSibling;
+        el?.focus(el?.localName === 'tag-editor' ? 'end' : {});
     }
 
     #focusNext() {
-        this.nextElementSibling?.focus('start');
+        const el = this.nextElementSibling;
+        el?.focus(el?.localName === 'tag-editor' ? 'start' : {});
     }
 
     #addStyles() {

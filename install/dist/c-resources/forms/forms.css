@@ -87,11 +87,16 @@
         }
     }
 
+    &>p,
     &>label,
     &>button,
     &>input {
         margin-top: calc(var(--forms-gap-vertical) / 4);
         margin-bottom: calc(var(--forms-gap-vertical) / 4);
+    }
+
+    &>p {
+        color: var(--forms-color-secondary);
     }
 
     &>label {
@@ -181,10 +186,10 @@
                     &::before {
                         position: absolute;
                         content: "";
-                        top: calc(50% - var(--forms-field-border-width));
+                        top: calc(50% - var(--forms-field-border-width) - 1px);
                         left: -0.1em;
                         height: 0px;
-                        border-top: calc(var(--forms-field-border-width) + 1px) solid var(--forms-field-color-bg, white);
+                        border-top: calc(var(--forms-field-border-width) + 2px) solid var(--forms-field-color-bg, white);
                         width: calc(100% + 0.2em);
                         z-index: -1;
                     }

@@ -88,6 +88,7 @@ export default class TagListEditor extends HTMLElement {
             });
         this.#root.querySelector('.trap')
             .addEventListener('focus', (event) => {
+                console.log('TagListEditor: focus on trap - clicking [add] button');
                 this.#root.querySelector('.add').click();
             });
     }
@@ -114,11 +115,12 @@ export default class TagListEditor extends HTMLElement {
         if (typeof value === 'string') {
             tag.textContent = value;
         } else {
+            console.log('TagListEditor: setting autofocus attr on new tag');
             tag.setAttribute('autofocus', 'true');
         }
         this.appendChild(tag);
         this.#propagateAttributes();
-        tag.focus();
+        console.log('TagListEditor: added new tag', tag);
     }
 
     reset() {

@@ -49,6 +49,11 @@ export default class TagEditor extends HTMLElement {
 
         this.#initListeners();
         this.dataset.ready = true;
+
+        if (this.hasAttribute('autofocus')) {
+            console.log('TagEditor: focusing on init');
+            this.focus();
+        }
     }
 
     #initListeners() {
@@ -62,10 +67,12 @@ export default class TagEditor extends HTMLElement {
 
         // On validation it is focused and error displayed
         this.#input.addEventListener('keydown', (event) => {
+            console.log('TagEditor: keydown on input - focusing', event.key);
             this.focus();
         });
 
         this.#removeButton.addEventListener('click', (event) => {
+            console.log('TagEditor: remove button clicked - trying to focus previous...')
             this.#focusPrev();
             this.#remove();
         });
@@ -75,8 +82,8 @@ export default class TagEditor extends HTMLElement {
             // if (this.#editor.textContent.trim() === '') {
             //     this.#remove();
             // } else {
-                this.#editor.textContent = this.#editor.textContent.trim();
-                this.validate();
+            this.#editor.textContent = this.#editor.textContent.trim();
+            this.validate();
             // }
         });
 
@@ -86,6 +93,7 @@ export default class TagEditor extends HTMLElement {
             const sel = root.getSelection ? root.getSelection() : document.getSelection();
             if (this.classList.contains('removing')) {
                 if (event.key === 'Enter' || event.key === 'Backspace') {
+                    console.log('TagEditor: removing tag - focusing previous')
                     this.#focusPrev();
                     this.#remove();
                 } else {
@@ -93,14 +101,17 @@ export default class TagEditor extends HTMLElement {
                 }
             } else if (event.key === 'Tab' || event.key === 'Enter') {
                 if (this.validate()) {
+                    console.log('TagEditor: bluring the tag', this);
                     this.#editor.blur();
                 } else {
                     event.preventDefault();
                 }
             } else if (event.key === 'ArrowLeft' && sel.focusOffset === 0) {
+                console.log('TagEditor: ArrowLeft at the beginning - focusing previous...');
                 this.#focusPrev();
                 event.preventDefault();
             } else if (event.key === 'ArrowRight' && (sel.focusOffset === sel.focusNode.length || sel.focusNode === this.#editor)) {
+                console.log('TagEditor: ArrowRight at the end - focusing next...');
                 this.#focusNext();
                 event.preventDefault();
             }
@@ -161,20 +172,23 @@ export default class TagEditor extends HTMLElement {
     }
 
     focus(position = 'start') {
+        console.log('TagEditor: focusing %s, %o', position, this);
         this.#readyPromise.then(() => {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+
             // focus this.#editor and place the cursor at the end or start
             this.#editor.focus();
             const range = document.createRange();
-            if (position === 'end') {
-                range.selectNodeContents(this.#editor);
-            } else {
-                range.setStart(this.#editor, 0);
-            }
 
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-            this.#editor.focus();
+            if (position === 'start') {
+                range.setStart(this.#editor, 0);
+                range.setEnd(this.#editor, 0);
+            } else {
+                range.selectNodeContents(this.#editor);
+                sel.addRange(range);
+                sel.collapse(this.#editor, position === 'end' ? this.#editor.childNodes.length : 0);
+            }
         });
     }
 
@@ -250,11 +264,13 @@ export default class TagEditor extends HTMLElement {
     }
 
     #focusPrev() {
+        console.log('TagEditor: focusing previous element');
         const el = this.previousElementSibling;
         el?.focus(el?.localName === 'tag-editor' ? 'end' : {});
     }
 
     #focusNext() {
+        console.log('TagEditor: focusing next element');
         const el = this.nextElementSibling;
         el?.focus(el?.localName === 'tag-editor' ? 'start' : {});
     }

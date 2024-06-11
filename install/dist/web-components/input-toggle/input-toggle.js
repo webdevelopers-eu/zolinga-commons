@@ -10,35 +10,22 @@ export default class InputToggle extends HTMLElement {
     #input;
     #toggle;
     static observedAttributes = ['value', 'checked', 'disabled', 'readonly', 'required', 'name', 'form'];
+    #states = {};
 
     constructor() {
         super();
+        this.boundOnInputChange = this.#onInputChange.bind(this);
         this.#init()
             .then(() => this.dataset.ready = true);
     }
 
-    // Lifecycle hooks
-    connectedCallback() {
-        this.#initInput();
+    get checked() {
+        return this.#states.checked !== null;
     }
 
-    // removed from dom
-    disconnectedCallback() {
-        this.#input.removeEventListener('click', this.#syncInputToToggle);
-        this.#input.removeEventListener('change', this.#syncInputToToggle);
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (!this.#input) return; // not yet initialized
-
-        if (oldValue === newValue) return;
-        if (this.#input.getAttribute(name) === newValue) return;
-
-        if (newValue === null) {
-            this.#input.removeAttribute(name);
-        } else {
-            this.#input.setAttribute(name, newValue);
-        }
+    set checked(value) {
+        this.#states.checked = value ? '' : null;
+        this.#syncStates();
     }
 
     async #init() {
@@ -48,44 +35,78 @@ export default class InputToggle extends HTMLElement {
 
     async #initInput() {
         this.#input = this.querySelector('input');
+        let master = this;
         if (this.#input) {
-            this.#syncInputToToggle();
+            master = this.#input;
         } else {
             this.#input = document.createElement('input');
             this.#input.type = 'checkbox';
             this.appendChild(this.#input);
-            this.#syncAttrs(this, this.#input);
         }
-        const observer = new MutationObserver(this.#syncInputToToggle.bind(this));
+
+        InputToggle.observedAttributes.forEach(attr => {
+            this.#states[attr] = master.getAttribute(attr);
+        });
+        this.#syncStates();
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((m) => {
+                if (m.type === 'attributes' && InputToggle.observedAttributes.includes(m.attributeName)) {
+                    if (this.#states[m.attributeName] !== m.target.getAttribute(m.attributeName)) {
+                        this.#states[m.attributeName] = m.target.getAttribute(m.attributeName);
+                        this.#syncStates();
+                    }
+                }
+            });
+        });
         observer.observe(this.#input, { attributes: true });
 
-        this.#input.addEventListener('click', this.#syncInputToToggle.bind(this));
-        this.#input.addEventListener('change', this.#syncInputToToggle.bind(this));
+        this.#input.addEventListener('click', this.boundOnInputChange);
+        this.#input.addEventListener('change', this.boundOnInputChange);
     }
 
-    #syncInputToToggle() {
-        if (this.#input.checked && !this.#input.hasAttribute('checked')) {
-            this.#input.setAttribute('checked', '');
-            // console.log('TOGGLE: checked', this.#input);
-        } else if (!this.#input.checked && this.#input.hasAttribute('checked')) {
-            this.#input.removeAttribute('checked');
-            // console.log('TOGGLE: unchecked', this.#input);
+    #onInputChange() {
+        if (this.#states.checked !== (this.#input.checked ? '' : null)) {
+            this.#input.toggleAttribute('checked', this.#input.checked);
         }
-        this.#syncAttrs(this.#input, this);
     }
 
-    #syncAttrs(source, target) {
-        InputToggle.observedAttributes.forEach(attr => {
-            if (source.hasAttribute(attr)) {
-                if (target.getAttribute(attr) !== source.getAttribute(attr)) {
-                    target.setAttribute(attr, source.getAttribute(attr));
-                    // console.log('TOGGLE: set', attr, source.getAttribute(attr));
-                }
-            } else if (target.hasAttribute(attr)) {
-                target.removeAttribute(attr);
-                // console.log('TOGGLE: remove', attr);
-            }
-        });
+    #syncStates() {
+        Object.entries(this.#states)
+            .forEach(([attr, value]) => {
+                [this.#input, this]
+                    .forEach(el => {
+                        if (el.getAttribute(attr) !== value) {
+                            if (value === null) {
+                                el.removeAttribute(attr);
+                            } else {
+                                el.setAttribute(attr, value);
+                            }
+                        }
+                    });
+            });
+        this.#input.checked = this.#states.checked !== null;
+    }
+
+    // Lifecycle hooks
+    connectedCallback() {
+        this.#initInput();
+    }
+
+    // removed from dom
+    disconnectedCallback() {
+        this.#input.removeEventListener('click', this.boundOnInputChange);
+        this.#input.removeEventListener('change', this.boundOnInputChange);
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (!this.#input) return; // not yet initialized
+
+        if (oldValue === newValue) return;
+        if (this.#states[name] === newValue) return;
+
+        this.#states[name] = newValue;
+        this.#syncStates();
     }
 
     async #initShadowDom() {

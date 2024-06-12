@@ -1,7 +1,6 @@
 :host([closed]) {
     display: none !important;
 }
-
 .curtain {
     display: none;
     grid-row: 1 / -1;

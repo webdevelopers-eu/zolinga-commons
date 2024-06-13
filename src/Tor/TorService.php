@@ -155,7 +155,7 @@ class TorService extends DownloaderService
     {
         global $api;
 
-        $api->log->info($this->logPrefix, "Refreshing TOR circuit - changing your identity...");
+        $api->log->info($this->logPrefix, "Refreshing TOR circuit (not flushing cookies)...");
 
         if (!$this->isControlConfigured()) {
             $this->controlHost

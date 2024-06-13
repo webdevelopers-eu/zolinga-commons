@@ -30,6 +30,7 @@ class TorService extends DownloaderService
     private readonly int $controlPort;
     private readonly string $controlPassword;
     private int $requestCounter = 0;
+    private int $successCounter = 0;
 
     public function __construct(string $cookieJarName = 'tor')
     {
@@ -44,6 +45,10 @@ class TorService extends DownloaderService
         $this->curlOpts = [
             CURLOPT_PROXY => "$socksHost:$socksPort",
             CURLOPT_PROXYTYPE => CURLPROXY_SOCKS5,
+            CURLOPT_LOW_SPEED_LIMIT => 1,
+            CURLOPT_LOW_SPEED_TIME => 15,
+            CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_CONNECTTIMEOUT_MS => 15000,
         ];
         $this->setDefaultTimeout();
 
@@ -63,7 +68,7 @@ class TorService extends DownloaderService
      * @param integer $timeout Timeout in seconds. Default is 60.
      * @return void
      */
-    public function setDefaultTimeout(int $timeout = 15): void
+    public function setDefaultTimeout(int $timeout = 90): void
     {
         $this->curlOpts[CURLOPT_TIMEOUT] = $timeout;
         $this->curlOpts[CURLOPT_TIMEOUT_MS] = $timeout * 1000;
@@ -110,18 +115,26 @@ class TorService extends DownloaderService
             $curlOptsLocal[CURLOPT_CONNECT_TO] = ["$host:$port:$ip"];
         }
 
+        $attempts = 3;
         do {
             try {
                 $ret = parent::download($url, $outFile, array_replace($this->curlOpts, $curlOptsLocal, $curlOpts));
-            } catch (TimeoutException | SslException | GotNothingException $e) { // Slow/unusable Tor service
-                // Try if the connection works
-                $this->refreshIdentity();
+            } catch (GotNothingException $e) {
+                if ($attempts-- <= 0) {
+                    $this->refreshIdentity();
+                }
+            } catch (TimeoutException | SslException $e) { // Slow/unusable Tor service
+                // Sometimes event good connection glitches.
+                if ($attempts-- <= 0 || !$this->successCounter) {
+                    $this->refreshIdentity();
+                }
             } catch (\Throwable $e) {
                 $api->log->error($this->logPrefix, "Failed to download $url: " . $e->getCode() . ' ' . $e->getMessage());
                 throw $e;
             }
         } while (!$ret);
 
+        $this->successCounter++;
         return $ret;
     }
 
@@ -185,6 +198,7 @@ class TorService extends DownloaderService
 
         fclose($fp);
         $this->requestCounter = 0;
+        $this->successCounter = 0;
 
         if ($flushCookies) {
             $this->flushCookies();

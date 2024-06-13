@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zolinga\Commons\Tor;
 
 use Zolinga\Commons\Downloader\DownloaderService;
+use Zolinga\Commons\Downloader\Exception\GotNothingException;
 use Zolinga\Commons\Downloader\Exception\SslException;
 use Zolinga\Commons\Downloader\Exception\TimeoutException;
 
@@ -91,10 +92,9 @@ class TorService extends DownloaderService
      * @param string $url
      * @param false|boolean $outFile false to return the content, string to save to file.
      * @param array<mixed> $curlOpts Additional CURL options. E.g. [CURLOPT_PROXY => 'http://proxy:port']
-     * @param bool $changeIdentityOnError on timout or SSL errors change identity and try again until such error occurs.
      * @return boolean|string Content of the resource if $outFile is false, otherwise true on success.
      */
-    public function download(string $url, false|string $outFile = false, array $curlOpts = [], bool $changeIdentityOnError = true): bool|string
+    public function download(string $url, false|string $outFile = false, array $curlOpts = []): bool|string
     {
         global $api;
         $this->requestCounter++;
@@ -113,14 +113,9 @@ class TorService extends DownloaderService
         do {
             try {
                 $ret = parent::download($url, $outFile, array_replace($this->curlOpts, $curlOptsLocal, $curlOpts));
-            } catch (TimeoutException|SslException $e) { // Slow/unusable Tor service
+            } catch (TimeoutException | SslException | GotNothingException $e) { // Slow/unusable Tor service
                 // Try if the connection works
-                if ($changeIdentityOnError) {
-                    $this->refreshIdentity();
-                } else {
-                    $api->log->error($this->logPrefix, "Failed download $url. Error: {$e->getCode()} {$e->getMessage()}");
-                    throw $e;
-                }
+                $this->refreshIdentity();
             } catch (\Throwable $e) {
                 $api->log->error($this->logPrefix, "Failed to download $url: " . $e->getCode() . ' ' . $e->getMessage());
                 throw $e;
@@ -190,5 +185,8 @@ class TorService extends DownloaderService
 
         fclose($fp);
         $this->requestCounter = 0;
+
+        $api->log->info($this->logPrefix, "Removing all cookies...");
+        file_put_contents($this->cookieJarFileName, '');
     }
 }

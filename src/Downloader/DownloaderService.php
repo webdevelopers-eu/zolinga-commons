@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zolinga\Commons\Downloader;
 
 use Exception;
+use Zolinga\Commons\Downloader\Exception\GotNothingException;
 use Zolinga\System\Events\ServiceInterface;
 use Zolinga\Commons\Downloader\Exception\SslException;
 use Zolinga\Commons\Downloader\Exception\TimeoutException;
@@ -18,7 +19,7 @@ use Zolinga\Commons\Downloader\Exception\TimeoutException;
 class DownloaderService implements ServiceInterface
 {
     protected readonly string $logPrefix;
-    private readonly string $cookieJarFileName;
+    protected readonly string $cookieJarFileName;
     private const DEFAULT_CURL_OPTS  = [
         CURLOPT_AUTOREFERER => 1,
         CURLOPT_COOKIESESSION => 1,
@@ -235,6 +236,8 @@ class DownloaderService implements ServiceInterface
                 case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
                     // 35 OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to www.tmdn.org:443
                     throw new SslException("SSL error downloading $url: $errNo $errMsg", $errNo);
+                case CURLE_GOT_NOTHING:
+                    throw new GotNothingException("Empty reply downloading $url: $errNo $errMsg", $errNo);
                 default:
                     throw new Exception("Failed to download $url: $errNo $errMsg", $errNo);
             }

@@ -35,11 +35,12 @@ class PingJoeService implements ServiceInterface
             or throw new \Exception("Invalid nextCheck value: $nextCheck");
 
         $url = "https://$user:$password@api.pingjoe.com/$spotter/$nextCheck";
+        $urlSafe = "https://***:***@api.pingjoe.com/$spotter/$nextCheck";
         
         if (file_get_contents($url)) {
-            $api->log->info("pingjoe", "Pinged Joe: $url");
+            $api->log->info("pingjoe", "Pinged Joe: $urlSafe");
         } else {
-            $api->log->error("pingjoe", "Failed to ping Joe: $url");
+            $api->log->error("pingjoe", "Failed to ping Joe: $urlSafe");
         }
     }
 }

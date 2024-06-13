@@ -46,12 +46,16 @@ class DownloaderService implements ServiceInterface
         // CURLOPT_FILETIME => true, // return file time of remote resource
         CURLOPT_VERBOSE => 0,
         // CURLOPT_STDERR => fopen('php://temp', 'w+'),
-        CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
+        // CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     ];
+    private readonly array $uaStrings;
 
     public function __construct(string $cookieJarName = 'downloader')
     {
         global $api;
+
+        $this->uaStrings = json_decode(file_get_contents('module://zolinga-commons/data/ua-strings.json'), true)
+            or throw new Exception("Failed to load user agent strings from module://zolinga-commons/data/ua-strings.json");
 
         $this->logPrefix = $cookieJarName;
         $this->cookieJarFileName = $api->fs->toPath('private://ipdefender-daq/cookies/' . $cookieJarName . '.txt');
@@ -165,6 +169,9 @@ class DownloaderService implements ServiceInterface
         }
 
         $curlOpts = array_replace(
+            [
+                CURLOPT_USERAGENT => $this->uaStrings[array_rand($this->uaStrings)]
+            ],
             self::DEFAULT_CURL_OPTS,
             [
                 CURLOPT_REFERER => $curlOpts[CURLOPT_REFERER] ?? "https://www.google.com/?source=osdd&sl=auto&tl=auto&text=" . parse_url($url, PHP_URL_HOST) . "&op=translate",

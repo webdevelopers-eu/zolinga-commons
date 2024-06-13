@@ -151,11 +151,11 @@ class TorService extends DownloaderService
      * @throws \InvalidArgumentException If the Tor control host, port, or password is not set in the configuration.
      * @throws \Exception If there is an error connecting to the Tor control port, authenticating, or sending the NEWNYM signal.
      */
-    public function refreshIdentity(): void
+    public function refreshIdentity(bool $flushCookies = false): void
     {
         global $api;
 
-        $api->log->info($this->logPrefix, "Refreshing TOR circuit (not flushing cookies)...");
+        $api->log->info($this->logPrefix, "Refreshing TOR circuit (" . ($flushCookies ? 'flushing cookies' : 'keeping cookies') . ")...");
 
         if (!$this->isControlConfigured()) {
             $this->controlHost
@@ -185,5 +185,9 @@ class TorService extends DownloaderService
 
         fclose($fp);
         $this->requestCounter = 0;
+
+        if ($flushCookies) {
+            $this->flushCookies();
+        }
     }
 }

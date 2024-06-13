@@ -63,7 +63,7 @@ class TorService extends DownloaderService
      * @param integer $timeout Timeout in seconds. Default is 60.
      * @return void
      */
-    public function setDefaultTimeout(int $timeout = 60): void
+    public function setDefaultTimeout(int $timeout = 15): void
     {
         $this->curlOpts[CURLOPT_TIMEOUT] = $timeout;
         $this->curlOpts[CURLOPT_TIMEOUT_MS] = $timeout * 1000;

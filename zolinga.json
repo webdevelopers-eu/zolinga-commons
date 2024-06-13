@@ -13,6 +13,16 @@
             "class": "Zolinga\\Commons\\PingJoe\\PingJoeService"
         },
         {
+            "description": "Tor service.",
+            "service": "tor",
+            "class": "Zolinga\\Commons\\Tor\\TorService"
+        },
+        {
+            "description": "Downloader services.",
+            "service": "downloader",
+            "class": "Zolinga\\Commons\\Downloader\\DownloaderService"
+        },
+        {
             "event": "cms:content:c-resources",
             "class": "Zolinga\\Commons\\Resources\\ResourcesElement",
             "method": "onResources",
@@ -118,6 +128,19 @@
         "pingjoe": {
             "user": "",
             "password": ""
+        },
+        "# tor": "Tor service.",
+        "tor": {
+            "proxy": {
+                "host": "127.0.0.1",
+                "port": 9050
+            },
+            "# control": "Tor control service. Used to refresh IPs and other control functions. Optional.",
+            "control": {
+                "host": "127.0.0.1",
+                "port": 9051,
+                "password": ""
+            }
         }
     }
 }

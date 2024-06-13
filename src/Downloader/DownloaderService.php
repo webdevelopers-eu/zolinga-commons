@@ -269,4 +269,14 @@ class DownloaderService implements ServiceInterface
 
         return $file;
     }
+
+    /**
+     * Flushes all cookies stored in the cookie jar.
+     */
+    public function flushCookies(): void
+    {
+        global $api;
+        $api->log->info($this->logPrefix, "Removing all cookies...");
+        file_put_contents($this->cookieJarFileName, '');
+    }
 }

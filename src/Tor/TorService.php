@@ -185,8 +185,5 @@ class TorService extends DownloaderService
 
         fclose($fp);
         $this->requestCounter = 0;
-
-        $api->log->info($this->logPrefix, "Removing all cookies...");
-        file_put_contents($this->cookieJarFileName, '');
     }
 }

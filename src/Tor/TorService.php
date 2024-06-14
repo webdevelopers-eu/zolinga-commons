@@ -31,6 +31,7 @@ class TorService extends DownloaderService
     private readonly string $controlPassword;
     private int $requestCounter = 0;
     private int $successCounter = 0;
+    private array $timeoutSettingsStack = [];
 
     public function __construct(string $cookieJarName = 'tor')
     {
@@ -45,12 +46,8 @@ class TorService extends DownloaderService
         $this->curlOpts = [
             CURLOPT_PROXY => "$socksHost:$socksPort",
             CURLOPT_PROXYTYPE => CURLPROXY_SOCKS5,
-            CURLOPT_LOW_SPEED_LIMIT => 1,
-            CURLOPT_LOW_SPEED_TIME => 15,
-            CURLOPT_CONNECTTIMEOUT => 15,
-            CURLOPT_CONNECTTIMEOUT_MS => 15000,
         ];
-        $this->setDefaultTimeout();
+        $this->setTimeout();
 
         $this->controlHost = $api->config['tor']['control']['host'];
         $this->controlPort = $api->config['tor']['control']['port'];
@@ -65,14 +62,42 @@ class TorService extends DownloaderService
     /**
      * TOR service can be very slow. Set the default timeout.
      *
-     * @param integer $timeout Timeout in seconds. Default is 60.
+     * @param integer $timeout Timeout in seconds. Default is 60. This is a total timeout for the whole request including connection, transfer, etc.
+     * @param integer $connectionTimeout Connection timeout in seconds. Default is 15. Connection timeout + transfer (whole thing) must always be less than the $timeout.
      * @return void
      */
-    public function setDefaultTimeout(int $timeout = 90): void
+    public function setTimeout(int $timeout = 60, int $connectionTimeout = 10): void
     {
+        $this->timeoutSettingsStack[] = [$timeout, $connectionTimeout];
+        $this->setTimeoutSettings($timeout, $connectionTimeout);
+    }
+
+    /**
+     * Set the previous timeout settings that were set before the last call to `$this->setTimeout()`.
+     *
+     * @return array{integer, integer} The previous timeout settings.
+     */
+    public function unsetTimeout(): array
+    {
+        array_pop($this->timeoutSettingsStack);
+        [$timeout, $connectionTimeout] = end($this->timeoutSettingsStack);
+        $this->setTimeoutSettings($timeout, $connectionTimeout);
+        return [$timeout, $connectionTimeout];
+    }
+
+    private function setTimeoutSettings(int $timeout, int $connectionTimeout): void
+    {
+        global $api;
+
+        $api->log->info($this->logPrefix, "Setting default timeout to $timeout seconds and connection timeout to $connectionTimeout seconds.");
         $this->curlOpts[CURLOPT_TIMEOUT] = $timeout;
         $this->curlOpts[CURLOPT_TIMEOUT_MS] = $timeout * 1000;
         $this->curlOpts[CURLOPT_CONNECTTIMEOUT] = $timeout / 2;
+
+        $this->curlOpts[CURLOPT_LOW_SPEED_LIMIT] = 1;
+        $this->curlOpts[CURLOPT_LOW_SPEED_TIME] = $connectionTimeout;
+        $this->curlOpts[CURLOPT_CONNECTTIMEOUT] = $connectionTimeout;
+        $this->curlOpts[CURLOPT_CONNECTTIMEOUT_MS] = $connectionTimeout * 1000;
     }
 
     public function __get(string $name): mixed
@@ -102,7 +127,6 @@ class TorService extends DownloaderService
     public function download(string $url, false|string $outFile = false, array $curlOpts = []): bool|string
     {
         global $api;
-        $this->requestCounter++;
         $ret = false;
         $curlOptsLocal = [];
 
@@ -118,14 +142,16 @@ class TorService extends DownloaderService
         $attempts = 3;
         do {
             try {
+                $this->requestCounter++;
                 $ret = parent::download($url, $outFile, array_replace($this->curlOpts, $curlOptsLocal, $curlOpts));
+                $this->successCounter++;
             } catch (GotNothingException $e) {
-                if ($attempts-- <= 0) {
+                if ($attempts-- <= 0 || --$this->successCounter <= 0) {
                     $this->refreshIdentity();
                 }
             } catch (TimeoutException | SslException $e) { // Slow/unusable Tor service
                 // Sometimes event good connection glitches.
-                if ($attempts-- <= 0 || !$this->successCounter) {
+                if ($attempts-- <= 0 || !--$this->successCounter <= 0) {
                     $this->refreshIdentity();
                 }
             } catch (\Throwable $e) {
@@ -134,27 +160,40 @@ class TorService extends DownloaderService
             }
         } while (!$ret);
 
-        $this->successCounter++;
         return $ret;
     }
 
-    // private function testConnection()
-    // {
-    //     global $api;
+    /**
+     * Test the connection to a well-known URL. By default it will try hard to download the page
+     * through $this->download() that will retry on failure and refresh the identity if necessary.
+     * 
+     * So when this method returns true, the connection is stable and the Tor service is working.
+     * 
+     * The test uses stricter timeout settings than the default ones (10s, 5s) to make sure the connection is stable.
+     *
+     * @return bool Returns true if the connection test is successful, false otherwise.
+     */
+    public function testConnection()
+    {
+        global $api;
 
-    //     try {
-    //         $html = parent::download('https://example.com/', false, $this->curlOpts);
+        $api->log->info($this->logPrefix, "Connection Test: Testing TOR connection (example.com)...");
+        $this->setTimeout(10, 5);
+        try {
+            $html = $this->download('https://example.com/', false);
 
-    //         if (!$html || strpos($html, 'Example Domain') === false) {
-    //             throw new \Exception("Failed to download test page.");
-    //         }
-    //         $api->log->info($this->logPrefix, "Connection test successful.");
-    //         return true;
-    //     } catch (\Throwable $e) {
-    //         $api->log->error($this->logPrefix, "Connection test failed: " . $e->getMessage());
-    //         return false;
-    //     }
-    // }
+            if (!$html || strpos($html, 'Example Domain') === false) {
+                throw new \Exception("Failed to download test page.");
+            }
+            $api->log->info($this->logPrefix, "Connection Test: Connection test successful.");
+            return true;
+        } catch (\Throwable $e) {
+            $api->log->error($this->logPrefix, "Connection Test: Connection test failed: " . $e->getMessage());
+            return false;
+        } finally {
+            $this->unsetTimeout();
+        }
+    }
 
     /**
      * Refreshes the identity of the Tor service by authenticating with the control port and sending a NEWNYM signal.
@@ -199,6 +238,7 @@ class TorService extends DownloaderService
         fclose($fp);
         $this->requestCounter = 0;
         $this->successCounter = 0;
+        $this->randomizeUserAgent();
 
         if ($flushCookies) {
             $this->flushCookies();

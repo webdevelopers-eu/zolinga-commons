@@ -50,6 +50,7 @@ class DownloaderService implements ServiceInterface
         // CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     ];
     private readonly array $uaStrings;
+    private ?string $ua = null;
 
     public function __construct(string $cookieJarName = 'downloader')
     {
@@ -61,8 +62,16 @@ class DownloaderService implements ServiceInterface
         $this->logPrefix = $cookieJarName;
         $this->cookieJarFileName = $api->fs->toPath('private://ipdefender-daq/cookies/' . $cookieJarName . '.txt');
         $this->initCookieJar();
+        $this->randomizeUserAgent();
     }
 
+    /**
+     * Randomizes the user agent string used for requests.
+     */
+    public function randomizeUserAgent(): void
+    {
+        $this->ua = $this->uaStrings[array_rand($this->uaStrings)];
+    }
 
     public function __get(string $name): mixed
     {
@@ -171,7 +180,7 @@ class DownloaderService implements ServiceInterface
 
         $curlOpts = array_replace(
             [
-                CURLOPT_USERAGENT => $this->uaStrings[array_rand($this->uaStrings)]
+                CURLOPT_USERAGENT => $this->ua
             ],
             self::DEFAULT_CURL_OPTS,
             [
@@ -183,25 +192,28 @@ class DownloaderService implements ServiceInterface
         );
 
         /** @var \CurlHandle $ch */
+        $result = false;
         try {
             // curl_setopt_array($ch, $curlOpts);
             foreach ($curlOpts as $opt => $val) {
                 curl_setopt($ch, $opt, $val);
             }
+            $result = curl_exec($ch);
         } catch (\Throwable $e) {
-            $api->log->error(
-                $this->logPrefix,
-                "Failed to set CURL options, invalid option {$opt} or value " . json_encode($val, JSON_UNESCAPED_SLASHES),
-                ["url" => $url, "opts" => $curlOpts, "error" => $e->getMessage()]
-            );
+            $this->log->error($this->logPrefix, "CURL: Failed to download $url: {$e->getCode()} {$e->getMessage()}", [
+                "url" => $url,
+                'error' => $e->getMessage(),
+                'errno' => $e->getCode(),
+                'info' => curl_getinfo($ch),
+                'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE) // file is resource - not serializable
+            ]);
+            throw $e;
+        } finally {
             curl_close($ch);
-            return false;
+            if ($file) fclose($file);
         }
 
-        $result = curl_exec($ch);
-        curl_close($ch);
-        if ($file) fclose($file);
-
+        // Checks the result and throws exceptions if necessary
         $this->curlCheckResult($url, $result, $outFile, $curlOpts, $ch);
 
         return $result;
@@ -241,7 +253,6 @@ class DownloaderService implements ServiceInterface
                 default:
                     throw new Exception("Failed to download $url: $errNo $errMsg", $errNo);
             }
-            throw new Exception("Failed to download $url: $errNo $errMsg", $errNo);
         } else {
             $size = is_string($outFile) ? filesize($outFile) : strlen($result);
             $sizeHuman = $api->convert->memoryUnits($size, "MiB", 3) . ' MiB';

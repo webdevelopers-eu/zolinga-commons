@@ -18,9 +18,9 @@ use Zolinga\Commons\Downloader\Exception\TimeoutException;
  */
 class DownloaderService implements ServiceInterface
 {
-    protected readonly string $logPrefix;
+    protected readonly string $downloaderName;
     protected readonly string $cookieJarFileName;
-    private const DEFAULT_CURL_OPTS  = [
+    private array $curlOpts = [
         CURLOPT_AUTOREFERER => 1,
         CURLOPT_COOKIESESSION => 1,
         CURLOPT_DNS_USE_GLOBAL_CACHE => 0,
@@ -51,19 +51,53 @@ class DownloaderService implements ServiceInterface
     ];
     private readonly array $uaStrings;
     private ?string $ua = null;
+    protected readonly QoS $qos;
 
-    public function __construct(string $cookieJarName = 'downloader')
+    public function __construct(string $downloaderName = 'downloader')
     {
         global $api;
 
         $this->uaStrings = json_decode(file_get_contents('module://zolinga-commons/data/ua-strings.json'), true)
             or throw new Exception("Failed to load user agent strings from module://zolinga-commons/data/ua-strings.json");
 
-        $this->logPrefix = $cookieJarName;
-        $this->cookieJarFileName = $api->fs->toPath('private://ipdefender-daq/cookies/' . $cookieJarName . '.txt');
+        $this->qos = new QoS();
+        $this->downloaderName = $downloaderName;
+        $this->cookieJarFileName = $api->fs->toPath('private://ipdefender-daq/cookies/' . $downloaderName . '.txt');
         $this->initCookieJar();
         $this->randomizeUserAgent();
     }
+
+    /**
+     * Return new Downloader object instance.
+     * 
+     * Good if you need it to configure differently then the standard service.
+     * 
+     * Example:
+     * $downloader = $api->downloader::createInstance('downloader2');
+     * $downloader->setOpts([CURLOPT_PROXY => 'http://proxy:port']);
+     * $downloader->download('https://example.com');
+     *
+     * @param string $downloaderName
+     * @return static New instance of $this object.
+     */
+    public static function createInstance(string $downloaderName = 'downloader'): static
+    {
+        $class = static::class;
+        return new $class($downloaderName);
+    }
+
+    /**
+     * Set additional CURL default options for this object.
+     * 
+     * @param array $opts
+     * @return array The updated CURL options.
+     */
+    public function setOpts(array $opts): array
+    {
+        $this->curlOpts = array_replace($this->curlOpts, $opts);
+        return $this->curlOpts;
+    }
+
 
     /**
      * Randomizes the user agent string used for requests.
@@ -166,8 +200,7 @@ class DownloaderService implements ServiceInterface
 
         // Remove hash from URL
         $url = preg_replace("@#.*$@", "", $url);
-
-        $api->log->info($this->logPrefix, 'Downloading ' . $url, ["url" => $url, 'opts' => $curlOpts]);
+        $start = microtime(true);
         $ch = curl_init($url)
             or throw new Exception('Failed to initialize CURL with URL ' . $url);
 
@@ -182,7 +215,7 @@ class DownloaderService implements ServiceInterface
             [
                 CURLOPT_USERAGENT => $this->ua
             ],
-            self::DEFAULT_CURL_OPTS,
+            $this->curlOpts,
             [
                 CURLOPT_REFERER => $curlOpts[CURLOPT_REFERER] ?? "https://www.google.com/?source=osdd&sl=auto&tl=auto&text=" . parse_url($url, PHP_URL_HOST) . "&op=translate",
                 CURLOPT_COOKIEFILE => $this->cookieJarFileName, // Read init cookies from here. By passing the empty string ("") to this option, you enable the cookie engine without reading any initial cookies.
@@ -200,7 +233,8 @@ class DownloaderService implements ServiceInterface
             }
             $result = curl_exec($ch);
         } catch (\Throwable $e) {
-            $this->log->error($this->logPrefix, "CURL: Failed to download $url: {$e->getCode()} {$e->getMessage()}", [
+            $this->qos->addFailure($e->getCode() . ' ' . $e->getMessage());
+            $this->log->error($this->downloaderName, "CURL: Failed to download $url: {$e->getCode()} {$e->getMessage()}", [
                 "url" => $url,
                 'error' => $e->getMessage(),
                 'errno' => $e->getCode(),
@@ -214,21 +248,23 @@ class DownloaderService implements ServiceInterface
         }
 
         // Checks the result and throws exceptions if necessary
-        $this->curlCheckResult($url, $result, $outFile, $curlOpts, $ch);
+        $this->curlCheckResult($url, $result, $outFile, $curlOpts, $ch, $start);
 
         return $result;
     }
 
-    private function curlCheckResult(string $url, $result, mixed $outFile, array $curlOpts, \CurlHandle $ch)
+    private function curlCheckResult(string $url, $result, mixed $outFile, array $curlOpts, \CurlHandle $ch, float $start)
     {
         global $api;
 
         $errMsg = curl_error($ch);
         $errNo = curl_errno($ch);
+        $elapsed = round(microtime(true) - $start, 2) . 's';
 
         if (!$result || $errNo) {
+            $this->qos->addFailure($errNo . ' ' . $errMsg);
             // Grep all possible info about the failure
-            $api->log->error($this->logPrefix, "CURL: Failed to download $url ($errNo $errMsg)", [
+            $api->log->error($this->downloaderName, "CURL: Failed to download $url ($errNo $errMsg)", [
                 "url" => $url,
                 'error' => $errMsg,
                 'errno' => $errNo,
@@ -238,7 +274,7 @@ class DownloaderService implements ServiceInterface
             // See https://curl.se/libcurl/c/libcurl-errors.html
             switch ($errNo) {
                 case CURLE_OPERATION_TIMEOUTED:
-                    throw new TimeoutException("Timeout downloading $url", $errNo);
+                    throw new TimeoutException("Timeout downloading $url (total time $elapsed)", $errNo);
                 case CURLE_SSL_CACERT_BADFILE:
                 case CURLE_SSL_CERTPROBLEM:
                 case CURLE_SSL_CIPHER:
@@ -247,21 +283,23 @@ class DownloaderService implements ServiceInterface
                 case CURLE_SSL_ENGINE_SETFAILED:
                 case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
                     // 35 OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to www.tmdn.org:443
-                    throw new SslException("SSL error downloading $url: $errNo $errMsg", $errNo);
+                    throw new SslException("SSL error downloading $url: $errNo $errMsg (total time $elapsed)", $errNo);
                 case CURLE_GOT_NOTHING:
-                    throw new GotNothingException("Empty reply downloading $url: $errNo $errMsg", $errNo);
+                    throw new GotNothingException("Empty reply downloading $url: $errNo $errMsg (total time $elapsed)", $errNo);
                 default:
-                    throw new Exception("Failed to download $url: $errNo $errMsg", $errNo);
+                    throw new Exception("Failed to download $url: $errNo $errMsg (total time $elapsed)", $errNo);
             }
         } else {
+            $this->qos->addSuccess(microtime(true) - $start, strlen($result));
             $size = is_string($outFile) ? filesize($outFile) : strlen($result);
             $sizeHuman = $api->convert->memoryUnits($size, "MiB", 3) . ' MiB';
-            $api->log->info($this->logPrefix, "CURL: Downloaded $url ($sizeHuman)", [
+            $api->log->info($this->downloaderName, "CURL: Downloaded $url ($sizeHuman, total time $elapsed)", [
                 "url" => $url,
                 "error" => $errMsg,
                 "errno" => $errNo,
                 'info' => curl_getinfo($ch),
                 'size' => $size,
+                'elapsed' => $elapsed,
             ]);
         }
     }
@@ -287,7 +325,7 @@ class DownloaderService implements ServiceInterface
     public function flushCookies(): void
     {
         global $api;
-        $api->log->info($this->logPrefix, "Removing all cookies...");
+        $api->log->info($this->downloaderName, "Removing all cookies...");
         file_put_contents($this->cookieJarFileName, '');
     }
 }

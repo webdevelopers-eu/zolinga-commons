@@ -15,7 +15,7 @@
         {
             "description": "Tor service.",
             "service": "tor",
-            "class": "Zolinga\\Commons\\Tor\\TorService"
+            "class": "Zolinga\\Commons\\Downloader\\TorService"
         },
         {
             "description": "Downloader services.",

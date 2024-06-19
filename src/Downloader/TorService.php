@@ -23,21 +23,16 @@ use Zolinga\Commons\Downloader\Exception\TimeoutException;
  * @author Daniel Sevcik <danny@zolinga.net>
  * @date 2024-06-13
  */
-class TorService extends DownloaderService
+class TorService extends Anonymizer
 {
-    public const FLAG_CHANGE_IP = 0;
-    public const FLAG_FLUSH_COOKIES = 1;
-    public const FLAG_RANDOMIZE_USER_AGENT = 2;
-    public const FLAG_CHANGE_ALL = 3;
+    private ?string $controlHost = null;
+    private ?int $controlPort = null;
+    private ?string $controlPassword = null;
+    private mixed $controlFilePointer = null;
 
-    private readonly string $controlHost;
-    private readonly int $controlPort;
-    private readonly string $controlPassword; 
-    private array $timeoutSettingsStack = [];
-    private $lastIP = null;
-    private $blacklist = [];
-    private array $onIndentityChangeHooks = [];
-    private bool $inCallback = false;
+    // @experimental list of public tor nodes
+    private array $publicExitNodeList = [];
+    private int $publicExitNodeListUpdate = 0;
 
     public function __construct(string $downloaderName = 'tor')
     {
@@ -49,169 +44,56 @@ class TorService extends DownloaderService
         $socksPort = $api->config['tor']['proxy']['port']
             or throw new \Exception("Tor proxy port not set in config.");
 
-        $this->setOpts([
-            CURLOPT_PROXY => "$socksHost:$socksPort",
-            CURLOPT_PROXYTYPE => CURLPROXY_SOCKS5,
-        ]);
-
-        $this->controlHost = $api->config['tor']['control']['host'];
-        $this->controlPort = $api->config['tor']['control']['port'];
-        $this->controlPassword = $api->config['tor']['control']['password'];
+        $this->setProxy($socksHost, $socksPort);
+        $this->setControl($api->config['tor']['control']['host'], $api->config['tor']['control']['port'], $api->config['tor']['control']['password']);
 
         $api->log->info($this->downloaderName, "Tor proxy set to $socksHost:$socksPort (control port: {$this->controlHost}:{$this->controlPort})");
-        $this->setTimeout();
     }
 
+    // Experimental feature - guess if the IP is a public Tor node
+    private function matchPublicExitNodeList(string $ip): bool
+    {
+        if ($this->publicExitNodeListUpdate < time() - 600) {
+            $list = file_get_contents('https://openinternet.io/tor/tor-exit-list.txt');
+            $this->publicExitNodeList = explode("\n", $list);
+            $this->publicExitNodeListUpdate = time();
+            // Filter valid IPs only
+            $this->publicExitNodeList = array_filter($this->publicExitNodeList, function ($ip) {
+                return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+            });
+
+            // $this->controlConnect();
+            // // $this->controlCommand("SETCONF excludeExitNod   es=\"1.1.1.1,2.2.2.2\"");
+            // $this->controlCommand("SETCONF excludeExitNodes=\"".implode(',', $this->publicExitNodeList)."\"");
+            // $this->controlDisconnect();
+        }
+
+        return in_array($ip, $this->publicExitNodeList);
+    }
+
+    /**
+     * Set the control port settings for the Tor service.
+     *
+     * @param string $host
+     * @param integer $port
+     * @param string $password
+     * @return void
+     */
+    public function setControl(string $host, int $port, string $password): void
+    {
+        $this->controlHost = $host;
+        $this->controlPort = $port;
+        $this->controlPassword = $password;
+    }
+
+    /**
+     * Check if the control port settings are configured.
+     *
+     * @return bool
+     */
     private function isControlConfigured(): bool
     {
-        return $this->controlHost && $this->controlPort && $this->controlPassword;
-    }
-
-    /**
-     * TOR service can be very slow. Set the default timeout.
-     *
-     * @param integer $timeout Timeout in seconds. Default is 60. This is a total timeout for the whole request including connection, transfer, etc.
-     * @param integer $connectionTimeout Connection timeout in seconds. Default is 15. Connection timeout + transfer (whole thing) must always be less than the $timeout.
-     * @return void
-     */
-    public function setTimeout(int $timeout = 60, int $connectionTimeout = 10): void
-    {
-        $this->timeoutSettingsStack[] = [$timeout, $connectionTimeout];
-        $this->setTimeoutSettings($timeout, $connectionTimeout);
-    }
-
-    /**
-     * Set the previous timeout settings that were set before the last call to `$this->setTimeout()`.
-     *
-     * @return array{integer, integer} The previous timeout settings.
-     */
-    public function unsetTimeout(): array
-    {
-        array_pop($this->timeoutSettingsStack);
-        [$timeout, $connectionTimeout] = end($this->timeoutSettingsStack);
-        $this->setTimeoutSettings($timeout, $connectionTimeout);
-        return [$timeout, $connectionTimeout];
-    }
-
-    private function setTimeoutSettings(int $timeout, int $connectionTimeout): void
-    {
-        global $api;
-
-        $api->log->info($this->downloaderName, "Setting default timeout to $timeout seconds and connection timeout to $connectionTimeout seconds.");
-        $this->setOpts([
-            CURLOPT_TIMEOUT => $timeout,
-            CURLOPT_TIMEOUT_MS => $timeout * 1000,
-            CURLOPT_CONNECTTIMEOUT => $timeout / 2,
-            CURLOPT_LOW_SPEED_LIMIT => 1,
-            CURLOPT_LOW_SPEED_TIME => $connectionTimeout,
-            CURLOPT_CONNECTTIMEOUT => $connectionTimeout,
-            CURLOPT_CONNECTTIMEOUT_MS => $connectionTimeout * 1000,
-        ]);
-    }
-
-    public function __get(string $name): mixed
-    {
-        switch ($name) {
-            case 'requestCounter':
-                return $this->qos->getStats()['total'];
-            default:
-                return parent::__get($name);
-        }
-    }
-
-    /**
-     * Download a remote resource using CURL.
-     * 
-     * By default it stores cookies persistently into $this->cookieJarFileName 
-     * stored in private://ipdefender-daq/cookies/ directory. It reuses cookies
-     * for subsequent requests. It also follows redirects by default.
-     * 
-     * This is a wrapper for `Zolinga\Commons\Downloader\DownloaderService::download()` method.
-     *
-     * @param string $url
-     * @param false|boolean $outFile false to return the content, string to save to file.
-     * @param array<mixed> $curlOpts Additional CURL options. E.g. [CURLOPT_PROXY => 'http://proxy:port']
-     * @return boolean|string Content of the resource if $outFile is false, otherwise true on success.
-     */
-    public function download(string $url, false|string $outFile = false, array $curlOpts = []): bool|string
-    {
-        global $api;
-        $ret = false;
-        $curlOptsLocal = [];
-
-        // Trying to optimize DNS queries using local query to lower the TOR latency...
-        // $host = parse_url($url, PHP_URL_HOST);
-        // $port = parse_url($url, PHP_URL_PORT) ?: 443;
-        // $ip = gethostbyname($host);
-        // if ($ip !== $host) {
-        //     $curlOptsLocal[CURLOPT_RESOLVE] = ["$host:$port:$ip"];
-        //     $curlOptsLocal[CURLOPT_CONNECT_TO] = ["$host:$port:$ip"];
-        // }
-
-        $attempts = 3;
-        do {
-            try {
-                $ret = parent::download($url, $outFile, array_replace($curlOptsLocal, $curlOpts));
-            } catch (TimeoutException | SslException | GotNothingException $e) {
-                if ($attempts-- <= 0 || $this->qos->getStats()['successRatio'] <= 0.5) {
-                    $this->refreshIdentity();
-                }
-            } catch (\Throwable $e) {
-                $api->log->error($this->downloaderName, "Failed to download $url: " . $e->getCode() . ' ' . $e->getMessage());
-                throw $e;
-            }
-        } while (!$ret);
-
-        return $ret;
-    }
-
-    /**
-     * Test the connection to a well-known URL. By default it will try hard to download the page
-     * through $this->download() that will retry on failure and refresh the identity if necessary.
-     * 
-     * So when this method returns true, the connection is stable and the Tor service is working.
-     * 
-     * The test uses stricter timeout settings than the default ones (10s, 5s) to make sure the connection is stable.
-     *
-     * @return bool Returns true if the connection test is successful, false otherwise.
-     */
-    public function testConnection()
-    {
-        global $api;
-
-        $api->log->info($this->downloaderName, "Connection Test: Testing TOR connection (example.com)...");
-        $this->setTimeout(10, 5);
-        try {
-            $html = $this->download('https://example.com/', false);
-
-            if (!$html || strpos($html, 'Example Domain') === false) {
-                throw new \Exception("Failed to download test page.");
-            }
-            $api->log->info($this->downloaderName, "Connection Test: Connection test successful.");
-            return true;
-        } catch (\Throwable $e) {
-            $api->log->error($this->downloaderName, "Connection Test: Connection test failed: " . $e->getMessage());
-            return false;
-        } finally {
-            $this->unsetTimeout();
-        }
-    }
-
-    /**
-     * Add a callback that will be called when the identity of the Tor service is refreshed.
-     * 
-     * The callback will receive the TorService instance as the first argument. Since
-     * the callback is called after the identity is refreshed, you can use the instance
-     * to set cookies, user agent, etc. to the new identity.
-     * 
-     * Rembmber that refreshing identity by default flushes cookies and randomizes user agent.
-     *
-     * @param callable $callback The callback to add.
-     * @return void
-     */
-    public function addRefreshIdentityCallback(callable $callback): void
-    {
-        $this->onIndentityChangeHooks[] = $callback;
+        return $this->controlHost && $this->controlPort && $this->controlPassword !== null;
     }
 
     /**
@@ -221,49 +103,31 @@ class TorService extends DownloaderService
      *
      * @throws \InvalidArgumentException If the Tor control host, port, or password is not set in the configuration.
      * @throws \Exception If there is an error connecting to the Tor control port, authenticating, or sending the NEWNYM signal.
-     * @param int $flags Flags to control the behavior of the method. Default is to change all (IP, User Agent, flush cookies).
-     *            Use the constants FLAG_FLUSH_COOKIES, FLAG_RANDOMIZE_USER_AGENT, FLAG_CHANGE_IP, or FLAG_CHANGE_ALL to control the behavior.
-     *            You can combine the flags using the bitwise OR operator (|). FLAG_CHANGE_IP is always implied.
      * @return void
      */
-    public function refreshIdentity(int $flags = self::FLAG_CHANGE_ALL): void
+    public function changeExitNode(): void
     {
         global $api;
 
-        $successRatioPct = round($this->qos->getStats()['successRatio'] * 100);
-        if ($successRatioPct <= 50) { // if we downloaded a lot of pages we may want to keep the IP usable
-            $this->blacklist[] = $this->lastIP;
-            $api->log->warning($this->downloaderName, "IP address {$this->lastIP} blacklisted due to low success ratio ($successRatioPct%).");
-        }
-        
         $this->qos->setExitNode('*TOR Identity Pings*'); // pings to find out IP address
+        $info = [];
 
         do {
             $this->sendNewNymSignal();
-            $info = [];
-
-            if ($flags & self::FLAG_RANDOMIZE_USER_AGENT) {
-                $info[] = 'randomize user agent';
-                $this->randomizeUserAgent();
-            } else {
-                $info[] = 'keep user agent';
-            }
-
-            if ($flags & self::FLAG_FLUSH_COOKIES) {
-                $info[] = 'flush cookies';
-                $this->flushCookies();
-            } else {
-                $info[] = 'keep cookies';
-            }
-
             $ip = $this->getMyIP();
+            $stats = $this->qos->getStats($ip);
 
             if ($ip === $this->lastIP) {
-                $api->log->warning($this->downloaderName, "Failed to change IP address ($ip). Retrying...");
+                $api->log->warning($this->downloaderName, "Failed to change IP address ($ip). Retrying... (" . json_encode($stats) . ")");
                 $retry = true;
-            } elseif (in_array($ip, $this->blacklist)) {
-                $api->log->warning($this->downloaderName, "IP address $ip is blacklisted. Retrying...");
+            } elseif ($stats['total'] >= 3 && !$stats['successRatio']) {
+                $api->log->warning($this->downloaderName, "IP address $ip is dysfunctional. Retrying... (" . json_encode($stats) . ")");
                 $retry = true;
+            } elseif ($this->matchPublicExitNodeList($ip)) {
+                // $api->log->warning($this->downloaderName, "IP address $ip is a listed public Tor node. Retrying... (" . json_encode($stats) . ")");
+                // $retry = true;
+                $info[] = "publicly listed node 😞";
+                $retry = false;
             } else {
                 $retry = false;
             }
@@ -272,21 +136,17 @@ class TorService extends DownloaderService
         $this->lastIP = $ip;
         $info[] = "new IP {$ip}";
         $this->qos->setExitNode($ip);
-        $api->log->info($this->downloaderName, "Refreshed TOR circuit (" . implode(', ', $info) . ")...");
+        $api->log->info($this->downloaderName, "Refreshed TOR circuit (" . implode(', ', $info) . ")... (" . json_encode($stats) . ")");
 
-        if (!$this->inCallback) {
-            try {
-                $this->inCallback = true;
-                foreach ($this->onIndentityChangeHooks as $callback) {
-                    $callback($this);
-                }
-            } finally {
-                $this->inCallback = false;
-            }
-        }
+        parent::changeExitNode();
     }
 
-    private function sendNewNymSignal()
+    /**
+     * Sends a NEWNYM signal to the Tor control port to request a new identity.
+     *
+     * @return void
+     */
+    private function sendNewNymSignal(): void
     {
         global $api;
         static $lastSignal = 0;
@@ -304,50 +164,43 @@ class TorService extends DownloaderService
                 or throw new \InvalidArgumentException("Tor control password not set in config key tor.control.password");
         }
 
-        $fp = fsockopen($this->controlHost, $this->controlPort, $errno, $errstr, 30)
-            or throw new \Exception("Failed to connect to Tor control port {$this->controlHost}:{$this->controlPort}: $errstr ($errno)");
+        $this->controlConnect();
+        $this->controlCommand("SIGNAL NEWNYM");
+        
+        // Get new IP
+        // $reportedIp = $this->controlCommand("GETINFO address"); // does not work most of the time
+        // $ip = explode(' ', $reportedIp)[1] ?? null;
+        // $api->log->info($this->downloaderName, "New reported exit node IP address: $reportedIp");
+        // dormant
 
-        fwrite($fp, "AUTHENTICATE \"$this->controlPassword\"\r\n");
-        $response = trim(fread($fp, 1024));
-        if (strpos($response, "250") !== 0) {
-            throw new \Exception("Failed to authenticate to Tor control port: $response");
-        }
-        // $api->log->info($this->downloaderName, "Authenticated to Tor control port: $response");
-
-        fwrite($fp, "SIGNAL NEWNYM\r\n");
-        $response = trim(fread($fp, 1024));
-        if (strpos($response, "250") !== 0) {
-            throw new \Exception("Failed to send NEWNYM signal to Tor control port: $response");
-        }
-        // $api->log->info($this->downloaderName, "Sent NEWNYM signal to Tor control port: $response");
-
-        fclose($fp);
+        $this->controlDisconnect();
     }
 
-    /**
-     * Returns the current IP address of the Tor service.
-     *
-     * @return string|null The current IP address of the Tor service or null if the IP address could not be determined.
-     */
-    public function getMyIP(): string
+    private function controlConnect(): void {
+        if (!$this->isControlConfigured()) {
+            throw new \InvalidArgumentException("Tor control host and port not set.");
+        }
+
+        $this->controlFilePointer = fsockopen($this->controlHost, $this->controlPort, $errno, $errstr, 30)
+            or throw new \Exception("Failed to connect to Tor control port {$this->controlHost}:{$this->controlPort}: $errstr ($errno)");
+
+        stream_set_timeout($this->controlFilePointer, 30);
+        $this->controlCommand("AUTHENTICATE \"$this->controlPassword\"");
+    }
+
+    private function controlDisconnect(): void  {
+        $this->controlCommand("QUIT");
+        fclose($this->controlFilePointer);
+    }
+
+    private function controlCommand(string $command): ?string
     {
-        $try = [
-            'https://api.ipify.org',
-            'https://icanhazip.com',
-            'https://ipinfo.io/ip',
-            'https://ip.seeip.org',
-            'https://ipapi.co/ip',
-        ];
-
-        $ip = null;
-        do {
-            try {
-                $ip = $this->download(array_shift($try), false);
-            } catch (\Throwable $e) {
-                $ip = null;
-            }
-        } while (!$ip && $try);
-
-        return $ip ?: null;
+        fwrite($this->controlFilePointer, "$command\r\n");
+        $response = trim(fread($this->controlFilePointer, 1024));
+        // 551 is when "GETINFO address" is not available
+        if (strpos($response, "250") !== 0 && strpos($response, "551") !== 0) {
+            throw new \Exception("Failed to send $command command to Tor control port: $response");
+        }
+        return $response ?? null;
     }
 }

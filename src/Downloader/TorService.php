@@ -28,11 +28,7 @@ class TorService extends Anonymizer
     private ?string $controlHost = null;
     private ?int $controlPort = null;
     private ?string $controlPassword = null;
-    private mixed $controlFilePointer = null;
-
-    // @experimental list of public tor nodes
-    private array $publicExitNodeList = [];
-    private int $publicExitNodeListUpdate = 0;
+    private mixed $controlSocket = null;
 
     public function __construct(string $downloaderName = 'tor')
     {
@@ -50,26 +46,6 @@ class TorService extends Anonymizer
         $api->log->info($this->downloaderName, "Tor proxy set to $socksHost:$socksPort (control port: {$this->controlHost}:{$this->controlPort})");
     }
 
-    // Experimental feature - guess if the IP is a public Tor node
-    private function matchPublicExitNodeList(string $ip): bool
-    {
-        if ($this->publicExitNodeListUpdate < time() - 600) {
-            $list = file_get_contents('https://openinternet.io/tor/tor-exit-list.txt');
-            $this->publicExitNodeList = explode("\n", $list);
-            $this->publicExitNodeListUpdate = time();
-            // Filter valid IPs only
-            $this->publicExitNodeList = array_filter($this->publicExitNodeList, function ($ip) {
-                return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
-            });
-
-            // $this->controlConnect();
-            // // $this->controlCommand("SETCONF excludeExitNod   es=\"1.1.1.1,2.2.2.2\"");
-            // $this->controlCommand("SETCONF excludeExitNodes=\"".implode(',', $this->publicExitNodeList)."\"");
-            // $this->controlDisconnect();
-        }
-
-        return in_array($ip, $this->publicExitNodeList);
-    }
 
     /**
      * Set the control port settings for the Tor service.
@@ -123,11 +99,6 @@ class TorService extends Anonymizer
             } elseif ($stats['total'] >= 3 && !$stats['successRatio']) {
                 $api->log->warning($this->downloaderName, "IP address $ip is dysfunctional. Retrying... (" . json_encode($stats) . ")");
                 $retry = true;
-            } elseif ($this->matchPublicExitNodeList($ip)) {
-                // $api->log->warning($this->downloaderName, "IP address $ip is a listed public Tor node. Retrying... (" . json_encode($stats) . ")");
-                // $retry = true;
-                $info[] = "publicly listed node 😞";
-                $retry = false;
             } else {
                 $retry = false;
             }
@@ -181,22 +152,22 @@ class TorService extends Anonymizer
             throw new \InvalidArgumentException("Tor control host and port not set.");
         }
 
-        $this->controlFilePointer = fsockopen($this->controlHost, $this->controlPort, $errno, $errstr, 30)
+        $this->controlSocket = fsockopen($this->controlHost, $this->controlPort, $errno, $errstr, 30)
             or throw new \Exception("Failed to connect to Tor control port {$this->controlHost}:{$this->controlPort}: $errstr ($errno)");
 
-        stream_set_timeout($this->controlFilePointer, 30);
+        stream_set_timeout($this->controlSocket, 30);
         $this->controlCommand("AUTHENTICATE \"$this->controlPassword\"");
     }
 
     private function controlDisconnect(): void  {
         $this->controlCommand("QUIT");
-        fclose($this->controlFilePointer);
+        fclose($this->controlSocket);
     }
 
     private function controlCommand(string $command): ?string
     {
-        fwrite($this->controlFilePointer, "$command\r\n");
-        $response = trim(fread($this->controlFilePointer, 1024));
+        fwrite($this->controlSocket, "$command\r\n");
+        $response = trim(fread($this->controlSocket, 1024));
         // 551 is when "GETINFO address" is not available
         if (strpos($response, "250") !== 0 && strpos($response, "551") !== 0) {
             throw new \Exception("Failed to send $command command to Tor control port: $response");

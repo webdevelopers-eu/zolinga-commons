@@ -29,6 +29,7 @@ class TorService extends Anonymizer
     private ?int $controlPort = null;
     private ?string $controlPassword = null;
     private mixed $controlSocket = null;
+    private array $excludedExitNodes = [];
 
     public function __construct(string $downloaderName = 'tor')
     {
@@ -46,6 +47,17 @@ class TorService extends Anonymizer
         $api->log->info($this->downloaderName, "Tor proxy set to $socksHost:$socksPort (control port: {$this->controlHost}:{$this->controlPort})");
     }
 
+    private function excludeExitNode(string $node): void
+    {
+        global $api;
+
+        $this->excludedExitNodes[$node] = $node;
+        $this->controlConnect();
+        $this->controlCommand("SETCONF ExcludeExitNodes=" . implode(',', $this->excludedExitNodes));
+        $this->controlDisconnect();
+
+        $api->log->warning($this->downloaderName, "Excluded exit node $node");
+    }
 
     /**
      * Set the control port settings for the Tor service.
@@ -85,6 +97,10 @@ class TorService extends Anonymizer
     {
         global $api;
 
+        if ($this->lastIP && $this->qos->isDysfunctional($this->lastIP)) {
+            $this->excludeExitNode($this->lastIP);
+        }
+        
         $this->qos->setExitNode('*TOR Identity Pings*'); // pings to find out IP address
         $info = [];
 

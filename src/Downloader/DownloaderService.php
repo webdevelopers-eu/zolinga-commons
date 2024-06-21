@@ -26,6 +26,11 @@ class DownloaderService implements ServiceInterface
     public const OPT_KEEP_ALIVE = 1;
 
     /**
+     * If the request fails, throw an exception and do not try to recover.
+     */
+    public const FAIL_FAST = 2;
+
+    /**
      * When self::OPT_KEEP_ALIVE is set this will hold the persistent CURL handle
      * and each subsequent request with self::OPT_KEEP_ALIVE will reuse this handle.
      * 
@@ -330,9 +335,14 @@ class DownloaderService implements ServiceInterface
         $url = preg_replace("@#.*$@", "", $url);
         $start = microtime(true);
         $keepAlive = $downloaderOpts & self::OPT_KEEP_ALIVE;
+        $failFast = $downloaderOpts & self::FAIL_FAST;
 
         if ($keepAlive) {
             $curlOpts = array_replace($curlOpts, [CURLOPT_FORBID_REUSE => 0]);
+        }
+        
+        if ($failFast) {
+            $curlOpts = array_replace($curlOpts, [CURLOPT_FAILONERROR => 1]);
         }
 
         $ch = ($keepAlive && $this->curlKeepAliveHandler ? $this->curlKeepAliveHandler : curl_init())

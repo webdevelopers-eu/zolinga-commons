@@ -30,9 +30,11 @@ class QoS
         $this->setExitNode();
     }
 
-    public function isDysfunctional(): bool
+    public function isDysfunctional(string $exitNode = null): bool
     {
-        return $this->getStats()['lastStatusCount'] > 3 && $this->getStats()['lastStatus'] === 'failure';
+        $stats = $this->getStats($exitNode);
+        return $stats['total'] >= 3 && !$stats['successRatio'];
+        // return $this->getStats()['lastStatusCount'] > 3 && $this->getStats()['lastStatus'] === 'failure';
     }
 
     public function getStats(?string $exitNode = null): array

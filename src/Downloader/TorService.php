@@ -47,7 +47,7 @@ class TorService extends Anonymizer
         $api->log->info($this->downloaderName, "Tor proxy set to $socksHost:$socksPort (control port: {$this->controlHost}:{$this->controlPort})");
     }
 
-    private function excludeExitNode(string $node): void
+    protected function excludeExitNode(string $node): void
     {
         global $api;
 
@@ -56,7 +56,9 @@ class TorService extends Anonymizer
         $this->controlCommand("SETCONF ExcludeExitNodes=" . implode(',', $this->excludedExitNodes));
         $this->controlDisconnect();
 
-        $api->log->warning($this->downloaderName, "Excluded exit node $node");
+        $stats = $this->qos->getStats($node);
+        $api->log->warning($this->downloaderName, "Excluded exit node $node (total excluded " . count($this->excludedExitNodes) . ", " . json_encode($stats) . ")");
+        parent::excludeExitNode($node);
     }
 
     /**
@@ -107,13 +109,12 @@ class TorService extends Anonymizer
         do {
             $this->sendNewNymSignal();
             $ip = $this->getMyIP();
-            $stats = $this->qos->getStats($ip);
 
             if ($ip === $this->lastIP) {
-                $api->log->warning($this->downloaderName, "Failed to change IP address ($ip). Retrying... (" . json_encode($stats) . ")");
+                $api->log->warning($this->downloaderName, "Failed to change IP address ($ip). Retrying...");
                 $retry = true;
-            } elseif ($stats['total'] >= 3 && !$stats['successRatio']) {
-                $api->log->warning($this->downloaderName, "IP address $ip is dysfunctional. Retrying... (" . json_encode($stats) . ")");
+            } elseif ($this->qos->isDysfunctional($ip)) {
+                $api->log->warning($this->downloaderName, "IP address $ip is dysfunctional. Retrying...");
                 $retry = true;
             } else {
                 $retry = false;
@@ -123,7 +124,7 @@ class TorService extends Anonymizer
         $this->lastIP = $ip;
         $info[] = "new IP {$ip}";
         $this->qos->setExitNode($ip);
-        $api->log->info($this->downloaderName, "Refreshed TOR circuit (" . implode(', ', $info) . ")... (" . json_encode($stats) . ")");
+        $api->log->info($this->downloaderName, "Refreshed TOR circuit (" . implode(', ', $info) . ")...");
 
         parent::changeExitNode();
     }

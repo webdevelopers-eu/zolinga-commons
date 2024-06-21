@@ -62,13 +62,16 @@ class Anonymizer extends DownloaderService
         global $api;
         $ret = false;
         $curlOptsLocal = [];
+        $failFast = $downloaderOpts & self::FAIL_FAST;
 
         $attempts = 3;
         do {
             try {
                 $ret = parent::download($url, $outFile, array_replace($curlOptsLocal, $curlOpts));
             } catch (TimeoutException | SslException | GotNothingException $e) {
-                if ($attempts-- <= 0 || $this->qos->getStats()['successRatio'] <= 0.5) {
+                if ($failFast) {
+                    throw $e;
+                } elseif ($attempts-- <= 0 || $this->qos->getStats()['successRatio'] <= 0.5) {
                     $this->changeExitNode();
                 }
             } catch (\Throwable $e) {
@@ -110,9 +113,14 @@ class Anonymizer extends DownloaderService
      */
     public function changeExitNode(): void
     {
-        $this->closeConnection();
+        $this->closeConnection(); // close persistent curl connections
         $this->processCallbacks();
     }
+
+    protected function excludeExitNode(string $node): void {
+        // implement exclusion of exit nodes
+    }
+
 
     /**
      * Returns the current IP address of the Tor service.
@@ -124,7 +132,7 @@ class Anonymizer extends DownloaderService
         $try = self::IP_SERVICES;
         do {
             try {
-                $ip = $this->download(array_shift($try), false);
+                $ip = $this->download(array_shift($try), downloaderOpts: self::FAIL_FAST);
                 if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
                     $ip = null;
                 }

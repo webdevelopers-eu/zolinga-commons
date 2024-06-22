@@ -407,6 +407,7 @@ class DownloaderService implements ServiceInterface
                 'error' => $e->getMessage(),
                 'errno' => $e->getCode(),
                 'info' => curl_getinfo($ch),
+                'cookies' => $this->getCookies(parse_url($url, PHP_URL_HOST)),
                 'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE) // file is resource - not serializable
             ]);
             throw $e;
@@ -459,6 +460,7 @@ class DownloaderService implements ServiceInterface
                 'error' => $errMsg,
                 'errno' => $errNo,
                 'info' => curl_getinfo($ch),
+                'cookies' => $this->getCookies(parse_url($url, PHP_URL_HOST)),
                 'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE), // file is resource - not serializable
                 'downloaderOpts' => $downloaderOpts,
             ]);

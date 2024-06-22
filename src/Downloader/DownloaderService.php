@@ -75,6 +75,21 @@ class DownloaderService implements ServiceInterface
         'Upgrade',
         'Via',
         'Warning',
+        'Sec-Fetch-Dest',
+        'Sec-Fetch-Mode',
+        'Sec-Fetch-Site',
+        'Sec-Fetch-User',
+        'Accept-Ranges',
+        'Age',
+        'Allow',
+        'Content-Disposition',
+        'Content-Encoding',
+        'Content-Language',
+        'Content-Location',
+        'Content-Range',
+        'sec-ch-ua',
+        'sec-ch-ua-mobile',
+        'sec-ch-ua-platform',
     ];
     protected readonly string $downloaderName;
     protected readonly string $cookieJarFileName;

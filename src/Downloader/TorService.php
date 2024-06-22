@@ -95,7 +95,7 @@ class TorService extends Anonymizer
      * @throws \Exception If there is an error connecting to the Tor control port, authenticating, or sending the NEWNYM signal.
      * @return void
      */
-    public function changeExitNode(): void
+    public function anonymize(): void
     {
         global $api;
 
@@ -110,7 +110,10 @@ class TorService extends Anonymizer
             $this->sendNewNymSignal();
             $ip = $this->getMyIP();
 
-            if ($ip === $this->lastIP) {
+            if (!$ip) {
+                $api->log->warning($this->downloaderName, "Failed to obtain IP - current IP is dysfunctional. Retrying...");
+                $retry = true;
+            } elseif ($ip === $this->lastIP) {
                 $api->log->warning($this->downloaderName, "Failed to change IP address ($ip). Retrying...");
                 $retry = true;
             } elseif ($this->qos->isDysfunctional($ip)) {
@@ -126,7 +129,7 @@ class TorService extends Anonymizer
         $this->qos->setExitNode($ip);
         $api->log->info($this->downloaderName, "Refreshed TOR circuit (" . implode(', ', $info) . ")...");
 
-        parent::changeExitNode();
+        parent::anonymize();
     }
 
     /**

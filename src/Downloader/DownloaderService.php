@@ -114,19 +114,15 @@ class DownloaderService implements ServiceInterface
         // CURLOPT_STDERR => fopen('php://temp', 'w+'),
         // CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     ];
-    private readonly array $uaStrings;
     protected readonly QoS $qos;
 
     public function __construct(string $downloaderName = 'downloader')
     {
         global $api;
 
-        $this->uaStrings = json_decode(file_get_contents('module://zolinga-commons/data/ua-strings.json'), true)
-            or throw new Exception("Failed to load user agent strings from module://zolinga-commons/data/ua-strings.json");
-
         $this->qos = new QoS();
         $this->downloaderName = $downloaderName;
-        $this->cookieJarFileName = $api->fs->toPath('private://ipdefender-daq/cookies/' . $downloaderName . '.txt');
+        $this->cookieJarFileName = $api->fs->toPath('private://zolinga-commons/cookies/' . basename($downloaderName) . '.txt');
         $this->initCookieJar();
         $this->randomizeUserAgent();
     }
@@ -214,15 +210,30 @@ class DownloaderService implements ServiceInterface
     /**
      * Randomizes the user agent string used for requests.
      * 
-     * The user agent strings are loaded from the module://zolinga-commons/data/ua-strings.json file.
+     * The user agent strings are loaded from the module://zolinga-commons/data/ua-headers.json file.
      */
     public function randomizeUserAgent(): void
     {
         global $api;
 
-        $ua = $this->uaStrings[array_rand($this->uaStrings)];
-        $this->setOpts([CURLOPT_USERAGENT => $ua]);
-        $api->log->info($this->downloaderName, "User agent set to $ua");
+        $headers = [];
+        $list = json_decode(file_get_contents('module://zolinga-commons/data/ua-headers.json'), true)
+            or throw new Exception("Failed to load user agent headers from module://zolinga-commons/data/ua-headers.json");
+        
+        $info = $list[array_rand($list)];
+        $replaceVals = array_map(fn ($v) => match($v[0]) {
+            'random' => rand($v[1], $v[2]),
+            default => throw new Exception("Unsupported variable type $v[0]"),
+        }, $info['randomizers']);
+        $replaceWhat = array_map(fn ($k) => '${' . $k . '}', array_keys($replaceVals));
+        $headers = array_map(fn ($value) => str_replace($replaceWhat, $replaceVals, $value), $info['headers']);
+
+        // Merge headers
+        $this->setOpts([CURLOPT_USERAGENT => $headers['User-Agent']]);
+        $headerLines = array_map(fn ($k, $v) => "$k: $v", array_keys($headers), $headers);
+        $this->curlOpts[CURLOPT_HTTPHEADER] = $this->mergeHeaders($this->curlOpts[CURLOPT_HTTPHEADER], $headerLines);
+
+        $api->log->info($this->downloaderName, "User agent set to {$headers['User-Agent']}");
     }
 
     /**
@@ -495,6 +506,38 @@ class DownloaderService implements ServiceInterface
         global $api;
         $api->log->info($this->downloaderName, "Removing all cookies...");
         file_put_contents($this->cookieJarFileName, '');
+    }
+
+
+    /**
+     * Return all cookies stored in the cookie jar.
+     *
+     * @param string|null $domain if null return all cookies, otherwise only cookies for the specified domain.
+     * @param bool $full If false return only values of the cookies oterwise return the whole cookie array
+     * @return array Array of cookies.
+     */
+    public function getCookies(string $domain = null, bool $full = false): array
+    {
+        $ret = [];
+        $cookies = file_get_contents($this->cookieJarFileName);
+        foreach (explode("\n", $cookies) as $cookie) {
+            $cookie = explode("\t", $cookie);
+            if (count($cookie) < 7) {
+                continue;
+            }
+            $ret[] = [
+                "domain" => $cookie[0],
+                "flag" => $cookie[1],
+                "path" => $cookie[2],
+                "secure" => $cookie[3],
+                "expiration" => $cookie[4],
+                "name" => $cookie[5],
+                "value" => $cookie[6],
+            ];
+        }
+
+        $ret = $domain ? array_filter($ret, fn ($c) => str_ends_with($c['domain'], $domain)) : $ret;
+        return $full ? $ret : array_column($ret, 'value', 'name');
     }
 
 

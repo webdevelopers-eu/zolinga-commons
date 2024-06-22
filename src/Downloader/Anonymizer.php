@@ -32,8 +32,8 @@ class Anonymizer extends DownloaderService
     ];
 
     protected ?string $lastIP = null;
-    private array $onExitNodeChangeHooks = [];
-    private bool $inCallback = false;
+    private array $onAnonymizeHooks = [];
+    private bool $inAnonymizeCallback = false;
 
     public function __construct(string $downloaderName = 'tor')
     {
@@ -72,7 +72,7 @@ class Anonymizer extends DownloaderService
                 if ($failFast) {
                     throw $e;
                 } elseif ($attempts-- <= 0 || $this->qos->getStats()['successRatio'] <= 0.5) {
-                    $this->changeExitNode();
+                    $this->anonymize();
                 }
             } catch (\Throwable $e) {
                 $api->log->error($this->downloaderName, "Failed to download $url: " . $e->getCode() . ' ' . $e->getMessage());
@@ -95,9 +95,9 @@ class Anonymizer extends DownloaderService
      * @param callable $callback The callback to add.
      * @return void
      */
-    public function addExitNodeCallback(callable $callback): void
+    public function onAnonymize(callable $callback): void
     {
-        $this->onExitNodeChangeHooks[] = $callback;
+        $this->onAnonymizeHooks[] = $callback;
     }
 
     /**
@@ -105,16 +105,16 @@ class Anonymizer extends DownloaderService
      * 
      * This method should be implemented in the extending class.
      * 
-     * It also calls the callbacks added by `$this->addExitNodeCallback()`.
+     * It also calls the callbacks added by `$this->onAnonymize()`.
      *
      * @throws \InvalidArgumentException If the Tor control host, port, or password is not set in the configuration.
      * @throws \Exception If there is an error connecting to the Tor control port, authenticating, or sending the NEWNYM signal.
      * @return void
      */
-    public function changeExitNode(): void
+    public function anonymize(): void
     {
         $this->closeConnection(); // close persistent curl connections
-        $this->processCallbacks();
+        $this->processAnonymizeHooks();
     }
 
     protected function excludeExitNode(string $node): void {
@@ -127,7 +127,7 @@ class Anonymizer extends DownloaderService
      *
      * @return string|null The current IP address of the Tor service or null if the IP address could not be determined.
      */
-    public function getMyIP(): string
+    public function getMyIP(): ?string
     {
         $try = self::IP_SERVICES;
         do {
@@ -145,20 +145,20 @@ class Anonymizer extends DownloaderService
     }
 
     /**
-     * Process the callbacks added by `$this->addExitNodeCallback()`.
+     * Process the callbacks added by `$this->onAnonymize()`.
      *
      * @return void
      */
-    private function processCallbacks(): void
+    private function processAnonymizeHooks(): void
     {
-        if (!$this->inCallback) {
+        if (!$this->inAnonymizeCallback) {
             try {
-                $this->inCallback = true;
-                foreach ($this->onExitNodeChangeHooks as $callback) {
+                $this->inAnonymizeCallback = true;
+                foreach ($this->onAnonymizeHooks as $callback) {
                     $callback($this);
                 }
             } finally {
-                $this->inCallback = false;
+                $this->inAnonymizeCallback = false;
             }
         }
     }

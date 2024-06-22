@@ -87,9 +87,9 @@ class DownloaderService implements ServiceInterface
         'Content-Language',
         'Content-Location',
         'Content-Range',
-        'sec-ch-ua',
-        'sec-ch-ua-mobile',
-        'sec-ch-ua-platform',
+        'Sec-Ch-Ua',
+        'Sec-Ch-Ua-Mobile',
+        'Sec-Ch-Ua-Platform',
     ];
     protected readonly string $downloaderName;
     protected readonly string $cookieJarFileName;

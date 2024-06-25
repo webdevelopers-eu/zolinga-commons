@@ -464,11 +464,12 @@ class DownloaderService implements ServiceInterface
         $errNo = curl_errno($ch);
         $elapsed = round(microtime(true) - $start, 2) . 's';
         $keepAliveText = $downloaderOpts & self::OPT_KEEP_ALIVE ? ' (keep-alive)' : '';
+        $throttlingText = $this->throttler->getInfoText($url);
 
         if (!$result || $errNo) {
             $this->qos->addFailure($errNo . ' ' . $errMsg);
             // Grep all possible info about the failure
-            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg)", [
+            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg, $throttlingText)", [
                 "url" => $url,
                 'error' => $errMsg,
                 'errno' => $errNo,
@@ -501,7 +502,7 @@ class DownloaderService implements ServiceInterface
             $this->qos->addSuccess(microtime(true) - $start, strlen($result));
             $size = is_string($outFile) ? filesize($outFile) : strlen($result);
             $sizeHuman = $api->convert->memoryUnits($size, "MiB", 3) . ' MiB';
-            $api->log->info($this->downloaderName, "CURL: Downloaded $url$keepAliveText ($sizeHuman, total time $elapsed)", [
+            $api->log->info($this->downloaderName, "CURL: Downloaded $url$keepAliveText ($sizeHuman, total time $elapsed, $throttlingText)", [
                 "url" => $url,
                 "error" => $errMsg,
                 "errno" => $errNo,

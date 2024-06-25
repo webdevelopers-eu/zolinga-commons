@@ -10,7 +10,8 @@ namespace Zolinga\Commons\Downloader;
  * @author Daniel Sevcik <danny@zolinga.net>
  * @date 2024-06-25
  */
-class ThrottlerDomain {
+class ThrottlerDomain
+{
     /**
      * Host to match the throttler to.
      *
@@ -39,7 +40,8 @@ class ThrottlerDomain {
      */
     public readonly int $maxSeconds;
 
-    public function __construct(string $host, int $maxSeconds = 1, int $maxRequests = 1) {
+    public function __construct(string $host, int $maxSeconds = 1, int $maxRequests = 1)
+    {
         $this->host = strtolower($host);
         $this->maxRequests = $maxRequests;
         $this->maxSeconds = $maxSeconds;
@@ -56,7 +58,8 @@ class ThrottlerDomain {
      * @param string $host
      * @return bool
      */
-    public function matchHost(string $host): bool {
+    public function matchHost(string $host): bool
+    {
         $host = strtolower($host);
         return str_ends_with($host, '.' . $this->host) !== false || $this->host === $host;
     }
@@ -67,7 +70,8 @@ class ThrottlerDomain {
      * @param ?integer $time The time of the request. If null, the current time is used.
      * @return void
      */
-    public function recordRequest(?int $time = null): void {
+    public function recordRequest(?int $time = null): void
+    {
         $this->history[] = $time ?? time();
         array_shift($this->history);
     }
@@ -77,8 +81,19 @@ class ThrottlerDomain {
      *
      * @return bool
      */
-    public function isOverLimit(): bool {
+    public function isOverLimit(): bool
+    {
         return !!$this->getRemainingTime();
+    }
+
+    /**
+     * Get human information about the throttler settings.
+     *
+     * @return string
+     */
+    public function getInfoText(): string
+    {
+        return $this->maxSeconds ? sprintf('throttling %dreq/%ds', $this->maxRequests, $this->maxSeconds) : 'not throttled';
     }
 
     /**
@@ -86,7 +101,8 @@ class ThrottlerDomain {
      *
      * @return int
      */
-    public function getRemainingTime(): int {
+    public function getRemainingTime(): int
+    {
         return max(0, $this->maxSeconds - (time() - ($this->history[0] ?? 0)));
     }
 }

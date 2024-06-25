@@ -49,6 +49,10 @@ class Throttler {
         $domain->recordRequest($time);
     }
 
+    public function getInfoText(string $url): string {
+        $domain = $this->getDomain($url);
+        return $domain->getInfoText();
+    }
 
     private function getDomain(string $url): ThrottlerDomain {
         $host = parse_url($url, PHP_URL_HOST) ?? $url;

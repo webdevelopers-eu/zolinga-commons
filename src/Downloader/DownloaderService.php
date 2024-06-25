@@ -130,12 +130,16 @@ class DownloaderService implements ServiceInterface
         // CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     ];
     protected readonly QoS $qos;
+    private int $requestCounterReset = 0;
+
+    private Throttler $throttler;
 
     public function __construct(string $downloaderName = 'downloader')
     {
         global $api;
 
         $this->qos = new QoS();
+        $this->throttler = new Throttler();
         $this->downloaderName = $downloaderName;
         $this->cookieJarFileName = $api->fs->toPath('private://zolinga-commons/cookies/' . basename($downloaderName) . '.txt');
         $this->initCookieJar();
@@ -266,10 +270,15 @@ class DownloaderService implements ServiceInterface
     {
         switch ($name) {
             case 'requestCounter':
-                return $this->qos->getStats()['total'];
+                return $this->qos->getStats()['total'] - $this->requestCounterReset;
             default:
                 throw new Exception("Property $name not found in " . static::class);
         }
+    }
+
+    public function resetRequestCounter(): void
+    {
+        $this->requestCounterReset = $this->qos->getStats()['total'];
     }
 
     private function initCookieJar()
@@ -399,6 +408,10 @@ class DownloaderService implements ServiceInterface
             foreach ($curlOpts as $opt => $val) {
                 curl_setopt($ch, $opt, $val);
             }
+            
+            sleep($this->throttler->getRemainingTime($url));
+            $this->throttler->recordRequest($url);
+
             $result = curl_exec($ch);
         } catch (\Throwable $e) {
             $this->qos->addFailure($e->getCode() . ' ' . $e->getMessage());

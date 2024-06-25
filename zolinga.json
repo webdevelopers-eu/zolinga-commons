@@ -141,6 +141,17 @@
                 "port": 9051,
                 "password": ""
             }
+        },
+        "downloader": {
+            "throttle": {
+                "# example.com": "Throttle settings for example.com. Any matched domain must end to 'example.com'. E.g. 'sub1.sub2.example.com' or 'example.com'", 
+                "example.com": {
+                    "# max": "Maximum number of downloads per timeframe.",
+                    "max": 1,
+                    "# time": "Timeframe in seconds.",
+                    "time": 1
+                }
+            }
         }
     }
 }

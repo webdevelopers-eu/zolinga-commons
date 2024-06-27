@@ -409,7 +409,8 @@ class DownloaderService implements ServiceInterface
                 curl_setopt($ch, $opt, $val);
             }
             
-            sleep($this->throttler->getRemainingTime($url));
+            $sleep = $this->throttler->getRemainingTime($url);
+            sleep($sleep);
             $this->throttler->recordRequest($url);
 
             $result = curl_exec($ch);
@@ -435,7 +436,7 @@ class DownloaderService implements ServiceInterface
         }
 
         // Checks the result and throws exceptions if necessary
-        $this->curlCheckResult($url, $result, $outFile, $curlOpts, $downloaderOpts, $ch, $start);
+        $this->curlCheckResult($url, $result, $outFile, $curlOpts, $downloaderOpts, $ch, $start, $sleep);
 
         return $result;
     }
@@ -456,7 +457,7 @@ class DownloaderService implements ServiceInterface
         }
     }
 
-    private function curlCheckResult(string $url, $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start)
+    private function curlCheckResult(string $url, $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start, int $sleep = 0)
     {
         global $api;
 
@@ -464,7 +465,7 @@ class DownloaderService implements ServiceInterface
         $errNo = curl_errno($ch);
         $elapsed = round(microtime(true) - $start, 2) . 's';
         $keepAliveText = $downloaderOpts & self::OPT_KEEP_ALIVE ? ' (keep-alive)' : '';
-        $throttlingText = $this->throttler->getInfoText($url);
+        $throttlingText = $this->throttler->getInfoText($url) . ($sleep ? ", delayed request by {$sleep}s" : '');
 
         if (!$result || $errNo) {
             $this->qos->addFailure($errNo . ' ' . $errMsg);

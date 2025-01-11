@@ -31,8 +31,25 @@ class Anonymizer extends DownloaderService
         'https://ipapi.co/ip',
     ];
 
+    /**
+     * The last IP address of the Tor service.
+     *
+     * @var string|null
+     */
     protected ?string $lastIP = null;
+
+    /**
+     * The list of callbacks that will be called when the identity of the Tor service is refreshed.
+     *
+     * @var array<callable>
+     */
     private array $onAnonymizeHooks = [];
+
+    /**
+     * Flag to prevent recursion in the anonymize() method.
+     *
+     * @var boolean
+     */
     private bool $inAnonymizeCallback = false;
 
     public function __construct(string $downloaderName = 'tor')
@@ -92,7 +109,7 @@ class Anonymizer extends DownloaderService
      * 
      * Rembmber that refreshing identity by default flushes cookies and randomizes user agent.
      *
-     * @param callable $callback The callback to add.
+     * @param callable(DownloaderService):void $callback The callback to add.
      * @return void
      */
     public function onAnonymize(callable $callback): void

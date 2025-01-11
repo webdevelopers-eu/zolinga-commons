@@ -548,7 +548,7 @@ class DownloaderService implements ServiceInterface
      * @param bool $full If false return only values of the cookies oterwise return the whole cookie array
      * @return array Array of cookies.
      */
-    public function getCookies(string $domain = null, bool $full = false): array
+    public function getCookies(?string $domain = null, bool $full = false): array
     {
         $ret = [];
         $cookies = file_get_contents($this->cookieJarFileName);

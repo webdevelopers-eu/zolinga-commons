@@ -1,6 +1,8 @@
 # File Uploader
 
-Simple drag&drop upload component for uploading multiple files.
+Simple drag&drop upload component for uploading multiple files. The component is designed to be used in forms. It uploads files to the server and provides a preview of the uploaded files. 
+
+After the files are uploaded the unique upload URI is stored in a hidden input field. The URI can be used to retrieve the file content from the server.
 
 ## Usage
 
@@ -62,3 +64,4 @@ uploader.add({
     "type": "image/jpeg",
 });
 ```
+

@@ -8,7 +8,7 @@ use const Zolinga\System\IS_HTTPS;
 
 /**
  * Various URL related functions.
- * 
+ *
  * @author Daniel Sevcik <daniel@zolinga.net>
  * @date 2024-04-26
  */
@@ -16,13 +16,13 @@ class UrlService implements ServiceInterface {
 
     /**
      * Get current URL.
-     * 
+     *
      * @return string
      */
     public function getCurrentUrl(): string {
-        return 
-            (IS_HTTPS ? "https://" : "http://") . 
-            $_SERVER["HTTP_HOST"] . 
+        return
+            (IS_HTTPS ? "https://" : "http://") .
+            $_SERVER["HTTP_HOST"] .
             // Port
             (
                 ($_SERVER["SERVER_PORT"] == 80 && !IS_HTTPS) || ($_SERVER["SERVER_PORT"] == 443 && IS_HTTPS)
@@ -32,12 +32,12 @@ class UrlService implements ServiceInterface {
 
     /**
      * Make URL absolute.
-     * 
+     *
      * Examples:
      * echo $api->url->resolveUrl("test", "http://example.com"); // http://example.com/test
      * echo $api->url->resolveUrl("test", "http://example.com/dir/"); // http://example.com/dir/test
      * echo $api->url->resolveUrl("test", "http://example.com/dir"); // http://example.com/test
-     * 
+     *
      * @param string $url
      * @param ?string $base if not given then current URL is used
      */

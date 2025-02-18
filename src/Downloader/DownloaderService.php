@@ -397,6 +397,7 @@ class DownloaderService implements ServiceInterface
                 CURLOPT_COOKIEFILE => $this->cookieJarFileName, // Read init cookies from here. By passing the empty string ("") to this option, you enable the cookie engine without reading any initial cookies.
                 CURLOPT_COOKIEJAR => $this->cookieJarFileName, // Write cookies here.
                 CURLOPT_URL => $url,
+                CURLOPT_ENCODING => "", // Enables gzip/deflate automatically (reuters detects compression support otherwise it sends 401)
             ],
             $curlOpts
         );

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Zolinga\Commons;
+
 use Zolinga\System\Events\ServiceInterface;
 use const Zolinga\System\IS_HTTPS;
 
@@ -12,21 +13,22 @@ use const Zolinga\System\IS_HTTPS;
  * @author Daniel Sevcik <daniel@zolinga.net>
  * @date 2024-04-26
  */
-class UrlService implements ServiceInterface {
+class UrlService implements ServiceInterface
+{
 
     /**
      * Get current URL.
      *
      * @return string
      */
-    public function getCurrentUrl(): string {
-        return
-            (IS_HTTPS ? "https://" : "http://") .
+    public function getCurrentUrl(): string
+    {
+        return (IS_HTTPS ? "https://" : "http://") .
             $_SERVER["HTTP_HOST"] .
             // Port
             (
                 ($_SERVER["SERVER_PORT"] == 80 && !IS_HTTPS) || ($_SERVER["SERVER_PORT"] == 443 && IS_HTTPS)
-                 ? "" : ":" . $_SERVER["SERVER_PORT"]
+                ? "" : ":" . $_SERVER["SERVER_PORT"]
             ) . $_SERVER["REQUEST_URI"];
     }
 
@@ -41,7 +43,8 @@ class UrlService implements ServiceInterface {
      * @param string $url
      * @param ?string $base if not given then current URL is used
      */
-    public function resolveUrl(string $url, ?string $base = null): string {
+    public function resolveUrl(string $url, ?string $base = null): string
+    {
         if ($base === null) {
             $base = $this->getCurrentUrl();
         }
@@ -78,5 +81,25 @@ class UrlService implements ServiceInterface {
         }
 
         return $base;
+    }
+
+    /**
+     * Make URL name from text.
+     *
+     * Examples:
+     * echo $api->url->makeUrlPathPart("Hello, World!"); // hello-world
+     * echo $api->url->makeUrlPathPart("Dobrý večer!"); // dobry-vecer
+     * 
+     * @param string $text
+     * @return string
+     */
+    public function makeUrlPathPart(string $text): string
+    {
+        $text = iconv("UTF-8", "ASCII//TRANSLIT", $text);
+        $text = strtolower($text);
+        $text = preg_replace("@[^a-z0-9]+@", "-", $text);
+        $text = preg_replace("@-+@", "-", $text);
+        $text = trim($text, "-");
+        return $text;
     }
 }

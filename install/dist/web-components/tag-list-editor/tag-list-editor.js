@@ -17,6 +17,7 @@ export default class TagListEditor extends HTMLElement {
         super();
         //this.#internals = this.attachInternals();
         const origTags = this.tags; // this is only before the class is loaded the first time
+        delete this.tags; // delete property so our setter/getter starts working
 
         this.#init()
             .then(() => {

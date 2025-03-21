@@ -17,6 +17,10 @@ class Throttler {
         global $api;
 
         foreach ($api->config['downloader']['throttle'] as $host => $throttle) {
+            if (!is_array($throttle)) {
+                trigger_error('Throttler: Invalid throttle configuration for host ' . json_encode($host) . ': ' . json_encode($throttle), E_USER_WARNING);
+                $throttle = ['time' => 0, 'max' => 0];
+            }
             $this->domains[$host] = new ThrottlerDomain($host, $throttle['time'], $throttle['max']);
         }
         $this->domains['default'] = new ThrottlerDomain('default', 0, 0);

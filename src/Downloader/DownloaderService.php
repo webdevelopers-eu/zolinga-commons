@@ -459,7 +459,7 @@ class DownloaderService implements ServiceInterface
         }
     }
                                 
-    private function curlCheckResult(string $url, $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start, int $sleep = 0)
+    private function curlCheckResult(string $url, bool | string $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start, int $sleep = 0)
     {
         global $api;
                                     
@@ -502,7 +502,7 @@ class DownloaderService implements ServiceInterface
                 throw new Exception("Failed to download $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
             }
         } else {
-            $this->qos->addSuccess(microtime(true) - $start, strlen($result));
+            $this->qos->addSuccess(microtime(true) - $start, is_bool($result) ? $result : strlen($result));
             $size = is_string($outFile) ? filesize($outFile) : strlen($result);
             $sizeHuman = $api->convert->memoryUnits($size, "MiB", 3) . ' MiB';
             $api->log->info($this->downloaderName, "CURL: Downloaded $url$keepAliveText ($sizeHuman, total time $elapsed, $throttlingText)", [

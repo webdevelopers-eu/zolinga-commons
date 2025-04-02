@@ -135,13 +135,16 @@ class Email
     {
         global $api;
 
+
         if ($_SERVER["HTTP_HOST"] ?? false) {
             [$this->httpHost] = explode(':', $_SERVER["HTTP_HOST"] ?? '');
         } else {
             $this->httpHost = 'localhost';
         }
 
-        $this->htmlBaseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http') . '://' . $this->httpHost . ($_SERVER["REQUEST_URI"] ?? '/');
+        $this->htmlBaseURL = $api->config['baseURL'] ?: (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http') . '://' . $this->httpHost . ($_SERVER["REQUEST_URI"] ?? '/');
+        $this->httpHost = parse_url($this->htmlBaseURL, PHP_URL_HOST);
+
         $this->boundary = $this->mkUniqueId('E2Email-Boundary-');
         $this->messageId = $this->mkUniqueId();
         $this->rootHeaders[] = array('Message-ID', '<' . $this->messageId . '>');
@@ -293,11 +296,11 @@ class Email
         return $parts;
     }
 
-    public function send($to = false, $vars = array(), $exceptions = 1): bool
+    public function send(string | array | false $to = false, $vars = array(), $exceptions = 1): bool
     {
         $vars = $this->getVars($vars);
 
-        if ($to) $this->addHeader('To', $to);
+        if ($to) $this->addHeader('To', is_array($to) ? implode(', ', $to) : $to);
         $parts = $this->getSource($vars, true);
         $from = preg_replace('@^.+<|>.*$@', '', $parts['from']); // beware of format 'XY <mail>'
 
@@ -705,8 +708,10 @@ class Email
 
     private function notifyAdmin($subject, $message)
     {
+        global $api;
+
         //$mail='info@'.preg_replace('/^(www\d*)\./', '', strtolower($this->httpHost));
-        $mail = 'error@' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        $mail = 'error@' . $this->httpHost;
         return mail($mail, $subject, $message);
     }
 

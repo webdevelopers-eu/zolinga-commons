@@ -502,7 +502,7 @@ class DownloaderService implements ServiceInterface
                 throw new Exception("Failed to download $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
             }
         } else {
-            $this->qos->addSuccess(microtime(true) - $start, is_bool($result) ? $result : strlen($result));
+            $this->qos->addSuccess(microtime(true) - $start, is_bool($result) ? 0 : strlen($result));
             $size = is_string($outFile) ? filesize($outFile) : strlen($result);
             $sizeHuman = $api->convert->memoryUnits($size, "MiB", 3) . ' MiB';
             $api->log->info($this->downloaderName, "CURL: Downloaded $url$keepAliveText ($sizeHuman, total time $elapsed, $throttlingText)", [

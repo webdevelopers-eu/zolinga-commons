@@ -115,6 +115,11 @@
             "tag": "file-uploader",
             "description": "File uploader.",
             "module": "web-components/file-uploader/file-uploader.js"
+        },
+        {
+            "tag": "clipboard-copy",
+            "description": "Copy the contents on click.",
+            "module": "web-components/clipboard-copy/clipboard-copy.js"
         }
     ],
     "autoload": {

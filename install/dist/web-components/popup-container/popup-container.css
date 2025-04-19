@@ -112,6 +112,13 @@
                 height: 1.2em;
                 overflow: visible;
             }
+
+            &.nav-back-close,
+            & .nav-back-close {
+                width: 100%;
+                min-width: 2.5em; /* problem clicking to top left corner on mobile */
+                height: 100%;
+            }
         }
 
         & ::slotted([slot="nav-back"]),

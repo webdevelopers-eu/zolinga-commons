@@ -95,6 +95,12 @@
         margin-bottom: calc(var(--forms-gap-vertical) / 4);
     }
 
+    input:is(:-webkit-autofill, :autofill),
+    textarea:is(:-webkit-autofill, :autofill) {
+        border-radius: var(--forms-radius, 5px) !important;
+    }
+
+
     &>p {
         color: var(--forms-color-secondary);
     }

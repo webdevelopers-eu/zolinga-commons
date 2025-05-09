@@ -11,6 +11,10 @@ use Zolinga\System\Events\ServiceInterface;
 use Zolinga\Commons\Downloader\Exception\SslException;
 use Zolinga\Commons\Downloader\Exception\TimeoutException;
 
+// Import the manager classes
+use Zolinga\Commons\Downloader\CookieManager;
+use Zolinga\Commons\Downloader\UserAgentManager;
+
 /**
  * Downloader Service API. Uses CURL to download files and send JSON requests.
  * 
@@ -92,7 +96,10 @@ class DownloaderService implements ServiceInterface
         'Sec-Ch-Ua-Platform',
     ];
     protected readonly string $downloaderName;
-    protected readonly string $cookieJarFileName;
+    protected readonly string $cookieJarFileName; // Keep for direct cURL usage
+    public readonly CookieManager $cookieManager;
+    public readonly UserAgentManager $uaManager;
+
     private array $curlOpts = [
         CURLOPT_AUTOREFERER => 1,
         CURLOPT_COOKIESESSION => 1,
@@ -118,24 +125,11 @@ class DownloaderService implements ServiceInterface
             'DNT: 1',
         ],
         CURLOPT_FORBID_REUSE => 0, // 1: Do not reuse the connection.
-        // CURLOPT_COOKIE => '', // Is used when you want to specify the exact contents of a cookie header to send to the server.
-        CURLOPT_COOKIESESSION => 0, // 1: Do not use cookies from the previous session.
-        //CURLOPT_HTTPPROXYTUNNEL => true,
-        //CURLOPT_PROXY
-        //CURLOPT_PROXYPORT
-        //CURLOPT_PROXYTYPE => CURLPROXY_HTTP,
-        //CURLOPT_RESUME_FROM => 0,
-        //CURLOPT_COOKIE => 'test=1;test=2',
         CURLOPT_HEADER => 0,
         CURLOPT_SSL_VERIFYPEER => 0,
         CURLOPT_SSL_VERIFYHOST => 0,
         CURLOPT_FAILONERROR => 1,
-        // CURLOPT_TIMECONDITION => CURL_TIMECOND_IFMODSINCE,
-        // CURLOPT_TIMEVALUE => 0,
-        // CURLOPT_FILETIME => true, // return file time of remote resource
         CURLOPT_VERBOSE => 0,
-        // CURLOPT_STDERR => fopen('php://temp', 'w+'),
-        // CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     ];
     
     public function __construct(string $downloaderName = 'downloader')
@@ -144,7 +138,11 @@ class DownloaderService implements ServiceInterface
         
         $this->downloaderName = $downloaderName;
         $this->cookieJarFileName = $api->fs->toPath('private://zolinga-commons/cookies/' . basename($downloaderName) . '.txt');
-        $this->initCookieJar();
+        
+        // Initialize the managers
+        $this->cookieManager = new CookieManager($this->cookieJarFileName);
+        $this->uaManager = new UserAgentManager();
+
         $this->randomizeUserAgent();
     }
     
@@ -228,31 +226,16 @@ class DownloaderService implements ServiceInterface
     
     /**
      * Randomizes the user agent string used for requests.
-     * 
-     * The user agent strings are loaded from the module://zolinga-commons/data/ua-headers.json file.
      */
     public function randomizeUserAgent(): void
     {
-        global $api;
+        $userAgentData = $this->uaManager->getRandomUserAgentData();
         
-        $headers = [];
-        $list = json_decode(file_get_contents('module://zolinga-commons/data/ua-headers.json'), true)
-              or throw new Exception("Failed to load user agent headers from module://zolinga-commons/data/ua-headers.json");
-        
-        $info = $list[array_rand($list)];
-        $replaceVals = array_map(fn ($v) => match($v[0]) {
-                'random' => rand($v[1], $v[2]),
-                default => throw new Exception("Unsupported variable type $v[0]"),
-            }, $info['randomizers']);
-        $replaceWhat = array_map(fn ($k) => '${' . $k . '}', array_keys($replaceVals));
-        $headers = array_map(fn ($value) => str_replace($replaceWhat, $replaceVals, $value), $info['headers']);
-        
-        // Merge headers
-        $this->setOpts([CURLOPT_USERAGENT => $headers['User-Agent']]);
-        $headerLines = array_map(fn ($k, $v) => "$k: $v", array_keys($headers), $headers);
-        $this->curlOpts[CURLOPT_HTTPHEADER] = $this->mergeHeaders($this->curlOpts[CURLOPT_HTTPHEADER], $headerLines);
-        
-        $api->log->info($this->downloaderName, "User agent set to {$headers['User-Agent']}");
+        // Merge headers obtained from the UserAgentManager
+        $this->setOpts([CURLOPT_USERAGENT => $userAgentData['userAgent']]);
+        $headerLines = array_map(fn ($k, $v) => "$k: $v", array_keys($userAgentData['headers']), $userAgentData['headers']);
+        // Ensure we merge with existing headers, especially those not managed by ua-headers.json
+        $this->curlOpts[CURLOPT_HTTPHEADER] = $this->mergeHeaders($this->curlOpts[CURLOPT_HTTPHEADER] ?? [], $headerLines);
     }
     
     /**
@@ -264,16 +247,6 @@ class DownloaderService implements ServiceInterface
     public function setUserAgent(string $ua): void
     {
         $this->setOpts([CURLOPT_USERAGENT => $ua]);
-    }
-        
-    private function initCookieJar()
-    {
-        if (!is_dir(dirname($this->cookieJarFileName))) {
-            mkdir(dirname($this->cookieJarFileName), 0777, true);
-        }
-            
-        touch($this->cookieJarFileName)
-            or throw new Exception("Failed to create cookie jar file $this->cookieJarFileName");
     }
         
     /**
@@ -384,7 +357,6 @@ class DownloaderService implements ServiceInterface
         /** @var \CurlHandle $ch */
         $result = false;
         try {
-            // curl_setopt_array($ch, $curlOpts);
             foreach ($curlOpts as $opt => $val) {
                 curl_setopt($ch, $opt, $val);
             }
@@ -396,7 +368,7 @@ class DownloaderService implements ServiceInterface
                 'error' => $e->getMessage(),
                 'errno' => $e->getCode(),
                 'info' => curl_getinfo($ch),
-                'cookies' => $this->getCookies(parse_url($url, PHP_URL_HOST)),
+                'cookies' => $this->cookieManager->getCookies(parse_url($url, PHP_URL_HOST)),
                 'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE) // file is resource - not serializable
             ]);
             throw $e;
@@ -447,7 +419,7 @@ class DownloaderService implements ServiceInterface
                 'error' => $errMsg,
                 'errno' => $errNo,
                 'info' => curl_getinfo($ch),
-                'cookies' => $this->getCookies(parse_url($url, PHP_URL_HOST)),
+                'cookies' => $this->cookieManager->getCookies($this->cookieJarFileName, parse_url($url, PHP_URL_HOST)),
                 'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE), // file is resource - not serializable
                 'downloaderOpts' => $downloaderOpts,
             ]);
@@ -464,7 +436,6 @@ class DownloaderService implements ServiceInterface
             case CURLE_SSL_ENGINE_NOTFOUND:
             case CURLE_SSL_ENGINE_SETFAILED:
             case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
-                // 35 OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to www.tmdn.org:443
                 throw new SslException("SSL error downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
             case CURLE_GOT_NOTHING:
                 throw new GotNothingException("Empty reply downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
@@ -507,8 +478,9 @@ class DownloaderService implements ServiceInterface
     public function flushCookies(): void
     {
         global $api;
+        
         $api->log->info($this->downloaderName, "Removing all cookies...");
-        file_put_contents($this->cookieJarFileName, '');
+        $this->cookieManager->flushCookies();
     }
                                                                         
                                                                         
@@ -521,26 +493,7 @@ class DownloaderService implements ServiceInterface
      */
     public function getCookies(?string $domain = null, bool $full = false): array
     {
-        $ret = [];
-        $cookies = file_get_contents($this->cookieJarFileName);
-        foreach (explode("\n", $cookies) as $cookie) {
-            $cookie = explode("\t", $cookie);
-            if (count($cookie) < 7) {
-                continue;
-            }
-            $ret[] = [
-                "domain" => $cookie[0],
-                "flag" => $cookie[1],
-                "path" => $cookie[2],
-                "secure" => $cookie[3],
-                "expiration" => $cookie[4],
-                "name" => $cookie[5],
-                "value" => $cookie[6],
-            ];
-        }
-                                                                            
-        $ret = $domain ? array_filter($ret, fn ($c) => str_ends_with($c['domain'], $domain)) : $ret;
-        return $full ? $ret : array_column($ret, 'value', 'name');
+        return $this->cookieManager->getCookies($domain, $full);
     }
                                                                         
                                                                         

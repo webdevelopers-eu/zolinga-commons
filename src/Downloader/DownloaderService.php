@@ -102,6 +102,7 @@ class DownloaderService implements ServiceInterface
         CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_TIMEOUT => 10,
         CURLOPT_TIMEOUT_MS => 10000,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS, // Ensure HTTP/2 support
         CURLOPT_HTTPHEADER => [
             'Connection: keep-alive',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -136,7 +137,6 @@ class DownloaderService implements ServiceInterface
         // CURLOPT_STDERR => fopen('php://temp', 'w+'),
         // CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     ];
-    private int $requestCounterReset = 0;
     
     public function __construct(string $downloaderName = 'downloader')
     {
@@ -160,8 +160,6 @@ class DownloaderService implements ServiceInterface
      * 
      *
      * 
-     * @property-read int $requestCounter Number of requests made since the last identity refresh.
-     *
      * @param string $downloaderName
      * @return static New instance of $this object.
      */
@@ -266,21 +264,6 @@ class DownloaderService implements ServiceInterface
     public function setUserAgent(string $ua): void
     {
         $this->setOpts([CURLOPT_USERAGENT => $ua]);
-    }
-    
-    public function __get(string $name): mixed
-    {
-        switch ($name) {
-        case 'requestCounter':
-            return $this->requestCounterReset;
-        default:
-            throw new Exception("Property $name not found in " . static::class);
-        }
-    }
-        
-    public function resetRequestCounter(): void
-    {
-        $this->requestCounterReset = 0;
     }
         
     private function initCookieJar()

@@ -136,17 +136,12 @@ class DownloaderService implements ServiceInterface
         // CURLOPT_STDERR => fopen('php://temp', 'w+'),
         // CURLOPT_USERAGENT => 'Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
     ];
-    protected readonly QoS $qos;
     private int $requestCounterReset = 0;
-    
-    private Throttler $throttler;
     
     public function __construct(string $downloaderName = 'downloader')
     {
         global $api;
         
-        $this->qos = new QoS();
-        $this->throttler = new Throttler();
         $this->downloaderName = $downloaderName;
         $this->cookieJarFileName = $api->fs->toPath('private://zolinga-commons/cookies/' . basename($downloaderName) . '.txt');
         $this->initCookieJar();
@@ -277,7 +272,7 @@ class DownloaderService implements ServiceInterface
     {
         switch ($name) {
         case 'requestCounter':
-            return $this->qos->getStats()['total'] - $this->requestCounterReset;
+            return $this->requestCounterReset;
         default:
             throw new Exception("Property $name not found in " . static::class);
         }
@@ -285,7 +280,7 @@ class DownloaderService implements ServiceInterface
         
     public function resetRequestCounter(): void
     {
-        $this->requestCounterReset = $this->qos->getStats()['total'];
+        $this->requestCounterReset = 0;
     }
         
     private function initCookieJar()
@@ -411,14 +406,9 @@ class DownloaderService implements ServiceInterface
                 curl_setopt($ch, $opt, $val);
             }
                                         
-            $sleep = $this->throttler->getRemainingTime($url);
-            sleep($sleep);
-            $this->throttler->recordRequest($url);
-                                        
             $result = curl_exec($ch);
         } catch (\Throwable $e) {
-            $this->qos->addFailure($e->getCode() . ' ' . $e->getMessage());
-            $this->log->error($this->downloaderName, "CURL: Failed to download $url: {$e->getCode()} {$e->getMessage()}", [
+            $api->log->error($this->downloaderName, "CURL: Failed to download $url: {$e->getCode()} {$e->getMessage()}", [
                 "url" => $url,
                 'error' => $e->getMessage(),
                 'errno' => $e->getCode(),
@@ -438,7 +428,7 @@ class DownloaderService implements ServiceInterface
         }
                                     
         // Checks the result and throws exceptions if necessary
-        $this->curlCheckResult($url, $result, $outFile, $curlOpts, $downloaderOpts, $ch, $start, $sleep);
+        $this->curlCheckResult($url, $result, $outFile, $curlOpts, $downloaderOpts, $ch, $start);
                                     
         return $result;
     }
@@ -459,7 +449,7 @@ class DownloaderService implements ServiceInterface
         }
     }
                                 
-    private function curlCheckResult(string $url, bool | string $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start, int $sleep = 0)
+    private function curlCheckResult(string $url, bool | string $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start)
     {
         global $api;
                                     
@@ -467,12 +457,9 @@ class DownloaderService implements ServiceInterface
         $errNo = curl_errno($ch);
         $elapsed = round(microtime(true) - $start, 2) . 's';
         $keepAliveText = $downloaderOpts & self::OPT_KEEP_ALIVE ? ' (keep-alive)' : '';
-        $throttlingText = $this->throttler->getInfoText($url) . ($sleep ? ", delayed request by {$sleep}s" : '');
                                     
         if (!$result || $errNo) {
-            $this->qos->addFailure($errNo . ' ' . $errMsg);
-            // Grep all possible info about the failure
-            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg, $throttlingText)", [
+            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg)", [
                 "url" => $url,
                 'error' => $errMsg,
                 'errno' => $errNo,
@@ -502,10 +489,9 @@ class DownloaderService implements ServiceInterface
                 throw new Exception("Failed to download $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
             }
         } else {
-            $this->qos->addSuccess(microtime(true) - $start, is_bool($result) ? 0 : strlen($result));
             $size = is_string($outFile) ? filesize($outFile) : strlen($result);
             $sizeHuman = $api->convert->memoryUnits($size, "MiB", 3) . ' MiB';
-            $api->log->info($this->downloaderName, "CURL: Downloaded $url$keepAliveText ($sizeHuman, total time $elapsed, $throttlingText)", [
+            $api->log->info($this->downloaderName, "CURL: Downloaded $url$keepAliveText ($sizeHuman, total time $elapsed)", [
                 "url" => $url,
                 "error" => $errMsg,
                 "errno" => $errNo,
@@ -614,4 +600,4 @@ class DownloaderService implements ServiceInterface
         ]);
     }
 }
-                                                                    
+

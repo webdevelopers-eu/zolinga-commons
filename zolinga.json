@@ -13,11 +13,6 @@
             "class": "Zolinga\\Commons\\PingJoe\\PingJoeService"
         },
         {
-            "description": "Tor service.",
-            "service": "tor",
-            "class": "Zolinga\\Commons\\Downloader\\TorService"
-        },
-        {
             "description": "Downloader services.",
             "service": "downloader",
             "class": "Zolinga\\Commons\\Downloader\\DownloaderService"

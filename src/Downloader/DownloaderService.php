@@ -274,7 +274,7 @@ class DownloaderService implements ServiceInterface
         $opts = array_replace(
             $curlOpts,
             [
-                CURLOPT_HTTPHEADER => array_replace($curlOpts[CURLOPT_HTTPHEADER] ?? [], ['Content-Type: application/json; charset=utf-8'])
+                CURLOPT_HTTPHEADER => array_merge($curlOpts[CURLOPT_HTTPHEADER] ?? [], ['Content-Type: application/json; charset=utf-8'])
             ]
         );
         switch ($method) {

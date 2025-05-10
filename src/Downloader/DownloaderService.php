@@ -419,7 +419,7 @@ class DownloaderService implements ServiceInterface
                 'error' => $errMsg,
                 'errno' => $errNo,
                 'info' => curl_getinfo($ch),
-                'cookies' => $this->cookieManager->getCookies($this->cookieJarFileName, parse_url($url, PHP_URL_HOST)),
+                'cookies' => $this->cookieManager->getCookies(parse_url($url, PHP_URL_HOST)),
                 'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE), // file is resource - not serializable
                 'downloaderOpts' => $downloaderOpts,
             ]);

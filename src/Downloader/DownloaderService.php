@@ -111,7 +111,7 @@ class DownloaderService implements ServiceInterface
         CURLOPT_TIMEOUT_MS => 10000,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS, // Ensure HTTP/2 support
         CURLOPT_HTTPHEADER => [
-            'Connection: keep-alive',
+            // 'Connection: keep-alive', - not automatically to have rotating proxies
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language: en-US,en;q=0.5',
             'Accept-Encoding: gzip, deflate',

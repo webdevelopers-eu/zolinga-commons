@@ -10,4 +10,4 @@ use Exception;
  * @author Daniel Sevcik <danny@zolinga.net>
  * @date 2024-06-13
  */
-class GotNothingException extends DownloaderException {}
+class DownloaderException extends Exception {}

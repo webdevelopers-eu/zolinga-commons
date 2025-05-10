@@ -10,7 +10,7 @@ use Exception;
  * @author Daniel Sevcik <danny@zolinga.net>
  * @date 2024-06-13
  */
-class HttpReturnedErrorException extends Exception {
+class HttpReturnedErrorException extends DownloaderException {
     /**
      * The HTTP status code.
      *

@@ -307,9 +307,13 @@ class DownloaderService implements ServiceInterface
      * stored in private://ipdefender-daq/cookies/ directory. It reuses cookies
      * for subsequent requests. It also follows redirects by default.
      *
-     * @throws TimeoutException If the download times out.
      * @throws Exception If the download fails.
-     * 
+     * @throws HttpReturnedErrorException If cURL returns CURLE_HTTP_RETURNED_ERROR.
+     * @throws TimeoutException If cURL returns CURLE_OPERATION_TIMEOUTED.
+     * @throws SslException If cURL returns an SSL-related error (e.g., CURLE_SSL_CACERT_BADFILE, CURLE_SSL_CERTPROBLEM).
+     * @throws GotNothingException If cURL returns CURLE_GOT_NOTHING.
+     * @throws Exception For any other cURL error.
+     *
      * @param string $url
      * @param false|boolean $outFile false to return the content, string to save to file.
      * @param array<mixed> $curlOpts Additional CURL options. E.g. [CURLOPT_PROXY => 'http://proxy:port']
@@ -406,6 +410,30 @@ class DownloaderService implements ServiceInterface
         }
     }
 
+   /**
+     * Checks the result of a cURL request, logs the outcome, and throws specific exceptions on failure.
+     *
+     * This method analyzes the cURL execution result. If an error occurred, it logs detailed
+     * error information and throws an appropriate exception based on the cURL error number.
+     * If the download was successful, it logs success information including the downloaded size
+     * and time taken.
+     *
+     * @param string $url The URL that was attempted to be downloaded.
+     * @param bool|string $result The result of the curl_exec() call. False on failure, or the content if CURLOPT_RETURNTRANSFER was true.
+     * @param mixed $outFile The file path where the content was saved (if applicable), or the downloaded content itself.
+     * @param array $curlOpts The cURL options used for the request.
+     * @param int $downloaderOpts The downloader specific options (e.g., self::OPT_KEEP_ALIVE).
+     * @param \CurlHandle $ch The cURL handle used for the request.
+     * @param float $start The microtime timestamp taken before starting the cURL request.
+     *
+     * @throws HttpReturnedErrorException If cURL returns CURLE_HTTP_RETURNED_ERROR.
+     * @throws TimeoutException If cURL returns CURLE_OPERATION_TIMEOUTED.
+     * @throws SslException If cURL returns an SSL-related error (e.g., CURLE_SSL_CACERT_BADFILE, CURLE_SSL_CERTPROBLEM).
+     * @throws GotNothingException If cURL returns CURLE_GOT_NOTHING.
+     * @throws Exception For any other cURL error.
+     *
+     * @return void
+     */
     private function curlCheckResult(string $url, bool | string $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start)
     {
         global $api;

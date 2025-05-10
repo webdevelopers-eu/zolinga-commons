@@ -37,6 +37,25 @@ class CookieManager
         $api->log->info("CookieManager", "Cookie jar initialized at $cookieJarFileName");
     }
 
+
+    /**
+     * Retrieves cookies from the cookie jar file.
+     *
+     * This method reads the cookie jar file, parses its content, and returns an array of cookies.
+     * It can filter cookies by a specific domain and return either a full array of cookie data
+     * or an associative array of cookie names and values.
+     *
+     * @param string|null $domain Optional. The domain to filter cookies by. If null, all cookies are returned.
+     *                            The filtering matches if the cookie's domain ends with the specified domain,
+     *                            is an exact match, or if the cookie's domain starts with a '.' and the specified
+     *                            domain ends with the cookie's domain (e.g., cookie domain ".example.com" matches "www.example.com").
+     * @param bool $full Optional. If true, returns an array of arrays, where each inner array contains
+     *                   all cookie data ("domain", "flag", "path", "secure", "expiration", "name", "value").
+     *                   If false (default), returns an associative array with cookie names as keys and
+     *                   cookie values as values.
+     * @return array An array of cookies. The structure depends on the $full parameter.
+     *               Returns an empty array if the cookie file cannot be read or no cookies match.
+     */
     public function getCookies(?string $domain = null, bool $full = false): array
     {
         $ret = [];

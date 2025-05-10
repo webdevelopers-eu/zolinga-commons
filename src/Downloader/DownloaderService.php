@@ -28,12 +28,12 @@ class DownloaderService implements ServiceInterface
      * You need to explicitly call $this->closeConnection() to close it.
      */
     public const OPT_KEEP_ALIVE = 1;
-    
+
     /**
      * If the request fails, throw an exception and do not try to recover.
      */
     public const FAIL_FAST = 2;
-    
+
     /**
      * When self::OPT_KEEP_ALIVE is set this will hold the persistent CURL handle
      * and each subsequent request with self::OPT_KEEP_ALIVE will reuse this handle.
@@ -45,7 +45,7 @@ class DownloaderService implements ServiceInterface
      * @var \CurlHandle|null
      */
     private ?\CurlHandle $curlKeepAliveHandler = null;
-    
+
     private const UNIQUE_HTTP_HEADERS = [
         'Accept',
         'Accept-Charset',
@@ -131,21 +131,21 @@ class DownloaderService implements ServiceInterface
         CURLOPT_FAILONERROR => 1,
         CURLOPT_VERBOSE => 0,
     ];
-    
+
     public function __construct(string $downloaderName = 'downloader')
     {
         global $api;
-        
+
         $this->downloaderName = $downloaderName;
         $this->cookieJarFileName = $api->fs->toPath('private://zolinga-commons/cookies/' . basename($downloaderName) . '.txt');
-        
+
         // Initialize the managers
         $this->cookieManager = new CookieManager($this->cookieJarFileName);
         $this->uaManager = new UserAgentManager();
 
         $this->randomizeUserAgent();
     }
-    
+
     /**
      * Return new Downloader object instance.
      * 
@@ -166,7 +166,7 @@ class DownloaderService implements ServiceInterface
         $class = static::class;
         return new $class($downloaderName);
     }
-    
+
     /**
      * Set additional CURL default options for this object.
      * 
@@ -181,11 +181,11 @@ class DownloaderService implements ServiceInterface
         if (isset($opts[CURLOPT_HTTPHEADER])) {
             $opts[CURLOPT_HTTPHEADER] = $this->mergeHeaders($this->curlOpts[CURLOPT_HTTPHEADER], $opts[CURLOPT_HTTPHEADER]);
         }
-        
+
         $this->curlOpts = array_replace($this->curlOpts, $opts);
         return $this->curlOpts;
     }
-    
+
     /**
      * Smart merge headers from multiple sources.
      * 
@@ -201,7 +201,7 @@ class DownloaderService implements ServiceInterface
     private function mergeHeaders(...$list): array
     {
         $headers = array_merge(...$list);
-        
+
         $parsed = [];
         foreach ($headers as $header) {
             [$key, $value] = explode(':', $header, 2);
@@ -212,32 +212,32 @@ class DownloaderService implements ServiceInterface
                 $parsed[$key] = array_merge($parsed[$key] ?? [], [$value]);
             }
         }
-        
+
         $unparsed = [];
         foreach ($parsed as $key => $values) {
             foreach (array_unique($values) as $value) {
                 $unparsed[] = "$key: $value";
             }
         }
-        
+
         return $unparsed;
     }
-    
-    
+
+
     /**
      * Randomizes the user agent string used for requests.
      */
     public function randomizeUserAgent(): void
     {
         $userAgentData = $this->uaManager->getRandomUserAgentData();
-        
+
         // Merge headers obtained from the UserAgentManager
         $this->setOpts([CURLOPT_USERAGENT => $userAgentData['userAgent']]);
-        $headerLines = array_map(fn ($k, $v) => "$k: $v", array_keys($userAgentData['headers']), $userAgentData['headers']);
+        $headerLines = array_map(fn($k, $v) => "$k: $v", array_keys($userAgentData['headers']), $userAgentData['headers']);
         // Ensure we merge with existing headers, especially those not managed by ua-headers.json
         $this->curlOpts[CURLOPT_HTTPHEADER] = $this->mergeHeaders($this->curlOpts[CURLOPT_HTTPHEADER] ?? [], $headerLines);
     }
-    
+
     /**
      * Set the user agent string used for requests.
      *
@@ -248,7 +248,7 @@ class DownloaderService implements ServiceInterface
     {
         $this->setOpts([CURLOPT_USERAGENT => $ua]);
     }
-        
+
     /**
      * Sends a JSON request to the specified URL using the specified method and payload.
      * 
@@ -270,34 +270,36 @@ class DownloaderService implements ServiceInterface
     public function jsonRequest(string $url, ?array $payload = null, string $method = "GET", array $curlOpts = [], int $downloaderOpts = 0): array
     {
         global $api;
-            
+
         $opts = array_replace(
             $curlOpts,
             [
-                CURLOPT_HTTPHEADER => array_replace($curlOpts[CURLOPT_HTTPHEADER] ?? [], ['Content-Type: application/json; charset=utf-8'])]);
+                CURLOPT_HTTPHEADER => array_replace($curlOpts[CURLOPT_HTTPHEADER] ?? [], ['Content-Type: application/json; charset=utf-8'])
+            ]
+        );
         switch ($method) {
-        case 'GET':
-            $url .= '?' . http_build_query($payload);
-            $opts[CURLOPT_CUSTOMREQUEST] = 'GET';
-            break;
-        case 'POST':
-        case 'PUT':
-        case 'DELETE':
-            $opts[CURLOPT_CUSTOMREQUEST] = strtoupper($method);
-            $opts[CURLOPT_POSTFIELDS] = $payload ? json_encode($payload) : null;
-            break;
-        default:
-            throw new \Exception("Unsupported method $method");
+            case 'GET':
+                $url .= '?' . http_build_query($payload);
+                $opts[CURLOPT_CUSTOMREQUEST] = 'GET';
+                break;
+            case 'POST':
+            case 'PUT':
+            case 'DELETE':
+                $opts[CURLOPT_CUSTOMREQUEST] = strtoupper($method);
+                $opts[CURLOPT_POSTFIELDS] = $payload ? json_encode($payload) : null;
+                break;
+            default:
+                throw new \Exception("Unsupported method $method");
         }
-                                    
+
         $text = $this->download($url, false, $opts, $downloaderOpts)
-              or throw new \Exception($this::class . ": Failed to download JSON response from $url");
+            or throw new \Exception($this::class . ": Failed to download JSON response from $url");
         $resp = json_decode($text, true)
-              or throw new \JsonException($this::class . ": Failed to decode JSON response from $url: " . json_encode(substr($text, 0, 256)) . "...");
-                                    
+            or throw new \JsonException($this::class . ": Failed to decode JSON response from $url: " . json_encode(substr($text, 0, 256)) . "...");
+
         return $resp;
     }
-                                
+
     /**
      * Download a remote resource using CURL.
      * 
@@ -317,31 +319,31 @@ class DownloaderService implements ServiceInterface
     public function download(string $url, false|string $outFile = false, array $curlOpts = [], int $downloaderOpts = 0): bool|string
     {
         global $api;
-                                    
+
         // Remove hash from URL
         $url = preg_replace("@#.*$@", "", $url);
         $start = microtime(true);
         $keepAlive = $downloaderOpts & self::OPT_KEEP_ALIVE;
         $failFast = $downloaderOpts & self::FAIL_FAST;
-                                    
+
         if ($keepAlive) {
             $curlOpts = array_replace($curlOpts, [CURLOPT_FORBID_REUSE => 0]);
         }
-                                    
+
         if ($failFast) {
             $curlOpts = array_replace($curlOpts, [CURLOPT_FAILONERROR => 1]);
         }
-                                    
+
         $ch = ($keepAlive && $this->curlKeepAliveHandler ? $this->curlKeepAliveHandler : curl_init())
             or throw new Exception('Failed to initialize CURL with URL ' . $url);
-                                    
+
         $file = false;
         if (is_string($outFile)) {
             curl_setopt($ch, CURLOPT_FILE, $file = $this->curlPrepareOutputFile($outFile));
         } else { // important: you cannot set both CURLOPT_FILE and CURLOPT_RETURNTRANSFER to any value, 
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         }
-                                    
+
         $curlOpts = array_replace(
             $this->curlOpts,
             [
@@ -353,14 +355,14 @@ class DownloaderService implements ServiceInterface
             ],
             $curlOpts
         );
-                                    
+
         /** @var \CurlHandle $ch */
         $result = false;
         try {
             foreach ($curlOpts as $opt => $val) {
                 curl_setopt($ch, $opt, $val);
             }
-                                        
+
             $result = curl_exec($ch);
         } catch (\Throwable $e) {
             $api->log->error($this->downloaderName, "CURL: Failed to download $url: {$e->getCode()} {$e->getMessage()}", [
@@ -369,7 +371,7 @@ class DownloaderService implements ServiceInterface
                 'errno' => $e->getCode(),
                 'info' => curl_getinfo($ch),
                 'cookies' => $this->cookieManager->getCookies(parse_url($url, PHP_URL_HOST)),
-                'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE) // file is resource - not serializable
+                'opts' => array_filter($curlOpts, fn($k) => $k !== CURLOPT_FILE) // file is resource - not serializable
             ]);
             throw $e;
         } finally {
@@ -381,13 +383,13 @@ class DownloaderService implements ServiceInterface
             }
             if ($file) fclose($file);
         }
-                                    
+
         // Checks the result and throws exceptions if necessary
         $this->curlCheckResult($url, $result, $outFile, $curlOpts, $downloaderOpts, $ch, $start);
-                                    
+
         return $result;
     }
-                                
+
     /**
      * When you use self::OPT_KEEP_ALIVE wity the request you need to close the connection manually.
      *
@@ -396,23 +398,23 @@ class DownloaderService implements ServiceInterface
     public function closeConnection(): void
     {
         global $api;
-                                    
+
         if ($this->curlKeepAliveHandler) {
             $api->log->info($this->downloaderName, "Closing keep-alive connection...");
             curl_close($this->curlKeepAliveHandler);
             $this->curlKeepAliveHandler = null;
         }
     }
-                                
+
     private function curlCheckResult(string $url, bool | string $result, mixed $outFile, array $curlOpts, int $downloaderOpts, \CurlHandle $ch, float $start)
     {
         global $api;
-                                    
+
         $errMsg = curl_error($ch);
         $errNo = curl_errno($ch);
         $elapsed = round(microtime(true) - $start, 2) . 's';
         $keepAliveText = $downloaderOpts & self::OPT_KEEP_ALIVE ? ' (keep-alive)' : '';
-                                    
+
         if (!$result || $errNo) {
             $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg)", [
                 "url" => $url,
@@ -420,27 +422,27 @@ class DownloaderService implements ServiceInterface
                 'errno' => $errNo,
                 'info' => curl_getinfo($ch),
                 'cookies' => $this->cookieManager->getCookies(parse_url($url, PHP_URL_HOST)),
-                'opts' => array_filter($curlOpts, fn ($k) => $k !== CURLOPT_FILE), // file is resource - not serializable
+                'opts' => array_filter($curlOpts, fn($k) => $k !== CURLOPT_FILE), // file is resource - not serializable
                 'downloaderOpts' => $downloaderOpts,
             ]);
             // See https://curl.se/libcurl/c/libcurl-errors.html
             switch ($errNo) {
-            case CURLE_HTTP_RETURNED_ERROR:
-                throw new HttpReturnedErrorException($errNo, $errMsg);
-            case CURLE_OPERATION_TIMEOUTED:
-                throw new TimeoutException("Timeout downloading $url$keepAliveText (total time $elapsed)", $errNo);
-            case CURLE_SSL_CACERT_BADFILE:
-            case CURLE_SSL_CERTPROBLEM:
-            case CURLE_SSL_CIPHER:
-            case CURLE_SSL_CONNECT_ERROR:
-            case CURLE_SSL_ENGINE_NOTFOUND:
-            case CURLE_SSL_ENGINE_SETFAILED:
-            case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
-                throw new SslException("SSL error downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
-            case CURLE_GOT_NOTHING:
-                throw new GotNothingException("Empty reply downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
-            default:
-                throw new Exception("Failed to download $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
+                case CURLE_HTTP_RETURNED_ERROR:
+                    throw new HttpReturnedErrorException($errNo, $errMsg);
+                case CURLE_OPERATION_TIMEOUTED:
+                    throw new TimeoutException("Timeout downloading $url$keepAliveText (total time $elapsed)", $errNo);
+                case CURLE_SSL_CACERT_BADFILE:
+                case CURLE_SSL_CERTPROBLEM:
+                case CURLE_SSL_CIPHER:
+                case CURLE_SSL_CONNECT_ERROR:
+                case CURLE_SSL_ENGINE_NOTFOUND:
+                case CURLE_SSL_ENGINE_SETFAILED:
+                case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
+                    throw new SslException("SSL error downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
+                case CURLE_GOT_NOTHING:
+                    throw new GotNothingException("Empty reply downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
+                default:
+                    throw new Exception("Failed to download $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
             }
         } else {
             $size = is_string($outFile) ? filesize($outFile) : strlen($result);
@@ -456,7 +458,7 @@ class DownloaderService implements ServiceInterface
             ]);
         }
     }
-                                                                        
+
     private function curlPrepareOutputFile(string $outFile)
     {
         $dir = dirname($outFile);
@@ -464,26 +466,26 @@ class DownloaderService implements ServiceInterface
             mkdir($dir, 0777, true);
         }
         $file = fopen($outFile, 'w+');
-                                                                            
+
         if (!$file) {
             throw new Exception("Failed to open file $outFile for writing");
         }
-                                                                            
+
         return $file;
     }
-                                                                        
+
     /**
      * Flushes all cookies stored in the cookie jar.
      */
     public function flushCookies(): void
     {
         global $api;
-        
+
         $api->log->info($this->downloaderName, "Removing all cookies...");
         $this->cookieManager->flushCookies();
     }
-                                                                        
-                                                                        
+
+
     /**
      * Return all cookies stored in the cookie jar.
      *
@@ -495,8 +497,8 @@ class DownloaderService implements ServiceInterface
     {
         return $this->cookieManager->getCookies($domain, $full);
     }
-                                                                        
-                                                                        
+
+
     /**
      * TOR service can be very slow. Set the default timeout.
      *
@@ -507,19 +509,18 @@ class DownloaderService implements ServiceInterface
     public function setTimeout(int $timeout = 60, int $connectionTimeout = 10): void
     {
         global $api;
-                                                                            
+
         $api->log->info($this->downloaderName, "Setting default timeout to $timeout seconds and connection timeout to $connectionTimeout seconds.");
         $this->setOpts([
             CURLOPT_TIMEOUT => $timeout,
             CURLOPT_TIMEOUT_MS => $timeout * 1000,
-            CURLOPT_CONNECTTIMEOUT => $timeout / 2,
             CURLOPT_LOW_SPEED_LIMIT => 1,
             CURLOPT_LOW_SPEED_TIME => $connectionTimeout,
             CURLOPT_CONNECTTIMEOUT => $connectionTimeout,
             CURLOPT_CONNECTTIMEOUT_MS => $connectionTimeout * 1000,
         ]);
     }
-                                                                        
+
     /**
      * Set the proxy for the downloader.
      * 
@@ -536,4 +537,3 @@ class DownloaderService implements ServiceInterface
         ]);
     }
 }
-

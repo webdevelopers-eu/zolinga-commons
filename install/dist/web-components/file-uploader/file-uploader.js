@@ -18,7 +18,7 @@ import api from '/dist/system/js/api.js';
  * @since 2024-05-22
  */
 export default class FileUploader extends WebComponent {
-    observedAttributes = ['accept', ...WebComponent.observedAttributes];
+    static observedAttributes = ['accept', ...WebComponent.observedAttributes];
     #root;
     #template;
     #file;
@@ -254,8 +254,13 @@ export default class FileUploader extends WebComponent {
         switch (name) {
             case 'accept':
             case 'capture':
-                this.#file[name] = newValue;
+                if (this.#file) {                    
+                    this.#file[name] = newValue;
+                }
                 break
+            default:
+                super.attributeChangedCallback(name, oldValue, newValue);
+                break;
         }
     }
 

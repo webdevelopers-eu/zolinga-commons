@@ -66,7 +66,7 @@
 
             &.header {
                 grid-row: header-start / header-end;
-                background-color: var(--color-primary);
+                background-color: var(--forms-color-bg);
                 border-top-left-radius: var(--radius, 0.5em);
                 border-top-right-radius: var(--radius, 0.5em);
             }
@@ -94,7 +94,7 @@
         & slot[name="nav-back"]>*,
         & ::slotted([slot="title"]),
         & slot[name="title"]>* {
-            color: var(--color-bg);
+            color: var(--label-color);
             fill: currentColor;
         }
 
@@ -157,7 +157,7 @@
             align-self: start;
             justify-self: stretch;
             padding-bottom: 2em;
-            mask-image: linear-gradient(to bottom, black calc(100% - 2em), transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black calc(1em), black calc(100% - 2em), transparent 100%);
         }
 
         & ::slotted([slot="actions"]),

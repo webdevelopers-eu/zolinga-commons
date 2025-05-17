@@ -20,12 +20,14 @@ export default class InputToggle extends HTMLElement {
     }
 
     get checked() {
-        return this.#states.checked !== null;
+        return this.#input.checked;
     }
 
     set checked(value) {
-        this.#states.checked = value ? '' : null;
-        this.#syncStates();
+        const state = value === true || value === 'true' || value === '1' || value === 'on';
+        this.#states.checked = state;
+        this.#input.checked = state;
+        this.toggleAttribute('checked', state);
     }
 
     async #init() {

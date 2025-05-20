@@ -64,18 +64,14 @@ export default class ContactForm extends WebComponent {
     #toggleVisibility(formVisible) {
         if (formVisible) {
             this.#form.removeAttribute('hidden');
-            this.#form.removeAttribute('aria-hidden');
             this.#form.removeAttribute('disabled');
 
             this.#thankYou.setAttribute('hidden', '');
-            this.#thankYou.setAttribute('aria-hidden', 'true');
         } else {
             this.#form.setAttribute('hidden', '');
-            this.#form.setAttribute('aria-hidden', 'true');
             this.#form.setAttribute('disabled', '');
 
             this.#thankYou.removeAttribute('hidden');
-            this.#thankYou.removeAttribute('aria-hidden');
         }
     }
 }

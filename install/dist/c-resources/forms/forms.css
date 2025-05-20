@@ -19,7 +19,7 @@
 
     color: var(--forms-color-fg);
 
-    &:where(form, .form) {
+    &:where(form, .form):not([hidden]) {
         display: grid;
         grid-template-columns:
             [full-width-start] 0rem [content-start] 1fr [content-end] 0rem [full-width-end];

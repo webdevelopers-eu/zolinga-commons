@@ -57,8 +57,17 @@
             "origin": [
                 "remote"
             ]
+        },
+        {
+            "description": "Send all fields of the form to the e-mail address.",
+            "event": "contact-form",
+            "class": "Zolinga\\Commons\\ContactForm",
+            "method": "onContactForm",
+            "origin": [
+                "remote"
+            ]
         }
-    ],
+    ],  
     "emit": [],
     "webComponents": [
         {
@@ -115,6 +124,11 @@
             "tag": "clipboard-copy",
             "description": "Copy the contents on click.",
             "module": "web-components/clipboard-copy/clipboard-copy.js"
+        },
+        {
+            "tag": "contact-form",
+            "description": "Send content of the form to the e-mail address.",
+            "module": "web-components/contact-form/contact-form.js"
         }
     ],
     "autoload": {
@@ -124,6 +138,9 @@
         "zolinga-intl"
     ],
     "config": {
+        "contact": {
+            "email": "info@{hostname}"
+        },
         "# pingjoe": "PingJoe monitoring service. Register for free at https://pingjoe.com/ to get your user and password.",
         "pingjoe": {
             "user": "",

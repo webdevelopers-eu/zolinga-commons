@@ -32,6 +32,7 @@ export default class ContactForm extends WebComponent {
             return;
         }
 
+        this.#toggleVisibility(true);
         this.#form.addEventListener('submit', async (e) => this.#formSubmit(e));
     }
 

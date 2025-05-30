@@ -37,6 +37,10 @@ class ContactForm implements ListenerInterface
         $to = str_replace('{hostname}', $hostname, $to);
 
         $mail = new Email("Contact Form Submission", false, $html);
+
+        $from = 'contact@' . $hostname;
+        $mail->setHeader('From', $from);
+
         $api->log->info('zolinga-commons', 'ContactForm: Sending contact form email to: ' . $to);
         if (!$mail->send($to)) {
             $api->log->error('zolinga-commons', 'ContactForm: Failed to send email to: ' . $to);

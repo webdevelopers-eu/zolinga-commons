@@ -62,7 +62,7 @@
     }
 
     &:where(button, .button),
-    & button,
+    & :where(button),
     & input[type="submit"] {
         text-decoration: none;
         text-align: center;

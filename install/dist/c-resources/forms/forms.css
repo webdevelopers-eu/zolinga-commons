@@ -1,4 +1,4 @@
-.c-form {
+*:where(.c-form) {
     --forms-radius: var(--radius, 5px);
     --forms-color-fg: var(--color-fg, currentColor);
     --forms-color-bg: var(--color-bg);

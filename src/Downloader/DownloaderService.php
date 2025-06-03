@@ -6,13 +6,14 @@ namespace Zolinga\Commons\Downloader;
 
 use Exception;
 use Zolinga\Commons\Downloader\Exception\GotNothingException;
-use Zolinga\Commons\Downloader\Exception\HttpReturnedErrorException;
+use Zolinga\Commons\Downloader\Exception\HttpErrorResponseException;
 use Zolinga\System\Events\ServiceInterface;
 use Zolinga\Commons\Downloader\Exception\SslException;
 use Zolinga\Commons\Downloader\Exception\TimeoutException;
 
 // Import the manager classes
 use Zolinga\Commons\Downloader\CookieManager;
+use Zolinga\Commons\Downloader\Exception\CurlException;
 use Zolinga\Commons\Downloader\UserAgentManager;
 
 /**
@@ -307,8 +308,8 @@ class DownloaderService implements ServiceInterface
      * stored in private://ipdefender-daq/cookies/ directory. It reuses cookies
      * for subsequent requests. It also follows redirects by default.
      *
-     * @throws Exception If the download fails.
-     * @throws HttpReturnedErrorException If cURL returns CURLE_HTTP_RETURNED_ERROR.
+     * @throws HttpErrorResponseException If cURL returns CURLE_HTTP_RETURNED_ERROR, the HTTP status code is not 200 OK. Exception's code is the HTTP status code.
+     *          e.g. 404 Not Found, 500 Internal Server Error.
      * @throws TimeoutException If cURL returns CURLE_OPERATION_TIMEOUTED.
      * @throws SslException If cURL returns an SSL-related error (e.g., CURLE_SSL_CACERT_BADFILE, CURLE_SSL_CERTPROBLEM).
      * @throws GotNothingException If cURL returns CURLE_GOT_NOTHING.
@@ -339,7 +340,7 @@ class DownloaderService implements ServiceInterface
         }
 
         $ch = ($keepAlive && $this->curlKeepAliveHandler ? $this->curlKeepAliveHandler : curl_init())
-            or throw new Exception('Failed to initialize CURL with URL ' . $url);
+            or throw new CurlException('Failed to initialize CURL with URL ' . $url);
 
         $file = false;
         if (is_string($outFile)) {
@@ -426,7 +427,7 @@ class DownloaderService implements ServiceInterface
      * @param \CurlHandle $ch The cURL handle used for the request.
      * @param float $start The microtime timestamp taken before starting the cURL request.
      *
-     * @throws HttpReturnedErrorException If cURL returns CURLE_HTTP_RETURNED_ERROR.
+     * @throws HttpErrorResponseException If cURL returns CURLE_HTTP_RETURNED_ERROR, the HTTP status code is not 200 OK. Exception's code is the HTTP status code.
      * @throws TimeoutException If cURL returns CURLE_OPERATION_TIMEOUTED.
      * @throws SslException If cURL returns an SSL-related error (e.g., CURLE_SSL_CACERT_BADFILE, CURLE_SSL_CERTPROBLEM).
      * @throws GotNothingException If cURL returns CURLE_GOT_NOTHING.
@@ -444,30 +445,33 @@ class DownloaderService implements ServiceInterface
         $keepAliveText = $downloaderOpts & self::OPT_KEEP_ALIVE ? ' (keep-alive)' : '';
 
         if (!$result || $errNo) {
+            $httpStatusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg)", [
                 "url" => $url,
                 'error' => $errMsg,
                 'errno' => $errNo,
+                'httpStatusCode' => $httpStatusCode,
                 'info' => curl_getinfo($ch),
                 'cookies' => $this->cookieManager->getCookies(parse_url($url, PHP_URL_HOST)),
                 'opts' => array_filter($curlOpts, fn($k) => $k !== CURLOPT_FILE), // file is resource - not serializable
                 'downloaderOpts' => $downloaderOpts,
             ]);
+
             // See https://curl.se/libcurl/c/libcurl-errors.html
             switch ($errNo) {
-                case CURLE_HTTP_RETURNED_ERROR:
-                    throw new HttpReturnedErrorException($errNo, $errMsg);
-                case CURLE_OPERATION_TIMEOUTED:
+                case CURLE_HTTP_RETURNED_ERROR: // error 22
+                    throw new HttpErrorResponseException($httpStatusCode, $errMsg);
+                case CURLE_OPERATION_TIMEOUTED: // error 28
                     throw new TimeoutException("Timeout downloading $url$keepAliveText (total time $elapsed)", $errNo);
-                case CURLE_SSL_CACERT_BADFILE:
-                case CURLE_SSL_CERTPROBLEM:
-                case CURLE_SSL_CIPHER:
-                case CURLE_SSL_CONNECT_ERROR:
-                case CURLE_SSL_ENGINE_NOTFOUND:
-                case CURLE_SSL_ENGINE_SETFAILED:
-                case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
+                case CURLE_SSL_CACERT_BADFILE: // error 77
+                case CURLE_SSL_CERTPROBLEM: // error 58 
+                case CURLE_SSL_CIPHER: // error 59
+                case CURLE_SSL_CONNECT_ERROR: // error 35
+                case CURLE_SSL_ENGINE_NOTFOUND: // error 53
+                case CURLE_SSL_ENGINE_SETFAILED: // error 54
+                case CURLE_SSL_PINNEDPUBKEYNOTMATCH: // error 60
                     throw new SslException("SSL error downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
-                case CURLE_GOT_NOTHING:
+                case CURLE_GOT_NOTHING: // error 52
                     throw new GotNothingException("Empty reply downloading $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);
                 default:
                     throw new Exception("Failed to download $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo);

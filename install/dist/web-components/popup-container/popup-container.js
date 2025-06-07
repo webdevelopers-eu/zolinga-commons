@@ -19,6 +19,7 @@ export default class PopupContainer extends WebComponent {
     }
 
     connectedCallback() {
+        super.connectedCallback();
         this.#countPopups(1);
     }
 

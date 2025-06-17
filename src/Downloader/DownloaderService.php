@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace Zolinga\Commons\Downloader;
 
 use Exception;
+use Zolinga\Commons\Downloader\Exception\BadRequestException;
 use Zolinga\Commons\Downloader\Exception\GotNothingException;
 use Zolinga\Commons\Downloader\Exception\HttpErrorResponseException;
+use Zolinga\Commons\Downloader\Exception\PaymentRequiredException;
+use Zolinga\Commons\Downloader\Exception\RequestTimeoutException;
 use Zolinga\System\Events\ServiceInterface;
 use Zolinga\Commons\Downloader\Exception\SslException;
 use Zolinga\Commons\Downloader\Exception\TimeoutException;
+use Zolinga\Commons\Downloader\Exception\UnauthorizedException;
 
 // Import the manager classes
 use Zolinga\Commons\Downloader\CookieManager;
 use Zolinga\Commons\Downloader\Exception\CurlException;
+use Zolinga\Commons\Downloader\Exception\ForbiddenException;
+use Zolinga\Commons\Downloader\Exception\NotFoundException;
 use Zolinga\Commons\Downloader\UserAgentManager;
 
 /**
@@ -460,7 +466,23 @@ class DownloaderService implements ServiceInterface
             // See https://curl.se/libcurl/c/libcurl-errors.html
             switch ($errNo) {
                 case CURLE_HTTP_RETURNED_ERROR: // error 22
-                    throw new HttpErrorResponseException($httpStatusCode, $errMsg);
+                    switch ($httpStatusCode) 
+                    {
+                        case 400:
+                            throw new BadRequestException("Bad request $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo, null, $result ?: null);
+                        case 401:
+                            throw new UnauthorizedException("Unauthorized $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo, null, $result ?: null);
+                        case 402:
+                            throw new PaymentRequiredException("Payment required $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo, null, $result ?: null);
+                        case 403:
+                            throw new ForbiddenException("Forbidden $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo, null, $result ?: null);
+                        case 404:
+                            throw new NotFoundException("Not found $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo, null, $result ?: null);
+                        case 408:
+                            throw new RequestTimeoutException("Request timeout $url$keepAliveText: $errNo $errMsg (total time $elapsed)", $errNo, null, $result ?: null);
+                        default:
+                            throw new HttpErrorResponseException($errMsg, $httpStatusCode, null, $result ?: null);
+                    };
                 case CURLE_OPERATION_TIMEOUTED: // error 28
                     throw new TimeoutException("Timeout downloading $url$keepAliveText (total time $elapsed)", $errNo);
                 case CURLE_SSL_CACERT_BADFILE: // error 77

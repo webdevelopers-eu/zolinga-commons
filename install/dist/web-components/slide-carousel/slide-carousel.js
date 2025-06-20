@@ -67,7 +67,8 @@ export default class SlideCarousel extends HTMLElement {
         this.#lastActiveNames = active.map(slide => slide.dataset.name).join(' ');
         if (this.dataset.active != this.#lastActiveNames) {
             this.dataset.active = this.#lastActiveNames;
-            this.dispatchEvent(new CustomEvent('slide-carousel:change', { detail: { active: active }, bubbles: true, composed: true }));
+            const detail = { active: active, activeNames: this.dataset.active.split(' '), slides: slides };
+            this.dispatchEvent(new CustomEvent('slide-carousel:change', { detail: detail, bubbles: true, composed: true }));
             // console.log("SlideCarousel: active = %s", this.dataset.active);
         }
     }

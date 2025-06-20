@@ -35,9 +35,10 @@ The Slide Carousel component emits the following events:
 - `slide-carousel:change` - emitted when the active slide changes. The event detail contains the active slides.
 
 ```javascript
-document.querySelector('slide-carousel:change').addEventListener('slide-carousel:change', (event) => {
-    console.log(event.detail);
-});
+document.querySelector('slide-carousel')
+    .addEventListener('slide-carousel:change', (event) => {
+        console.log(event.detail);
+    });
 ```
 
 ## Enabling Widgets

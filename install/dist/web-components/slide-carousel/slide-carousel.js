@@ -24,9 +24,12 @@ export default class SlideCarousel extends HTMLElement {
         if (!this.dataset.active) { // otherwise it will be called from attributeChangedCallback automatically
             this.#markActiveSlide();
         }
-        this.#slides.addEventListener('scroll', (ev) => this.#markActiveSlide(ev, false), { passive: true });
+
+        // Safari does not support scrollend event, so we need to use scroll event and detect the end of scrolling manually
+        this.#slides.addEventListener('scroll', (ev) => this.#markActiveSlide(ev, !('onscrollend' in window)), { passive: true });
         this.#slides.addEventListener('scrollend', (ev) => this.#markActiveSlide(ev, true), { passive: true });
     }
+
 
     #markActiveSlide(ev, removeDisabledAttribute = true) {
         if (ev && ev.target != this.#slides) return;

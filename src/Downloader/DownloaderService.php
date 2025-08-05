@@ -363,6 +363,7 @@ class DownloaderService implements ServiceInterface
                 CURLOPT_COOKIEJAR => $this->cookieJarFileName, // Write cookies here.
                 CURLOPT_URL => $url,
                 CURLOPT_ENCODING => "", // Enables gzip/deflate automatically (reuters detects compression support otherwise it sends 401)
+                CURLOPT_FAILONERROR => false, // otherwise error 400 does not return the content and throws an error.
             ],
             $curlOpts
         );
@@ -445,14 +446,14 @@ class DownloaderService implements ServiceInterface
     {
         global $api;
 
+        $httpStatusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
         $errMsg = curl_error($ch);
-        $errNo = curl_errno($ch);
+        $errNo = curl_errno($ch) ?: ($httpStatusCode >= 400 ? CURLE_HTTP_RETURNED_ERROR : 0);
         $elapsed = round(microtime(true) - $start, 2) . 's';
         $keepAliveText = $downloaderOpts & self::OPT_KEEP_ALIVE ? ' (keep-alive)' : '';
 
-        if (!$result || $errNo) {
-            $httpStatusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg)", [
+        if (!$result || $errNo || $httpStatusCode >= 400) {
+            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg): " . json_encode($result), [
                 "url" => $url,
                 'error' => $errMsg,
                 'errno' => $errNo,

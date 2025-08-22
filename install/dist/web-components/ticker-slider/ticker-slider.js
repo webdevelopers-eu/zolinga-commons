@@ -23,7 +23,7 @@ import WebComponent from '/dist/system/js/web-component.js';
 export default class TickerSlider extends WebComponent {
   /** @type {ShadowRoot} */ #root;
   /** @type {HTMLElement} */ #track;
-  /** @type {HTMLElement} */ #clone;
+  /** @type {HTMLElement} */ #clones;
   /** @type {HTMLSlotElement} */ #slot;
 
   constructor() {
@@ -40,7 +40,7 @@ export default class TickerSlider extends WebComponent {
     });
 
     this.#track = this.#root.querySelector('.track');
-    this.#clone = this.#root.querySelector('.track-clone');
+    this.#clones = this.#root.querySelectorAll('.track-clone');
     this.#slot = this.#root.querySelector('slot');
 
     // Initial clone and on subsequent slot changes
@@ -49,14 +49,13 @@ export default class TickerSlider extends WebComponent {
   }
 
   #syncClone() {
-    if (!this.#track || !this.#clone) return;
+    if (!this.#track || !this.#clones.length) return;
     // Wipe previous clone content
-    this.#clone.textContent = '';
+    this.#clones.forEach(el => el.textContent = '');
     // Clone assigned elements (light DOM children of <ticker-slider>)
     const nodes = this.#slot.assignedElements ? this.#slot.assignedElements({ flatten: true }) : [];
-    for (const el of nodes) {
-      const clone = el.cloneNode(true);
-      this.#clone.appendChild(clone);
+    for (const n of nodes) {
+      this.#clones.forEach(el => el.appendChild(n.cloneNode(true)));
     }
   }
 }

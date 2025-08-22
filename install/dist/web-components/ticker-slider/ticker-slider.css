@@ -47,6 +47,6 @@ main {
 /* Keyframes for continuous leftward scroll */
 @keyframes ticker-scroll {
     from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    to { transform: translateX(-33.3333%); }
 }
 

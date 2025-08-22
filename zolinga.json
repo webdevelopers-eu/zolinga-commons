@@ -1,6 +1,6 @@
 {
     "name": "Zolinga Commons",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Zolinga PHP framework's common components.",
     "authors": [
         "Danny Sevcik <danny@zolinga.net>"
@@ -114,6 +114,11 @@
             "tag": "slide-carousel",
             "description": "Slide carousel.",
             "module": "web-components/slide-carousel/slide-carousel.js"
+        },
+        {
+            "tag": "ticker-slider",
+            "description": "Horizontal infinite ticker slider.",
+            "module": "web-components/ticker-slider/ticker-slider.js"
         },
         {
             "tag": "file-uploader",

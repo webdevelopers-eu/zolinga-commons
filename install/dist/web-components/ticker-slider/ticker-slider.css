@@ -8,7 +8,7 @@
     
     /* theming */
     --ticker-gap: 2rem;
-    --ticker-speed: 60s; /* total loop duration */
+    --ticker-speed: var(--speed, 60s); /* total loop duration */
 }
 
 /* Pause on hover (optional UX) */

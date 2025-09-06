@@ -3,6 +3,15 @@ import WebComponent from '/dist/system/js/web-component.js';
 /**
  * ticker-slider
  *
+ * <ticker-slider [speed="SPEED"] [hidden="hidden"] [shuffle="true"]><img ...>...</ticker-slider>
+ * 
+ * Example:
+ * 
+ * <ticker-slider speed="120s">
+ *    <img src="logo1.svg"/>
+ *    <img src="logo2.svg"/>
+ * </ticker-slider> 
+ * 
  * Closed, style-isolated horizontal ticker. Loads its HTML and CSS and
  * exposes a simple structure for marquee-like infinite scrolling.
  *
@@ -28,7 +37,26 @@ export default class TickerSlider extends WebComponent {
 
   constructor() {
     super();
-    this.ready(this.#init());
+
+    if (this.hasAttribute('speed') && this.getAttribute('speed').length) {
+      this.style.setProperty('--speed', this.getAttribute('speed'));
+    }
+
+    if (this.getAttribute('shuffle') == 'true') {
+      // Randomize children order
+      this.#shuffleChildren();
+    }
+
+    this.ready(this.#init()).then(() => this.removeAttribute('hidden'));
+  }
+
+  #shuffleChildren() {
+    const children = Array.from(this.children);
+    for (let i = children.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [children[i], children[j]] = [children[j], children[i]];
+    }
+    this.append(...children);
   }
 
   async #init() {

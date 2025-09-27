@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Zolinga\Commons;
 
+use Dom\HTMLDocument;
+use DOMDocument;
 use Zolinga\System\Events\ServiceInterface;
 use NumberFormatter;
 
 
 /**
  * Various formatting functions.
+ * 
+ * Available as $api->convert
  */
 class convertService implements ServiceInterface
 {
@@ -61,5 +65,47 @@ class convertService implements ServiceInterface
 
         $ret = round($size / self::MEMORY_UNITS[$out], $precision);
         return $precision ? (float) $ret : (int) $ret;
+    }
+
+    /**
+     * Convert HTML to Markdown using XSLT.
+     * 
+     * Example:
+     * 
+     * $md = $api->convert->htmlToMarkdown("<h1>Hello</h1><p>This is <b>bold</b> text.</p>");
+     *
+     * @param string|DOMDocument|HTMLDocument $html
+     * @return string|null
+     */
+    public function htmlToMarkdown(string|DOMDocument|HTMLDocument $html): ?string
+    {
+        global $api;
+
+        if (is_string($html)) {
+            $doc = new DOMDocument();
+            $doc->substituteEntities = false;
+            $doc->strictErrorChecking = false;
+            $doc->recover = true;
+            $doc->formatOutput = false;
+            $doc->resolveExternals = false;
+            $doc->validateOnParse = false;
+            $doc->xmlStandalone = true;        
+            @$doc->loadHTML('<!DOCTYPE html>'.PHP_EOL.$html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET | LIBXML_NOWARNING | LIBXML_NOERROR);
+        } else {
+            $doc = $html;
+        }
+
+        if (!$doc->documentElement) {
+            throw new \Exception("Failed to parse HTML: $html");
+        }
+
+        $xsl = new \DOMDocument();
+        $xsl->load("module://zolinga-commons/data/html2md.xsl");
+
+        $proc = new \XSLTProcessor();
+        $proc->importStylesheet($xsl);
+
+        $md = $proc->transformToXML($doc);
+        return trim($md ?: '') ?: null;
     }
 }

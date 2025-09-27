@@ -157,6 +157,17 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Convert SEO meta data into text -->
+    <xsl:template match="meta[@name or @property][@content]" priority="2">
+        <xsl:apply-templates select="@*|text()" />
+    </xsl:template>
+
+    <xsl:template match="title">
+        <xsl:text># </xsl:text>
+        <xsl:value-of select="normalize-space(.)" />
+        <xsl:text>&#xa;&#xa;</xsl:text>   
+    </xsl:template>
+
     <xsl:template match="text()">
         <xsl:value-of select="normalize-space(.)" />
     </xsl:template>

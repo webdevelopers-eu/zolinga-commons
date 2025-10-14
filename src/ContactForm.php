@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Zolinga\Commons;
 
 use Zolinga\System\Events\ListenerInterface;
-use Zolinga\System\Events\RequestResponseEvent;
+use Zolinga\System\Events\WebEvent;
 
 class ContactForm implements ListenerInterface
 {
-    public function onContactForm(RequestResponseEvent $event): void
+    public function onContactForm(WebEvent $event): void
     {
         global $api;
 

@@ -50,6 +50,11 @@
             "class": "Zolinga\\Commons\\Uploader\\UploaderService"
         },
         {
+            "description": "Currency service.",
+            "service": "currency",
+            "class": "Zolinga\\Commons\\CurrencyService"
+        },
+        {
             "description": "Uploader API",
             "event": "uploader",
             "class": "Zolinga\\Commons\\Uploader\\UploaderService",

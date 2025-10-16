@@ -15,7 +15,7 @@ use NumberFormatter;
  * 
  * Available as $api->convert
  */
-class convertService implements ServiceInterface
+class ConvertService implements ServiceInterface
 {
     private const MEMORY_UNITS = [
         "B" => 1,
@@ -107,5 +107,22 @@ class convertService implements ServiceInterface
 
         $md = $proc->transformToXML($doc);
         return trim($md ?: '') ?: null;
+    }
+
+    /**
+     * Convert currency amount from one currency to another.
+     * 
+     * Note: This is a stub function. Actual implementation would require
+     * integration with a currency conversion API or service.
+     *
+     * @param int $amount Amount in cents (e.g. 280 for $2.80)
+     * @param string $fromCurrency Currency code of the input amount (e.g. 'USD')
+     * @param string $toCurrency Currency code to convert to (e.g. 'EUR')
+     * @return int Converted amount in cents
+     */
+    public function convertCurrency(int $amount, string $fromCurrency, string $toCurrency): int
+    {
+        global $api;
+        return $api->currency->convert($amount, $fromCurrency, $toCurrency);
     }
 }

@@ -320,20 +320,19 @@ class DownloaderService implements ServiceInterface
      * @throws SslException If cURL returns an SSL-related error (e.g., CURLE_SSL_CACERT_BADFILE, CURLE_SSL_CERTPROBLEM).
      * @throws GotNothingException If cURL returns CURLE_GOT_NOTHING.
      * @throws Exception For any other cURL error.
-     *
+     * 
+     * Note: Do not forget to set curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); if you want to get the content as return value.
+     * 
      * @param string $url
-     * @param false|boolean $outFile false to return the content, string to save to file.
      * @param array<mixed> $curlOpts Additional CURL options. E.g. [CURLOPT_PROXY => 'http://proxy:port']
      * @param int $downloaderOpts Additional downloader options. E.g. DownloaderService::OPT_KEEP_ALIVE
-     * @return boolean|string Content of the resource if $outFile is false, otherwise true on success.
+     * @param \CurlHandle|null $curlHandle Optional existing cURL handle to reuse.
+     * @return \CurlHandle
      */
-    public function download(string $url, false|string $outFile = false, array $curlOpts = [], int $downloaderOpts = 0): bool|string
+    public function prepareCurlHandle(string $url, array $curlOpts = [], int $downloaderOpts = 0, null|\CurlHandle $curlHandle = null): \CurlHandle
     {
-        global $api;
-
         // Remove hash from URL
         $url = preg_replace("@#.*$@", "", $url);
-        $start = microtime(true);
         $keepAlive = $downloaderOpts & self::OPT_KEEP_ALIVE;
         $failFast = $downloaderOpts & self::FAIL_FAST;
 
@@ -345,15 +344,8 @@ class DownloaderService implements ServiceInterface
             $curlOpts = array_replace($curlOpts, [CURLOPT_FAILONERROR => 1]);
         }
 
-        $ch = ($keepAlive && $this->curlKeepAliveHandler ? $this->curlKeepAliveHandler : curl_init())
+        $ch = $curlHandle ?? ($keepAlive && $this->curlKeepAliveHandler ? $this->curlKeepAliveHandler : curl_init())
             or throw new CurlException('Failed to initialize CURL with URL ' . $url);
-
-        $file = false;
-        if (is_string($outFile)) {
-            curl_setopt($ch, CURLOPT_FILE, $file = $this->curlPrepareOutputFile($outFile));
-        } else { // important: you cannot set both CURLOPT_FILE and CURLOPT_RETURNTRANSFER to any value, 
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        }
 
         $curlOpts = array_replace(
             $this->curlOpts,
@@ -369,10 +361,52 @@ class DownloaderService implements ServiceInterface
         );
 
         /** @var \CurlHandle $ch */
+        foreach ($curlOpts as $opt => $val) {
+            curl_setopt($ch, $opt, $val);
+        }
+
+        return $ch;
+    }
+
+    /**
+     * Download a remote resource using CURL.
+     * 
+     * By default it stores cookies persistently into $this->cookieJarFileName 
+     * stored in private://ipdefender-daq/cookies/ directory. It reuses cookies
+     * for subsequent requests. It also follows redirects by default.
+     *
+     * @throws HttpErrorResponseException If cURL returns CURLE_HTTP_RETURNED_ERROR, the HTTP status code is not 200 OK. Exception's code is the HTTP status code.
+     *          e.g. 404 Not Found, 500 Internal Server Error.
+     * @throws TimeoutException If cURL returns CURLE_OPERATION_TIMEOUTED.
+     * @throws SslException If cURL returns an SSL-related error (e.g., CURLE_SSL_CACERT_BADFILE, CURLE_SSL_CERTPROBLEM).
+     * @throws GotNothingException If cURL returns CURLE_GOT_NOTHING.
+     * @throws Exception For any other cURL error.
+     *
+     * @param string $url
+     * @param false|boolean $outFile false to return the content, string to save to file.
+     * @param array<mixed> $curlOpts Additional CURL options. E.g. [CURLOPT_PROXY => 'http://proxy:port']
+     * @param int $downloaderOpts Additional downloader options. E.g. DownloaderService::OPT_KEEP_ALIVE
+     * @return boolean|string Content of the resource if $outFile is false, otherwise true on success.
+     */
+    public function download(string $url, false|string $outFile = false, array $curlOpts = [], int $downloaderOpts = 0): bool|string
+    {
+        global $api;
+
+        // Remove hash from URL
+        $start = microtime(true);
+        $file = false;
         $result = false;
+        $keepAlive = $downloaderOpts & self::OPT_KEEP_ALIVE;
+
+
         try {
-            foreach ($curlOpts as $opt => $val) {
-                curl_setopt($ch, $opt, $val);
+            $ch = $this->prepareCurlHandle($url, curlOpts: $curlOpts, downloaderOpts: $downloaderOpts);
+
+            if (is_string($outFile)) {
+                $file = $this->curlPrepareOutputFile($outFile);
+                curl_setopt($ch, CURLOPT_FILE, $file);
+            } else { // important: you cannot set both CURLOPT_FILE and CURLOPT_RETURNTRANSFER to any value, 
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             }
 
             $result = curl_exec($ch);

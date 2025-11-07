@@ -35,6 +35,9 @@ class ResourcesElement implements ListenerInterface
 
     private function getResourceRevision(): int
     {
+        if (!file_exists('module://zolinga-commons/data/resources.json')) {
+            return 0;
+        }
         return filemtime('module://zolinga-commons/data/resources.json') ?: 0;
     }
 

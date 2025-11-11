@@ -45,6 +45,11 @@ class ResourcesElement implements ListenerInterface
     {
         $file = 'public://zolinga-commons/resources.json';
 
+        if (!file_exists($file)) { // not initialized yet
+            $this->data = [];
+            return;
+        }
+
         $this->data = json_decode(file_get_contents($file) ?: '[]', true)
             or throw new \Exception('Failed to read resources list: ' . $file);
 

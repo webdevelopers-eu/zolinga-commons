@@ -25,11 +25,16 @@ class ResourcesElement implements ListenerInterface
 
     public function __construct()
     {
-        $this->load();
-
-        if ($this->data['revision'] !== $this->getResourceRevision()) {
-            $this->discover();
+        try {
             $this->load();
+
+            if (($this->data['revision'] ?? null) !== $this->getResourceRevision()) {
+                if ($this->discover()) {
+                    $this->load();
+                }
+            }
+        } catch (\Exception $e) {
+            $this->data = ['revision' => 0, 'list' => []];
         }
     }
 
@@ -164,5 +169,7 @@ class ResourcesElement implements ListenerInterface
 
         file_put_contents('public://zolinga-commons/resources.json', json_encode($data))
             or throw new \Exception('Failed to write resources list: ' . $file);
+
+        return true;
     }
 }

@@ -44,7 +44,7 @@ export default class FileUploader extends WebComponent {
     }
 
     async #init() {
-        this.#root = await this.loadContent(import.meta.url.replace(/\.js$/, '.html'), {
+        this.#root = await this.loadContent(import.meta.url.replace('.js', '.html'), {
             mode: "closed",
             allowScripts: true,
             inheritStyles: true
@@ -62,7 +62,7 @@ export default class FileUploader extends WebComponent {
         if (!parentRoot.fuInitialized) {
             parentRoot.fuInitialized = true;
             const sheet = new CSSStyleSheet();
-            const url = import.meta.url.replace(/\.js$/, '.css');
+            const url = import.meta.url.replace('.js', '.css');
             sheet.replaceSync(await fetch(url).then(response => response.text()));
             parentRoot.adoptedStyleSheets.push(sheet);
         }

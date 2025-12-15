@@ -42,6 +42,13 @@ class DownloaderService implements ServiceInterface
     public const FAIL_FAST = 2;
 
     /**
+     * Prefix to add to all HTTP headers when using a proxy service.
+     * 
+     * E.g. 'Ant-' to route through ScrapingAnt proxy.
+     */
+    public const PREFIX_HEADER = 4;
+
+    /**
      * When self::OPT_KEEP_ALIVE is set this will hold the persistent CURL handle
      * and each subsequent request with self::OPT_KEEP_ALIVE will reuse this handle.
      * 
@@ -113,9 +120,10 @@ class DownloaderService implements ServiceInterface
         CURLOPT_DNS_USE_GLOBAL_CACHE => 0,
         CURLOPT_FOLLOWLOCATION => 1,
         CURLOPT_MAXREDIRS => 10,
-        CURLOPT_CONNECTTIMEOUT => 10,
-        CURLOPT_TIMEOUT => 10,
-        CURLOPT_TIMEOUT_MS => 10000,
+        CURLOPT_CONNECTTIMEOUT => 30,
+        CURLOPT_CONNECTTIMEOUT_MS => 30000,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_TIMEOUT_MS => 30000,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS, // Ensure HTTP/2 support
         CURLOPT_HTTPHEADER => [
             // 'Connection: keep-alive', - not automatically to have rotating proxies
@@ -137,6 +145,8 @@ class DownloaderService implements ServiceInterface
         CURLOPT_SSL_VERIFYHOST => 0,
         CURLOPT_FAILONERROR => 1,
         CURLOPT_VERBOSE => 0,
+        CURLOPT_LOW_SPEED_LIMIT => 1,
+        CURLOPT_LOW_SPEED_TIME => 60,
     ];
 
     public function __construct(string $downloaderName = 'downloader')
@@ -329,22 +339,34 @@ class DownloaderService implements ServiceInterface
      * @param \CurlHandle|null $curlHandle Optional existing cURL handle to reuse.
      * @return \CurlHandle
      */
-    public function prepareCurlHandle(string $url, array $curlOpts = [], int $downloaderOpts = 0, null|\CurlHandle $curlHandle = null): \CurlHandle
+    public function prepareCurlHandle(string $url, array $curlOpts = [], int|array $downloaderOpts = 0, null|\CurlHandle $curlHandle = null): \CurlHandle
     {
         // Remove hash from URL
         $url = preg_replace("@#.*$@", "", $url);
-        $keepAlive = $downloaderOpts & self::OPT_KEEP_ALIVE;
-        $failFast = $downloaderOpts & self::FAIL_FAST;
 
-        if ($keepAlive) {
+        if (is_int($downloaderOpts)) {
+            $opts = [
+                'keepAlive' => ($downloaderOpts & self::OPT_KEEP_ALIVE) !== 0,
+                'failFast' => ($downloaderOpts & self::FAIL_FAST) !== 0,
+                'prefixHeader' => '',
+            ];
+        } else {
+            $opts = [
+                'keepAlive' => false,
+                'failFast' => false,
+                'prefixHeader' => '',
+                ...$downloaderOpts
+            ];
+        }
+        if ($opts['keepAlive']) {
             $curlOpts = array_replace($curlOpts, [CURLOPT_FORBID_REUSE => 0]);
         }
 
-        if ($failFast) {
+        if ($opts['failFast']) {
             $curlOpts = array_replace($curlOpts, [CURLOPT_FAILONERROR => 1]);
         }
 
-        $ch = $curlHandle ?? ($keepAlive && $this->curlKeepAliveHandler ? $this->curlKeepAliveHandler : curl_init())
+        $ch = $curlHandle ?? ($opts['keepAlive'] && $this->curlKeepAliveHandler ? $this->curlKeepAliveHandler : curl_init())
             or throw new CurlException('Failed to initialize CURL with URL ' . $url);
 
         $curlOpts = array_replace(
@@ -359,6 +381,14 @@ class DownloaderService implements ServiceInterface
             ],
             $curlOpts
         );
+
+
+        if ($opts['prefixHeader']) {
+            $curlOpts[CURLOPT_HTTPHEADER] = array_map(
+                fn($h) => $opts['prefixHeader'] . $h,
+                $curlOpts[CURLOPT_HTTPHEADER] ?? []
+            );
+        }
 
         /** @var \CurlHandle $ch */
         foreach ($curlOpts as $opt => $val) {

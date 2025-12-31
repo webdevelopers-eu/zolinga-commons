@@ -64,7 +64,7 @@ export default class HamburgerMenu extends WebComponent {
     if (!doc.querySelector('#hamburger-styles')) {
       const style = document.createElement('link');
       style.rel = 'stylesheet';
-      style.href = new URL(import.meta.url.replace(/\.js$/, '.css'));
+      style.href = new URL(import.meta.url.replace('.js', '.css'));
       style.id = 'hamburger-styles';
 
       promise = new Promise((resolve) => {

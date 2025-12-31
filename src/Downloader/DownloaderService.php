@@ -373,8 +373,8 @@ class DownloaderService implements ServiceInterface
             $this->curlOpts,
             [
                 CURLOPT_REFERER => $curlOpts[CURLOPT_REFERER] ?? "https://www.google.com/?source=osdd&sl=auto&tl=auto&text=" . parse_url($url, PHP_URL_HOST) . "&op=translate",
-                CURLOPT_COOKIEFILE => $this->cookieJarFileName, // Read init cookies from here. By passing the empty string ("") to this option, you enable the cookie engine without reading any initial cookies.
-                CURLOPT_COOKIEJAR => $this->cookieJarFileName, // Write cookies here.
+                CURLOPT_COOKIEFILE => $curlOpts[CURLOPT_COOKIEFILE] ?? $this->cookieJarFileName, // Read init cookies from here. By passing the empty string ("") to this option, you enable the cookie engine without reading any initial cookies.
+                CURLOPT_COOKIEJAR => $curlOpts[CURLOPT_COOKIEJAR] ?? $this->cookieJarFileName, // Write cookies here.
                 CURLOPT_URL => $url,
                 CURLOPT_ENCODING => "", // Enables gzip/deflate automatically (reuters detects compression support otherwise it sends 401)
                 CURLOPT_FAILONERROR => false, // otherwise error 400 does not return the content and throws an error.
@@ -390,12 +390,36 @@ class DownloaderService implements ServiceInterface
             );
         }
 
+        // Keep *_MS in sync when callers override the seconds-based options.
+        // Otherwise defaults like CURLOPT_TIMEOUT_MS=30000 will still cap the request at 30s.
+        $curlOpts = $this->resolveRedundantOptions(CURLOPT_TIMEOUT, CURLOPT_TIMEOUT_MS, $curlOpts);
+        $curlOpts = $this->resolveRedundantOptions(CURLOPT_CONNECTTIMEOUT, CURLOPT_CONNECTTIMEOUT_MS, $curlOpts);
+
         /** @var \CurlHandle $ch */
         foreach ($curlOpts as $opt => $val) {
             curl_setopt($ch, $opt, $val);
         }
 
         return $ch;
+    }
+
+    /**
+     * Ensure that both seconds-based and milliseconds-based timeout options are set consistently.
+     *
+     * @param int $opt1 The seconds-based option (e.g., CURLOPT_TIMEOUT).
+     * @param int $opt2 The milliseconds-based option (e.g., CURLOPT_TIMEOUT_MS).
+     * @param array $opts The array of cURL options.
+     * @return array The updated array of cURL options with both options set consistently.
+     */
+    private function resolveRedundantOptions(int $opt1, int $opt2, array $opts): array
+    {
+        if (isset($opts[$opt1]) && !isset($opts[$opt2])) {
+            $opts[$opt2] = (int) $opts[$opt1] * 1000;
+        }
+        if (isset($opts[$opt2]) && !isset($opts[$opt1])) {
+            $opts[$opt1] = (int) ceil(((int) $opts[$opt2]) / 1000);
+        }
+        return $opts;
     }
 
     /**

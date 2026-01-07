@@ -78,7 +78,7 @@ class ConvertService implements ServiceInterface
      * @param int $maxParts Maximum number of parts to include (e.g., 2 would return "1 hour 1 minute" instead of "1 hour 1 minute 5 seconds")
      * @return string
      */
-    public function timeDelta(float $seconds, int $maxParts): string
+    public function timeDelta(float $seconds, int $maxParts, string $glue = ' '): string
     {
         $dtF = new \DateTimeImmutable('@0');
         $dtT = new \DateTimeImmutable("@$seconds");
@@ -104,7 +104,7 @@ class ConvertService implements ServiceInterface
             $parts[] = $diff->s . ' second' . ($diff->s > 1 ? 's' : '');
         }
 
-        return implode(' ', array_slice($parts, 0, $maxParts));
+        return implode($glue, array_slice($parts, 0, $maxParts));
     }
 
     /**

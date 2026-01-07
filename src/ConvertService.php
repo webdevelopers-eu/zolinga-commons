@@ -68,6 +68,46 @@ class ConvertService implements ServiceInterface
     }
 
     /**
+     * Convert seconds to a human-readable time delta.
+     * 
+     * Example:
+     * 
+     * $api->convert->timeDelta(3665, 2); // "1 hour 1 minute"
+     *
+     * @param float $seconds
+     * @param int $maxParts Maximum number of parts to include (e.g., 2 would return "1 hour 1 minute" instead of "1 hour 1 minute 5 seconds")
+     * @return string
+     */
+    public function timeDelta(float $seconds, int $maxParts): string
+    {
+        $dtF = new \DateTimeImmutable('@0');
+        $dtT = new \DateTimeImmutable("@$seconds");
+        $diff = $dtF->diff($dtT);
+
+        $parts = [];
+        if ($diff->y) {
+            $parts[] = $diff->y . ' year' . ($diff->y > 1 ? 's' : '');
+        }
+        if ($diff->m) {
+            $parts[] = $diff->m . ' month' . ($diff->m > 1 ? 's' : '');
+        }
+        if ($diff->d) {
+            $parts[] = $diff->d . ' day' . ($diff->d > 1 ? 's' : '');
+        }
+        if ($diff->h) {
+            $parts[] = $diff->h . ' hour' . ($diff->h > 1 ? 's' : '');
+        }
+        if ($diff->i) {
+            $parts[] = $diff->i . ' minute' . ($diff->i > 1 ? 's' : '');
+        }
+        if ($diff->s) {
+            $parts[] = $diff->s . ' second' . ($diff->s > 1 ? 's' : '');
+        }
+
+        return implode(' ', array_slice($parts, 0, $maxParts));
+    }
+
+    /**
      * Convert HTML to Markdown using XSLT.
      * 
      * Example:

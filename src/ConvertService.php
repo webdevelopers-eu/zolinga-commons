@@ -74,12 +74,12 @@ class ConvertService implements ServiceInterface
      * 
      * $api->convert->timeDelta(3665, 2); // "1 hour 1 minute"
      *
-     * @param float $seconds
+     * @param int $seconds
      * @param int $maxParts Maximum number of parts to include (e.g., 2 would return "1 hour 1 minute" instead of "1 hour 1 minute 5 seconds")
      * @param string $glue String to join the parts with
      * @return string
      */
-    public function timeDelta(float $seconds, int $maxParts, string $glue = ' '): string
+    public function timeDelta(int $seconds, int $maxParts, string $glue = ' '): string
     {
         $dtF = new \DateTimeImmutable('@0');
         $dtT = new \DateTimeImmutable("@$seconds");

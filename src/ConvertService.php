@@ -76,6 +76,7 @@ class ConvertService implements ServiceInterface
      *
      * @param float $seconds
      * @param int $maxParts Maximum number of parts to include (e.g., 2 would return "1 hour 1 minute" instead of "1 hour 1 minute 5 seconds")
+     * @param string $glue String to join the parts with
      * @return string
      */
     public function timeDelta(float $seconds, int $maxParts, string $glue = ' '): string

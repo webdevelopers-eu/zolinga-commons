@@ -117,16 +117,16 @@ class UrlService implements ServiceInterface
         $fqURL = preg_replace("/#.*$/", "", $fqURL); // remove fragment
 
         if (!filter_var($fqURL, FILTER_VALIDATE_URL)) {
-            $api->log->warning("autoblog", "Invalid URL format: $fqURL");
+            $api->log->warning("url", "Invalid URL format: $fqURL");
             return false;
         }
 
         // Check if it is 200 response
         try {
             $api->downloader->download($fqURL);
-            $api->log->info("autoblog", "Validated link: $fqURL");
+            $api->log->info("url", "Validated link: $fqURL");
         } catch (\Exception $e) {
-            $api->log->warning("autoblog", "Invalid link: $fqURL . Reason: " . $e->getMessage());
+            $api->log->warning("url", "Invalid link: $fqURL . Reason: " . $e->getMessage());
             return false;
         }
 

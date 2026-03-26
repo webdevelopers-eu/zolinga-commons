@@ -541,7 +541,8 @@ class DownloaderService implements ServiceInterface
         $keepAliveText = $downloaderOpts & self::OPT_KEEP_ALIVE ? ' (keep-alive)' : '';
 
         if (!$result || $errNo || $httpStatusCode >= 400) {
-            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg): " . json_encode($result), [
+            $resultFragment = is_string($result) ? substr($result, 0, 256) . (strlen($result) > 256 ? '...' : '') : json_encode($result);
+            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg): " . $resultFragment, [
                 "url" => $url,
                 'error' => $errMsg,
                 'errno' => $errNo,

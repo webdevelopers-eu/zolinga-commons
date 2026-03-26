@@ -114,6 +114,7 @@ class UrlService implements ServiceInterface
         global $api;
 
         $fqURL = $api->url->resolveUrl($url, $api->config['baseURL']);
+        $fqURL = preg_replace("/#.*$/", "", $fqURL); // remove fragment
 
         if (!filter_var($fqURL, FILTER_VALIDATE_URL)) {
             $api->log->warning("autoblog", "Invalid URL format: $fqURL");

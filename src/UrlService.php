@@ -113,7 +113,7 @@ class UrlService implements ServiceInterface
     {
         global $api;
 
-        if (!filter_var($url, FILTER_VALIDATE_URL | FILTER_FLAG_PATH_REQUIRED)) {
+        if (!filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED)) {
             return false;
         }
 

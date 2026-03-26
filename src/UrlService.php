@@ -113,11 +113,12 @@ class UrlService implements ServiceInterface
     {
         global $api;
 
-        if (!filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED)) {
+        $fqURL = $api->url->resolveUrl($url, $api->config['baseURL']);
+
+        if (!filter_var($fqURL, FILTER_VALIDATE_URL)) {
+            $api->log->warning("autoblog", "Invalid URL format: $fqURL");
             return false;
         }
-
-        $fqURL = $api->url->resolveUrl($url, $api->config['baseURL']);
 
         // Check if it is 200 response
         try {

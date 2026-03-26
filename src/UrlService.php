@@ -102,4 +102,32 @@ class UrlService implements ServiceInterface
         $text = trim($text, "-");
         return $text;
     }
+
+    /**
+     * Download URL and check if it is valid (returns 200 response).
+     *
+     * @param string $url can be relative or absolute URL
+     * @return boolean true if valid, false otherwise
+     */
+    public function isValidURL(string $url): bool
+    {
+        global $api;
+
+        if (!filter_var($url, FILTER_VALIDATE_URL | FILTER_FLAG_PATH_REQUIRED)) {
+            return false;
+        }
+
+        $fqURL = $api->url->resolveUrl($url, $api->config['baseURL']);
+
+        // Check if it is 200 response
+        try {
+            $api->downloader->download($fqURL);
+            $api->log->info("autoblog", "Validated link: $fqURL");
+        } catch (\Exception $e) {
+            $api->log->warning("autoblog", "Invalid link: $fqURL . Reason: " . $e->getMessage());
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -1,6 +1,6 @@
 {
     "name": "Zolinga Commons",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "Zolinga PHP framework's common components.",
     "authors": [
         "Danny Sevcik <danny@zolinga.net>"
@@ -43,6 +43,11 @@
             "description": "Various conversion and formatting functions.",
             "service": "convert",
             "class": "Zolinga\\Commons\\ConvertService"
+        },
+        {
+            "description": "Network utilities.",
+            "service": "network",
+            "class": "Zolinga\\Commons\\NetworkService"
         },
         {
             "description": "Uploader service.",

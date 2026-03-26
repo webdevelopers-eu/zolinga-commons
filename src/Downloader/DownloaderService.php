@@ -542,7 +542,7 @@ class DownloaderService implements ServiceInterface
 
         if (!$result || $errNo || $httpStatusCode >= 400) {
             $resultFragment = is_string($result) ? substr($result, 0, 256) . (strlen($result) > 256 ? '...' : '') : json_encode($result);
-            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg): " . $resultFragment, [
+            $api->log->error($this->downloaderName, "CURL: Failed to download $url$keepAliveText ($errNo $errMsg, http status $httpStatusCode): " . $resultFragment, [
                 "url" => $url,
                 'error' => $errMsg,
                 'errno' => $errNo,

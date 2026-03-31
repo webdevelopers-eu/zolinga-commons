@@ -78,7 +78,20 @@
             ]
         }
     ],  
-    "emit": [],
+    "emit": [
+        {
+            "event": "contact-form",
+            "description": "Submit a contact form message.",
+            "class": "\\Zolinga\\System\\Events\\WebEvent",
+            "origin": ["remote"]
+        },
+        {
+            "event": "uploader",
+            "description": "File upload management (remove uploaded files).",
+            "class": "\\Zolinga\\System\\Events\\WebEvent",
+            "origin": ["remote"]
+        }
+    ],
     "webComponents": [
         {
             "tag": "card-deck",

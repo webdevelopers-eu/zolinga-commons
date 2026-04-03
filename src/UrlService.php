@@ -23,13 +23,16 @@ class UrlService implements ServiceInterface
      */
     public function getCurrentUrl(): string
     {
-        return (IS_HTTPS ? "https://" : "http://") .
-            $_SERVER["HTTP_HOST"] .
-            // Port
-            (
-                ($_SERVER["SERVER_PORT"] == 80 && !IS_HTTPS) || ($_SERVER["SERVER_PORT"] == 443 && IS_HTTPS)
-                ? "" : ":" . $_SERVER["SERVER_PORT"]
-            ) . $_SERVER["REQUEST_URI"];
+        $host = $_SERVER["HTTP_HOST"];
+        
+        // Port
+        $port = parse_url($host, PHP_URL_PORT);
+        $isStandard = ($port === 80 && !IS_HTTPS) || ($port === 443 && IS_HTTPS);
+        if (!$port && !$isStandard) {
+            $host .= ":" . $_SERVER["SERVER_PORT"];
+        }
+
+        return (IS_HTTPS ? "https://" : "http://") . $host . $_SERVER["REQUEST_URI"];
     }
 
     /**

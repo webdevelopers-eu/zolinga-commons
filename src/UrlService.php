@@ -27,7 +27,7 @@ class UrlService implements ServiceInterface
         
         // Port
         $port = parse_url($host, PHP_URL_PORT);
-        $isStandard = ($port === 80 && !IS_HTTPS) || ($port === 443 && IS_HTTPS);
+        $isStandard = !$port || ($port === 80 && !IS_HTTPS) || ($port === 443 && IS_HTTPS);
         if (!$port && !$isStandard) {
             $host .= ":" . $_SERVER["SERVER_PORT"];
         } elseif ($port && $isStandard) {

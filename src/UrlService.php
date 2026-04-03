@@ -23,7 +23,13 @@ class UrlService implements ServiceInterface
      */
     public function getCurrentUrl(): string
     {
-        $host = $_SERVER["HTTP_HOST"];
+        global $api;
+
+        $host = $_SERVER["HTTP_HOST"] ?: null;
+
+        if (!$host) {
+            return $api->config['baseURL'] ?? '';
+        }
         
         // Port
         $port = parse_url($host, PHP_URL_PORT);

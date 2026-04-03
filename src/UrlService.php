@@ -30,6 +30,8 @@ class UrlService implements ServiceInterface
         $isStandard = ($port === 80 && !IS_HTTPS) || ($port === 443 && IS_HTTPS);
         if (!$port && !$isStandard) {
             $host .= ":" . $_SERVER["SERVER_PORT"];
+        } elseif ($port && $isStandard) {
+            $host = str_replace(":" . $port, "", $host);
         }
 
         return (IS_HTTPS ? "https://" : "http://") . $host . $_SERVER["REQUEST_URI"];

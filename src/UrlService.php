@@ -25,7 +25,7 @@ class UrlService implements ServiceInterface
     {
         global $api;
 
-        $host = $_SERVER["HTTP_HOST"] ?: null;
+        $host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : null;
 
         if (!$host) {
             return $api->config['baseURL'] ?? '';

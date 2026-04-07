@@ -16,6 +16,8 @@ use const Zolinga\System\IS_HTTPS;
 class UrlService implements ServiceInterface
 {
 
+    private array $validatedURLCache = [];
+
     /**
      * Get current URL.
      *
@@ -114,6 +116,16 @@ class UrlService implements ServiceInterface
         return $text;
     }
 
+    private function addValidatedURLToCache(string $url, bool $isValid): bool
+    {
+        $this->validatedURLCache[$url] = $isValid;
+        if (count($this->validatedURLCache) > 1000) {
+            array_shift($this->validatedURLCache); // simple cache eviction
+        }
+
+        return $isValid;
+    }
+
     /**
      * Download URL and check if it is valid (returns 200 response).
      *
@@ -126,12 +138,15 @@ class UrlService implements ServiceInterface
 
         $fqURL = $api->url->resolveUrl($url, $api->config['baseURL']);
         $fqURL = preg_replace("/#.*$/", "", $fqURL); // remove fragment
-
         $fqURL = filter_var($fqURL, FILTER_SANITIZE_URL, FILTER_VALIDATE_URL);
 
         if (!$fqURL) {
             $api->log->warning("url", "Invalid URL format: $url");
-            return false;
+            return $this->addValidatedURLToCache($fqURL, false);
+        }
+
+        if (isset($this->validatedURLCache[$fqURL])) {
+            return $this->validatedURLCache[$fqURL];
         }
 
         // Check if it is 200 response
@@ -140,9 +155,9 @@ class UrlService implements ServiceInterface
             $api->log->info("url", "Validated link: $fqURL");
         } catch (\Exception $e) {
             $api->log->warning("url", "Invalid link: $fqURL . Reason: " . $e->getMessage());
-            return false;
+            return $this->addValidatedURLToCache($fqURL, false);
         }
 
-        return true;
+        return $this->addValidatedURLToCache($fqURL, true);
     }
 }

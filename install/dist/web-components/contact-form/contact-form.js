@@ -44,7 +44,16 @@ export default class ContactForm extends WebComponent {
 
         try {
             this.#form.setAttribute('disabled', '');
-            const packet = await api.dispatchEvent('contact-form', {data});
+
+            // Get auth token
+            const authPacket = await api.dispatchEvent('contact-form', {data});
+            if (!authPacket || authPacket.status !== 201) {
+                throw new Error(`Ups, something went wrong. Server responded with status ${authPacket?.status || 'unknown'}.`);
+            }
+
+            // Add token to data for the next request
+            const packet = await api.dispatchEvent('contact-form', {data, token: authPacket.response.token});
+
             if (packet.status !== 200) {
                 throw new Error(`Invalid response from server: ${packet.status} ${packet.statusMessage}`);
             }

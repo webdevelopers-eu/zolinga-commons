@@ -9,6 +9,40 @@ use Zolinga\System\Events\WebEvent;
 
 class ContactForm implements ListenerInterface
 {
+    private function getDataHash(array $data): string
+    {
+        // Reorder, normalize and hash the data to create a consistent hash for the same data regardless of order
+        ksort($data);
+        return substr(md5(json_encode($data)), 0, 16); // 16 bytes hash
+    }
+
+    private function generateAuthToken(array $data): string
+    {
+        $dataHash = $this->getDataHash($data);
+        $randHash = bin2hex(random_bytes(8));
+        $token = $randHash . '-' . $dataHash;
+        $_SESSION['zolinga-commons']['contactFormToken'] = $token;
+        
+        return $randHash;
+    }
+
+    private function checkAuthToken(string $token, array $data): bool
+    {
+        if (!$token || empty($_SESSION['zolinga-commons']['contactFormToken'])) {
+            return false; // No token generated yet
+        }
+
+        $dataHash = $this->getDataHash($data);
+        $tokenFull = $token . '-' . $dataHash;
+
+        if (hash_equals($_SESSION['zolinga-commons']['contactFormToken'], $tokenFull)) {
+            unset($_SESSION['zolinga-commons']['contactFormToken']); // Invalidate token after use
+            return true;
+        }
+
+        return false; // Invalid token
+    }
+
     public function onContactForm(WebEvent $event): void
     {
         global $api;
@@ -16,6 +50,12 @@ class ContactForm implements ListenerInterface
         // Handle the contact form submission
         $data = $event->request['data']
             or throw new \InvalidArgumentException('No data provided for contact form');
+
+        if (!$this->checkAuthToken($event->request['token'] ?? '', $data)) {
+            $event->response['token'] = $this->generateAuthToken($data);
+            $event->setStatus($event::STATUS_CREATED, dgettext('zolinga-commons', 'Authorization token created.'));
+            return;
+        }
 
         // Build HTML email
         $html = '<h1>Contact Form Submission</h1>';

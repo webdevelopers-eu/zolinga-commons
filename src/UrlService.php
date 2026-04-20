@@ -151,7 +151,8 @@ class UrlService implements ServiceInterface
 
         // Check if it is 200 response
         try {
-            $api->downloader->download($fqURL);
+            $ua = 'Mozilla/5.0 (compatible; ZolingaBot/1.0; +https://zolinga.net) link-checker';
+            $api->downloader->download($fqURL, curlOpts: [CURLOPT_USERAGENT => $ua, CURLOPT_REFERER => ""]);
             $api->log->info("url", "Validated link: $fqURL");
         } catch (\Exception $e) {
             $api->log->warning("url", "Invalid link: $fqURL . Reason: " . $e->getMessage());

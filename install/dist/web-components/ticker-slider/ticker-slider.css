@@ -5,6 +5,9 @@
     display: block;
     width: 100%;
     height: auto;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
     
     /* theming */
     --ticker-gap: 2rem;
@@ -17,10 +20,12 @@
 }
 
 main {
-    all: initial;
     display: block;
     overflow: hidden;
     width: 100%;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
 }
 
 .ticker {
@@ -31,6 +36,9 @@ main {
     align-items: stretch;
     gap: var(--ticker-gap);
     white-space: nowrap;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
     
     & .track,
     & .track-clone {

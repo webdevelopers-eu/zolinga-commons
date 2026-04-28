@@ -151,8 +151,25 @@ class ConvertService implements ServiceInterface
     }
 
     /**
+     * Convert Markdown to HTML using Parsedown.
+     *
+     * Example:
+     *
+     * $html = $api->convert->markdownToHtml("# Hello\n\nThis is **bold** text.");
+     *
+     * @param string $markdown
+     * @return string
+     */
+    public function markdownToHtml(string $markdown): string
+    {
+        $parser = new \Parsedown();
+        $parser->setMarkupEscaped(true);
+        return $parser->text($markdown);
+    }
+
+    /**
      * Convert currency amount from one currency to another.
-     * 
+     *
      * Note: This is a stub function. Actual implementation would require
      * integration with a currency conversion API or service.
      *

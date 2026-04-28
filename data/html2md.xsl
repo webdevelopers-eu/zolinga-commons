@@ -88,6 +88,11 @@
         <xsl:value-of select="normalize-space(.)" />
         <xsl:text>*</xsl:text>
     </xsl:template>
+    <xsl:template match="del|s|strike">
+        <xsl:text>~~</xsl:text>
+        <xsl:value-of select="normalize-space(.)" />
+        <xsl:text>~~</xsl:text>
+    </xsl:template>
     <xsl:template match="code">
         <!-- todo: skip the ` if inside a pre -->
         <xsl:text>`</xsl:text>
@@ -97,6 +102,27 @@
 
     <xsl:template match="br">
         <xsl:text>  &#xa;</xsl:text>
+    </xsl:template>
+
+    <!-- Text-level inline elements with no Markdown equivalent: pass through as raw HTML -->
+    <xsl:template match="cite|abbr|small|sub|sup|mark|kbd|var|span|time|q|ins|u|tt|bdo|ruby|rp|rt|wbr|font|big|nobr|acronym|basefont|blink|nextid|spacer|listing|marquee|xm">
+        <xsl:text>&lt;</xsl:text>
+        <xsl:value-of select="name()"/>
+        <xsl:apply-templates select="@*" mode="raw-attr"/>
+        <xsl:text>&gt;</xsl:text>
+        <xsl:apply-templates select="*|text()"/>
+        <xsl:text>&lt;/</xsl:text>
+        <xsl:value-of select="name()"/>
+        <xsl:text>&gt;</xsl:text>
+    </xsl:template>
+
+    <!-- Render attributes for raw HTML passthrough -->
+    <xsl:template match="@*" mode="raw-attr">
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="name()"/>
+        <xsl:text>="</xsl:text>
+        <xsl:value-of select="."/>
+        <xsl:text>"</xsl:text>
     </xsl:template>
 
     <!-- Block elements -->
@@ -137,6 +163,47 @@
         <xsl:text>&#xa;&#xa;</xsl:text>        <!-- Block element -->
     </xsl:template>
 
+    <!-- Table support (GFM-style) -->
+    <xsl:template match="table">
+        <xsl:apply-templates select="thead|tbody|tr"/>
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:template>
+
+    <xsl:template match="thead">
+        <xsl:apply-templates select="tr"/>
+        <xsl:call-template name="table-separator">
+            <xsl:with-param name="cells" select="tr/th|tr/td"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="tbody">
+        <xsl:apply-templates select="tr"/>
+    </xsl:template>
+
+    <xsl:template match="tr">
+        <xsl:text>| </xsl:text>
+        <xsl:for-each select="th|td">
+            <xsl:value-of select="normalize-space(.)"/>
+            <xsl:text> | </xsl:text>
+        </xsl:for-each>
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:template>
+
+    <xsl:template name="table-separator">
+        <xsl:param name="cells"/>
+        <xsl:text>| </xsl:text>
+        <xsl:for-each select="$cells">
+            <xsl:choose>
+                <xsl:when test="@align = 'left' or @style[contains(., 'text-align: left')]">:---</xsl:when>
+                <xsl:when test="@align = 'right' or @style[contains(., 'text-align: right')]">---:</xsl:when>
+                <xsl:when test="@align = 'center' or @style[contains(., 'text-align: center')]">:---:</xsl:when>
+                <xsl:otherwise>---</xsl:otherwise>
+            </xsl:choose>
+            <xsl:text> | </xsl:text>
+        </xsl:for-each>
+        <xsl:text>&#xa;</xsl:text>
+    </xsl:template>
+
     <!-- Helper template to replace newlines with prefix + newline -->
     <xsl:template name="replace-newlines">
         <xsl:param name="text"/>
@@ -173,5 +240,5 @@
     </xsl:template>
 
     <!-- Ignore these elements and their content -->
-    <xsl:template match="menu|script|style|meta|link|head|title|noscript" />
+    <xsl:template match="menu|script|style|meta|link|head|title|noscript|template" />
 </xsl:stylesheet>

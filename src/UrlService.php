@@ -81,7 +81,7 @@ class UrlService implements ServiceInterface
             $prefix .= isset($baseParts['path']) ? preg_replace("@/[^/]*$@", "/", $baseParts["path"]) : "/";
             return $prefix . $url;
         } else {
-            $prefix .= $baseParts["path"];
+            $prefix .= $baseParts["path"] ?? "";
         }
 
         if (substr($url, 0, 1) == "?") {

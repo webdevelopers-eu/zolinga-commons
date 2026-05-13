@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+#. TRANSLATORS: This is the confirmation button label when user tries to remove a tag, it should be short and clear.
+#: /dev/fd/51:35
+msgid "Remove?"
+msgstr ""
+
+#. TRANSLATORS: Button label for adding a new tag in a list of tags.
+#: /dev/fd/56:55
+msgid "Add tag..."
+msgstr ""
+
+#: /dev/fd/63:62
+msgid "An error occurred. Please try again later."
+msgstr ""

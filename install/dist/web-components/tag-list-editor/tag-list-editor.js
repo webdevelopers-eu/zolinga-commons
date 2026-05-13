@@ -51,6 +51,7 @@ export default class TagListEditor extends HTMLElement {
             <span class="trap" contenteditable="true"></span>
             `;
         this.#addStyles();
+        // TRANSLATORS: Button label for adding a new tag in a list of tags.
         this.#root.querySelector('.add .text').textContent = this.getAttribute('placeholder') || gettext('Add tag...');
 
         const observer = new MutationObserver(this.#onContentChange.bind(this));

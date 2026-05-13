@@ -1,0 +1,15 @@
+{
+    "": {
+        "project-id-version": "v 2.ipdefender.eu",
+        "last-translator": "Automatically generated",
+        "language-team": "none",
+        "language": "en_US",
+        "mime-version": "1.0",
+        "content-type": "text/plain; charset=UTF-8",
+        "content-transfer-encoding": "8bit",
+        "plural-forms": "nplurals=2; plural=(n != 1);"
+    },
+    "Remove?": "Remove?",
+    "Add tag...": "Add tag...",
+    "An error occurred. Please try again later.": "An error occurred. Please try again later."
+}

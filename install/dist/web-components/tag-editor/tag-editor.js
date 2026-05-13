@@ -31,11 +31,13 @@ export default class TagEditor extends HTMLElement {
 
         this.#addStyles();
         const value = this.getAttribute('value') || this.textContent;
+        // TRANSLATORS: This is the confirmation button label when user tries to remove a tag, it should be short and clear.
+        const label = gettext("Remove?");
 
         this.innerHTML = `
         <input role="tag" class="input-tag" type="hidden" tabindex="-1" required />
         <div class="editor" contenteditable="true" spellcheck="false"></div>
-        <div class="remove-confirm action">${gettext("Remove?")}</div>
+        <div class="remove-confirm action">${label}</div>
         <div class="remove action">⨯</div>
         `;
 

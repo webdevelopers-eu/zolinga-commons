@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+#. TRANSLATORS: Button label for adding a new tag in a list of tags.
+#: /dev/fd/56:55
+msgid "Add tag..."
+msgstr ""
+
+#: /dev/fd/63:62
+msgid "An error occurred. Please try again later."
+msgstr ""
+
+#: /dev/fd/58:56
+msgid "Authorization token created."
+msgstr ""
+
+#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[3]/div[2]/button[1] - translate it accordingly.
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#a2be7f)
+#. TRANSLATORS: This is the main web form container for the file uploader component
+#. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
+msgctxt "File Uploader Component"
+msgid "Cancel"
+msgstr ""
+
+#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[2]/span - translate it accordingly.
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#72724d)
+#. TRANSLATORS: This is the main web form container for the file uploader component
+#. TRANSLATORS: This is the instruction for the file uploader component, it should encourage users to click to open file picker dialog or drag and drop files to upload.
+msgctxt "File Uploader Component"
+msgid "Click or drag and drop files here"
+msgstr ""
+
+#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[1]/span - translate it accordingly.
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#fe9d3b)
+#. TRANSLATORS: This is the main web form container for the file uploader component
+#. TRANSLATORS: This is the instruction for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Drop files here to upload"
+msgstr ""
+
+#: /dev/fd/58:87
+msgid "Failed to send email, please try again later."
+msgstr ""
+
+#: /dev/fd/63:38
+msgid "File is empty"
+msgstr ""
+
+#: /dev/fd/63:34
+#, php-format
+msgid "File upload error: %s"
+msgstr ""
+
+#: /dev/fd/63:10
+msgid "File uploaded"
+msgstr ""
+
+#: /dev/fd/63:14
+msgid "No file was uploaded"
+msgstr ""
+
+#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[3]/div[1] - translate it accordingly.
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#ab68ff)
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Really remove this file?"
+msgstr ""
+
+#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[3]/div[2]/button[2] - translate it accordingly.
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#bf0168)
+#. TRANSLATORS: This is the main web form container for the file uploader component
+#. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
+msgctxt "File Uploader Component"
+msgid "Remove"
+msgstr ""
+
+#. TRANSLATORS: This is the confirmation button label when user tries to remove a tag, it should be short and clear.
+#: /dev/fd/51:35
+msgid "Remove?"
+msgstr ""
+
+#: /dev/fd/63:11
+#, php-format
+msgid "The uploaded file exceeds the %s MB"
+msgstr ""
+
+#: /dev/fd/63:12
+msgid ""
+"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
+"the HTML form"
+msgstr ""
+
+#: /dev/fd/63:13
+msgid "The uploaded file was only partially uploaded"
+msgstr ""

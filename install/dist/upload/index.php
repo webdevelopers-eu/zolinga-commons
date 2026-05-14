@@ -7,10 +7,15 @@ namespace Zolinga\Commons\Upload;
 require($_SERVER['DOCUMENT_ROOT'] . "/../system/loader.php");
 
 define("Zolinga\\Commons\\Upload\\ZOLINGA_UPLOAD_ERRORS", [
+        // TRANSLATORS: Upload status - success message when file uploaded.
         0 => dgettext('zolinga-commons', 'File uploaded'),
+        // TRANSLATORS: Upload error when file size exceeds PHP upload_max_filesize limit. %s is replaced with size in MB.
         1 => sprintf(dgettext('zolinga-commons', 'The uploaded file exceeds the %s MB'), $api->convert->memoryUnits(ini_get('upload_max_filesize'), 'M')),
+        // TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
         2 => dgettext('zolinga-commons', 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form'),
+        // TRANSLATORS: Upload error when the file was only partially uploaded.
         3 => dgettext('zolinga-commons', 'The uploaded file was only partially uploaded'),
+        // TRANSLATORS: Upload error when no file was provided in the upload request.
         4 => dgettext('zolinga-commons', 'No file was uploaded'),
         6 => 'Missing a temporary folder',
         7 => 'Failed to write file to disk.',
@@ -31,10 +36,12 @@ try {
     $data = $_FILES['file'];
 
     if ($data['error'] !== 0) {
+        // TRANSLATORS: Generic file upload error prefix; the specific error is appended.
         throw new \Exception(sprintf(dgettext("zolinga-commons", "File upload error: %s"), ZOLINGA_UPLOAD_ERRORS[$data['error']]), 500);
     }
 
     if (!$data['size']) {
+        // TRANSLATORS: Error shown when the uploaded file has zero size.
         throw new \Exception(dgettext("zolinga-commons", "File is empty"), 400);
     }
 

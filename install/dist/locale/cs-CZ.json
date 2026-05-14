@@ -1,6 +1,6 @@
 {
     "": {
-        "project-id-version": "v 2.ipdefender.eu",
+        "project-id-version": "zolinga-commons 1.0",
         "last-translator": "Automatically generated",
         "language-team": "none",
         "language": "cs",
@@ -11,5 +11,5 @@
     },
     "Remove?": "Odstranit?",
     "Add tag...": "Přidat štítek...",
-    "An error occurred. Please try again later.": "Vyskytla se chyba. Zkuste to prosím později."
+    "An error occurred. Please try again later.": "Došlo k chybě. Zkuste to prosím znovu později."
 }

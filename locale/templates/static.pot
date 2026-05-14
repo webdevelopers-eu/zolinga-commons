@@ -3,41 +3,39 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: en\n"
 
-#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[1]/span - translate it accordingly.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#fe9d3b)
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[1]/span)
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the instruction for the file uploader component
 msgctxt "File Uploader Component"
 msgid "Drop files here to upload"
 msgstr ""
 
-#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[2]/span - translate it accordingly.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#72724d)
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[2]/span)
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the instruction for the file uploader component, it should encourage users to click to open file picker dialog or drag and drop files to upload.
 msgctxt "File Uploader Component"
 msgid "Click or drag and drop files here"
 msgstr ""
 
-#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[3]/div[1] - translate it accordingly.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#ab68ff)
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[1])
 #. TRANSLATORS: This is the main web form container for the file uploader component
-msgctxt "File Uploader Component"
+msgctxt "file removal confirmation"
 msgid "Really remove this file?"
 msgstr ""
 
-#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[3]/div[2]/button[1] - translate it accordingly.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#a2be7f)
+#. TRANSLATORS: This string is inside a <button> element, which is a button / should be concise and as short as possible, follow rules for button text in {{TARGET_LANG}} language.
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[2]/button[1])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
-msgctxt "File Uploader Component"
+msgctxt "dialog button"
 msgid "Cancel"
 msgstr ""
 
-#. TRANSLATORS: This string's location in the HTML source code is /html/body/main/div[3]/div[2]/button[2] - translate it accordingly.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:.#bf0168)
+#. TRANSLATORS: The text has the following HTML attributes: role="remove-file".
+#. TRANSLATORS: This string is inside a <button> element, which is a button / should be concise and as short as possible, follow rules for button text in {{TARGET_LANG}} language.
+#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[2]/button[2])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
-msgctxt "File Uploader Component"
+msgctxt "dialog button"
 msgid "Remove"
 msgstr ""

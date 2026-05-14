@@ -53,6 +53,7 @@ class ContactForm implements ListenerInterface
 
         if (!$this->checkAuthToken($event->request['token'] ?? '', $data)) {
             $event->response['token'] = $this->generateAuthToken($data);
+            // TRANSLATORS: Status message indicating an authorization token for the contact form was created.
             $event->setStatus($event::STATUS_CREATED, dgettext('zolinga-commons', 'Authorization token created.'));
             return;
         }
@@ -84,6 +85,7 @@ class ContactForm implements ListenerInterface
         $api->log->info('zolinga-commons', 'ContactForm: Sending contact form email to: ' . $to);
         if (!$mail->send($to)) {
             $api->log->error('zolinga-commons', 'ContactForm: Failed to send email to: ' . $to);
+            // TRANSLATORS: Error shown to the user when sending the contact form email failed.
             $event->setStatus($event::STATUS_ERROR, dgettext('zolinga-commons', 'Failed to send email, please try again later.'));
             return;
         }

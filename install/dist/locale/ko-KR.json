@@ -1,0 +1,15 @@
+{
+    "": {
+        "project-id-version": "v 2.ipdefender.eu",
+        "last-translator": "Automatically generated",
+        "language-team": "none",
+        "language": "ko",
+        "mime-version": "1.0",
+        "content-type": "text/plain; charset=UTF-8",
+        "content-transfer-encoding": "8bit",
+        "plural-forms": "nplurals=1; plural=0;"
+    },
+    "Remove?": "제거하시겠습니까?",
+    "Add tag...": "태그 추가...",
+    "An error occurred. Please try again later.": "오류가 발생했습니다. 나중에 다시 시도해 주세요."
+}

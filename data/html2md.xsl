@@ -194,7 +194,7 @@
         <xsl:text>| </xsl:text>
         <xsl:for-each select="$cells">
             <xsl:choose>
-                <xsl:when test="@align = 'left' or @style[contains(., 'text-align: left')]">:---</xsl:when>
+                <xsl:when test="@align = 'left' or @style[contains(., 'text-align: start')]">:---</xsl:when>
                 <xsl:when test="@align = 'right' or @style[contains(., 'text-align: right')]">---:</xsl:when>
                 <xsl:when test="@align = 'center' or @style[contains(., 'text-align: center')]">:---:</xsl:when>
                 <xsl:otherwise>---</xsl:otherwise>

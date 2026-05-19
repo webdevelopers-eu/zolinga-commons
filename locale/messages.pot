@@ -2,6 +2,7 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: en\n"
+"Plural-Forms: Plural-Forms: nplurals=1; plural=0;\n"
 
 #. TRANSLATORS: Button label for adding a new tag in a list of tags.
 #: /dev/fd/56:55

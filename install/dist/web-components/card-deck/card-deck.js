@@ -58,9 +58,9 @@ class FlipCardDeck extends HTMLElement {
                 transform: rotateY(-180deg) var(--flip-transform-others, scale(0.5));
                 transition: margin var(--flip-speed-half) linear;
                 margin-top: 0%:
-                margin-left: 0%;
+                margin-inline-start: 0%;
                 margin-bottom: -100%;
-                margin-right: 0%;
+                margin-inline-end: 0%;
                 visibility: hidden;
             }
             ::slotted(.card-active) {

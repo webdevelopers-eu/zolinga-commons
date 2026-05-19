@@ -116,7 +116,6 @@ export default class HamburgerMenu extends WebComponent {
     // Cycle all subelements in canary and find the index of the first one that overflows right border.
     Array.from(this.#canary.children).forEach((child, idx) => {
       const overflows = this.#overflowsHorizontally(child, this.#canary);
-      console.log("Element %s overflows: %s", child.originalElement?.textContent.trim(), overflows);
       (overflows ? this.#popup : this.#menu).appendChild(child.originalElement);      
     });  
 

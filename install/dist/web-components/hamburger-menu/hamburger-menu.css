@@ -48,7 +48,8 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        padding-inline-start: 1.5em;
+        padding-inline-start: 1em;
+        padding-inline-end: 1em;
         anchor-name: --picker;
 
         &> dialog {            

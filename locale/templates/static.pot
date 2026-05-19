@@ -2,6 +2,7 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language: en\n"
+"Plural-Forms: Plural-Forms: nplurals=1; plural=0;\n"
 
 #. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[1]/span)
 #. TRANSLATORS: This is the main web form container for the file uploader component

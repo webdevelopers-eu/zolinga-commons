@@ -13,11 +13,17 @@
     &> .hamburger-canary {
         bottom: 0px !important; 
         right: 0px !important;
-        position: absolute !important;
+        position: fixed !important;
         visibility: hidden !important;
-        width: auto !important;
         pointer-events: none !important;
         opacity: 0 !important;
+        max-width: 100vw;
+        justify-content: flex-start !important;
+        outline: 1px solid red !important;
+        overflow: hidden !important;
+        & a {
+            color: gray !important;
+        }
     }
 
     & .hamburger-icon {
@@ -27,7 +33,7 @@
         pointer-events: visible; /* otherwise only visible lines are clickable */
     }
 
-    &:not(.hamburger-active) {
+    &:not(.hamburger-icon-visible) {
         & .hamburger-icon {
             display: none !important;
         }
@@ -37,61 +43,67 @@
         }
     }
 
-    &.hamburger-active {
+    & .hamburger-picker {
         position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding-inline-start: 1.5em;
+        anchor-name: --picker;
 
-        &> *:is(menu, ul, ol, nav):not(.hamburger-canary) {
-            display: none;
+        &> dialog {            
             background-color: var(--color-bg, white);
             border: 1px solid color-mix(in srgb, var(--color-fg, white) 40%, transparent);
             border-radius: var(--radius, 5px);
+            position-try: flip-block flip-inline;
+            position-anchor: --picker;
+            position: absolute;
+            top: anchor(bottom);
+            right: anchor(right);
+            width: fit-content;
+            height: fit-content;
+            justify-self: flex-end;
+            justify-self: anchor-center;
+            align-self: flex-start;
+            align-self: anchor-center;
+
+            flex-direction: column;
+            z-index: 100;
+            gap: 0px;
+            align-items: stretch;
+            list-style: none;
+            margin: 0px;
+            padding: 0px;
+            font: inherit;
+            box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.2);
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            text-transform: inherit;
 
             & .for-inactive {
                 display: none !important;
             }
-        }
 
-        &.hamburger-open {
-
-            &::after { /* clickable curtain */
-                content: '';
-                z-index: 99;
-                position: fixed;
-                inset: 0px;
-            }
-
-            &> *:is(menu, ul, ol, nav):not(.hamburger-canary) {
-                position: absolute;
-                top: 100%;
-                display: flex;
-                flex-direction: column;
-                z-index: 100;
-                gap: 0px;
-                align-items: stretch;
-                list-style: none;
+            & li {
+                text-align: start;
                 margin: 0px;
-                padding: 0px;
-                font: inherit;
-                box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.2);
+                display: flex;
+                flex-direction: row;
+                align-items: stretch;
 
-                &> li {
-                    text-align: start;
-                    margin: 0px;
-                    display: flex;
-                    flex-direction: row;
-                    align-items: stretch;
-
-                    &:hover {
-                        background-color: color-mix(in srgb, var(--color-fg, white) 20%, transparent);
-                    }
-
-                    & a {
-                        flex: 1 1 auto;
-                        padding: 0.8em 2em;
-                        text-decoration: none !important;
-                    }
-
+                &:hover {
+                    background-color: color-mix(in srgb, var(--color-fg, white) 20%, transparent);
                 }
+
+                & a {
+                    flex: 1 1 auto;
+                    padding: 0.8em 2em;
+                    text-decoration: none !important;
+                }
+
             }
         }
     }

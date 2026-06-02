@@ -147,7 +147,7 @@
     <xsl:template match="pre">
         <xsl:text></xsl:text>
         <xsl:call-template name="replace-newlines">
-            <xsl:with-param name="text" select="text()"/>
+            <xsl:with-param name="text" select="."/>
             <xsl:with-param name="prefix" select="'    '"/>
         </xsl:call-template>
         <xsl:text>&#xa;&#xa;</xsl:text>        <!-- Block element -->

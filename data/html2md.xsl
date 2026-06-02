@@ -39,8 +39,7 @@
                     <xsl:text>* </xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:value-of select="normalize-space(text())" />
-            <xsl:apply-templates select="*[not(self::ul) and not(self::ol)]" />
+            <xsl:apply-templates select="text()|*[not(self::ul) and not(self::ol)]" />
             <xsl:text>&#xa;&#xa;</xsl:text>
             <xsl:apply-templates select="ul|ol" />
         </xsl:if>
@@ -236,7 +235,7 @@
     </xsl:template>
 
     <xsl:template match="text()">
-        <xsl:value-of select="normalize-space(.)" />
+        <xsl:value-of select="." />
     </xsl:template>
 
     <!-- Ignore these elements and their content -->

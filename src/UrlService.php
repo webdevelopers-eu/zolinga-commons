@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zolinga\Commons;
 
+use Zolinga\Intl\LocaleService;
 use Zolinga\System\Events\ServiceInterface;
 use const Zolinga\System\IS_HTTPS;
 
@@ -52,48 +53,53 @@ class UrlService implements ServiceInterface
      * echo $api->url->resolveUrl("test", "http://example.com"); // http://example.com/test
      * echo $api->url->resolveUrl("test", "http://example.com/dir/"); // http://example.com/dir/test
      * echo $api->url->resolveUrl("test", "http://example.com/dir"); // http://example.com/test
+     * 
+     * echo $api->url->resolveUrl("/test", lang: "en_US"); // http://example.com/en/test
+     * 
      *
      * @param string $url
      * @param ?string $base if not given then current URL is used
+     * @param ?string $lang if given, it is added as "lang" query parameter to the resolved URL. If lang is already present in the URL, it is replaced.
      */
-    public function resolveUrl(string $url, ?string $base = null): string
+    public function resolveUrl(string $url, ?string $base = null, ?string $lang = null): string
     {
+        global $api;
+
         if ($base === null) {
             $base = $this->getCurrentUrl();
         }
-        if (preg_match("@^https?://@", $url)) { // is absolute already
-            return $url;
-        }
-
+        
         $baseParts = parse_url($base);
+        $parts = parse_url($url);
+        $merged = array_merge($baseParts, $parts);
 
-        $prefix = $baseParts["scheme"] . ":";
-        if (preg_match("@^//@", $url)) { // is protocol relative
-            return $prefix . $url;
+        if (!preg_match("@^/@", $merged['path'] ?? '')) { // is relative path
+            $merged['path'] = rtrim($baseParts["path"] ?? '', '/') . "/" . ($merged['path'] ?? '');
+        }
+        if ($lang) {
+            // Remove old lang parameter if present
+            $merged['path'] = preg_replace("/^\/[a-z]{2}(\/|$)/", "\\1", $merged['path']);
+            $merged['path'] = "/" . \Locale::getPrimaryLanguage($lang) . $merged['path'];
         }
 
-        $prefix .= "//" . $baseParts["host"] . (isset($baseParts["port"]) ? ":" . $baseParts["port"] : "");
-        if (preg_match("@^/@", $url)) { // is root relative
-            return $prefix . $url;
+        // Glue back together
+        $mergedURL = ($merged['scheme'] ?? 'https') . "://";
+        if (isset($merged['user']) && isset($merged['pass'])) {
+            $mergedURL .= $merged['user'] . ":" . $merged['pass'] . "@";
+        }
+        $mergedURL .= $merged['host'] ?? 'localhost';
+        if (isset($merged['port'])) {
+            $mergedURL .= ":" . $merged['port'];
+        }
+        $mergedURL .= $merged['path'] ?? '/';
+        if (isset($merged['query'])) {
+            $mergedURL .= "?" . $merged['query'];
+        }
+        if (isset($merged['fragment'])) {
+            $mergedURL .= "#" . $merged['fragment'];
         }
 
-        if (preg_match("@^[^?#]@", $url)) { // is relative
-            $prefix .= isset($baseParts['path']) ? preg_replace("@/[^/]*$@", "/", $baseParts["path"]) : "/";
-            return $prefix . $url;
-        } else {
-            $prefix .= $baseParts["path"] ?? "";
-        }
-
-        if (substr($url, 0, 1) == "?") {
-            return $prefix . $url;
-        }
-
-        if (substr($url, 0, 1) == "#") {
-            $prefix .= isset($baseParts["query"]) ? "?" . $baseParts["query"] : "";
-            return $prefix . $url;
-        }
-
-        return $base;
+        return $mergedURL;
     }
 
     /**

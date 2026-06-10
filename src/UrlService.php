@@ -59,11 +59,17 @@ class UrlService implements ServiceInterface
      *
      * @param string $url
      * @param ?string $base if not given then current URL is used
-     * @param ?string $lang if given, it is added as "lang" query parameter to the resolved URL. If lang is already present in the URL, it is replaced.
+     * @param null|string|true $lang if given, it is added as "lang" query parameter to the resolved URL. If lang is already present in the URL, it is replaced.
+     *      true: if multilingual, use current locale, otherwise do not add lang parameter
+     * @return string
      */
-    public function resolveUrl(string $url, ?string $base = null, ?string $lang = null): string
+    public function resolveUrl(string $url, ?string $base = null, null|string|true $lang = null): string
     {
         global $api;
+
+        if ($lang === true) {
+            $lang = $api->isMultilingual ? $api->locale->locale : null;
+        }
 
         if ($base === null) {
             $base = $this->getCurrentUrl();

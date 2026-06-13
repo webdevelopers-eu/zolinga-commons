@@ -1,4 +1,4 @@
-CREATE TABLE `uploads` (
+CREATE TABLE IF NOT EXISTS `uploads` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ip` varchar(39) NOT NULL,
   `mime` varchar(255) DEFAULT NULL,

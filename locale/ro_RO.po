@@ -7,19 +7,17 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2;\n"
 
 #. TRANSLATORS: Button label for adding a new tag in a list of tags.
-#: /dev/fd/56:55
 msgid "Add tag..."
 msgstr "Adaugă etichetă..."
 
-#: /dev/fd/63:62
 msgid "An error occurred. Please try again later."
 msgstr "A apărut o eroare. Vă rugăm să încercați din nou mai târziu."
 
 #. TRANSLATORS: Status message indicating an authorization token for the contact form was created.
-#: /dev/fd/58:57
 msgid "Authorization token created."
 msgstr "Token de autorizare creat."
 
@@ -46,28 +44,24 @@ msgid "Drop files here to upload"
 msgstr "Plasează fișierele aici pentru a le încărca"
 
 #. TRANSLATORS: Error shown to the user when sending the contact form email failed.
-#: /dev/fd/58:89
 msgid "Failed to send email, please try again later."
-msgstr "Trimiterea emailului a eșuat, vă rugăm să încercați din nou mai târziu."
+msgstr ""
+"Trimiterea emailului a eșuat, vă rugăm să încercați din nou mai târziu."
 
 #. TRANSLATORS: Error shown when the uploaded file has zero size.
-#: /dev/fd/63:45
 msgid "File is empty"
 msgstr "Fișierul este gol"
 
 #. TRANSLATORS: Generic file upload error prefix; the specific error is appended.
-#: /dev/fd/63:40
 #, php-format
 msgid "File upload error: %s"
 msgstr "Eroare la încărcarea fișierului: %s"
 
 #. TRANSLATORS: Upload status - success message when file uploaded.
-#: /dev/fd/63:11
 msgid "File uploaded"
 msgstr "Fișier încărcat"
 
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
-#: /dev/fd/63:19
 msgid "No file was uploaded"
 msgstr "Niciun fișier nu a fost încărcat"
 
@@ -87,22 +81,22 @@ msgid "Remove"
 msgstr "Elimină"
 
 #. TRANSLATORS: This is the confirmation button label when user tries to remove a tag, it should be short and clear.
-#: /dev/fd/51:35
 msgid "Remove?"
 msgstr "Ștergeți?"
 
 #. TRANSLATORS: Upload error when file size exceeds PHP upload_max_filesize limit. %s is replaced with size in MB.
-#: /dev/fd/63:13
 #, php-format
 msgid "The uploaded file exceeds the %s MB"
 msgstr "Fișierul încărcat depășește limita de %s MB."
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-#: /dev/fd/63:15
-msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
-msgstr "Fișierul încărcat depășește directiva MAX_FILE_SIZE specificată în formularul HTML."
+msgid ""
+"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
+"the HTML form"
+msgstr ""
+"Fișierul încărcat depășește directiva MAX_FILE_SIZE specificată în "
+"formularul HTML."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
-#: /dev/fd/63:17
 msgid "The uploaded file was only partially uploaded"
 msgstr "Fișierul încărcat a fost transferat doar parțial."

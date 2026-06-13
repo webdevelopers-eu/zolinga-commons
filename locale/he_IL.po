@@ -10,16 +10,13 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. TRANSLATORS: Button label for adding a new tag in a list of tags.
-#: /dev/fd/56:55
 msgid "Add tag..."
 msgstr "הוסף תגית..."
 
-#: /dev/fd/63:62
 msgid "An error occurred. Please try again later."
 msgstr "אירעה שגיאה. נא לנסות שוב מאוחר יותר."
 
 #. TRANSLATORS: Status message indicating an authorization token for the contact form was created.
-#: /dev/fd/58:57
 msgid "Authorization token created."
 msgstr "נוצר אסימון הרשאה."
 
@@ -46,28 +43,23 @@ msgid "Drop files here to upload"
 msgstr "גרור קבצים לכאן להעלאה"
 
 #. TRANSLATORS: Error shown to the user when sending the contact form email failed.
-#: /dev/fd/58:89
 msgid "Failed to send email, please try again later."
 msgstr "שליחת הדוא\"ל נכשלה, אנא נסה שוב מאוחר יותר."
 
 #. TRANSLATORS: Error shown when the uploaded file has zero size.
-#: /dev/fd/63:45
 msgid "File is empty"
 msgstr "הקובץ ריק"
 
 #. TRANSLATORS: Generic file upload error prefix; the specific error is appended.
-#: /dev/fd/63:40
 #, php-format
 msgid "File upload error: %s"
 msgstr "שגיאה בהעלאת קובץ: %s"
 
 #. TRANSLATORS: Upload status - success message when file uploaded.
-#: /dev/fd/63:11
 msgid "File uploaded"
 msgstr "הקובץ הועלה"
 
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
-#: /dev/fd/63:19
 msgid "No file was uploaded"
 msgstr "לא הועלה קובץ"
 
@@ -87,22 +79,20 @@ msgid "Remove"
 msgstr "הסר"
 
 #. TRANSLATORS: This is the confirmation button label when user tries to remove a tag, it should be short and clear.
-#: /dev/fd/51:35
 msgid "Remove?"
 msgstr "להסיר?"
 
 #. TRANSLATORS: Upload error when file size exceeds PHP upload_max_filesize limit. %s is replaced with size in MB.
-#: /dev/fd/63:13
 #, php-format
 msgid "The uploaded file exceeds the %s MB"
 msgstr "הקובץ המועבר חורג ממגבלת ה-%s מ\"ב"
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-#: /dev/fd/63:15
-msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
+msgid ""
+"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
+"the HTML form"
 msgstr "גודל הקובץ שהועלה חורג מהמגבלה (MAX_FILE_SIZE) שצוינה בטופס ה-HTML."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
-#: /dev/fd/63:17
 msgid "The uploaded file was only partially uploaded"
 msgstr "קובץ שהועלה נקלט רק בחלקו."

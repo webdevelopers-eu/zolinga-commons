@@ -10,16 +10,13 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. TRANSLATORS: Button label for adding a new tag in a list of tags.
-#: /dev/fd/56:55
 msgid "Add tag..."
 msgstr "Thêm thẻ..."
 
-#: /dev/fd/63:62
 msgid "An error occurred. Please try again later."
 msgstr "Đã xảy ra lỗi. Vui lòng thử lại sau."
 
 #. TRANSLATORS: Status message indicating an authorization token for the contact form was created.
-#: /dev/fd/58:57
 msgid "Authorization token created."
 msgstr "Đã tạo mã thông báo xác thực."
 
@@ -46,28 +43,23 @@ msgid "Drop files here to upload"
 msgstr "Thả tệp vào đây để tải lên"
 
 #. TRANSLATORS: Error shown to the user when sending the contact form email failed.
-#: /dev/fd/58:89
 msgid "Failed to send email, please try again later."
 msgstr "Không thể gửi email, vui lòng thử lại sau."
 
 #. TRANSLATORS: Error shown when the uploaded file has zero size.
-#: /dev/fd/63:45
 msgid "File is empty"
 msgstr "File trống"
 
 #. TRANSLATORS: Generic file upload error prefix; the specific error is appended.
-#: /dev/fd/63:40
 #, php-format
 msgid "File upload error: %s"
 msgstr "Lỗi tải lên tệp: %s"
 
 #. TRANSLATORS: Upload status - success message when file uploaded.
-#: /dev/fd/63:11
 msgid "File uploaded"
 msgstr "Tải lên thành công"
 
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
-#: /dev/fd/63:19
 msgid "No file was uploaded"
 msgstr "Không có tệp nào được tải lên"
 
@@ -87,22 +79,22 @@ msgid "Remove"
 msgstr "Xóa"
 
 #. TRANSLATORS: This is the confirmation button label when user tries to remove a tag, it should be short and clear.
-#: /dev/fd/51:35
 msgid "Remove?"
 msgstr "Xóa?"
 
 #. TRANSLATORS: Upload error when file size exceeds PHP upload_max_filesize limit. %s is replaced with size in MB.
-#: /dev/fd/63:13
 #, php-format
 msgid "The uploaded file exceeds the %s MB"
 msgstr "Tệp tải lên vượt quá %s MB"
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-#: /dev/fd/63:15
-msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
-msgstr "Tệp tải lên vượt quá giới hạn MAX_FILE_SIZE được chỉ định trong biểu mẫu HTML."
+msgid ""
+"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
+"the HTML form"
+msgstr ""
+"Tệp tải lên vượt quá giới hạn MAX_FILE_SIZE được chỉ định trong biểu mẫu "
+"HTML."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
-#: /dev/fd/63:17
 msgid "The uploaded file was only partially uploaded"
 msgstr "Tệp chỉ được tải lên một phần."

@@ -21,21 +21,18 @@ msgid "Authorization token created."
 msgstr "인증 토큰이 생성되었습니다."
 
 #. TRANSLATORS: This string is inside a <button> element, which is a button / should be concise and as short as possible, follow rules for button text in {{TARGET_LANG}} language.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[2]/button[1])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
 msgctxt "dialog button"
 msgid "Cancel"
 msgstr "취소"
 
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[2]/span)
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the instruction for the file uploader component, it should encourage users to click to open file picker dialog or drag and drop files to upload.
 msgctxt "File Uploader Component"
 msgid "Click or drag and drop files here"
 msgstr "파일을 클릭하거나 여기에 드래그하여 업로드하세요."
 
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[1]/span)
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the instruction for the file uploader component
 msgctxt "File Uploader Component"
@@ -63,7 +60,6 @@ msgstr "파일 업로드 완료"
 msgid "No file was uploaded"
 msgstr "파일이 업로드되지 않았습니다"
 
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[1])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 msgctxt "file removal confirmation"
 msgid "Really remove this file?"
@@ -71,7 +67,6 @@ msgstr "정말 이 파일을 삭제하시겠습니까?"
 
 #. TRANSLATORS: The text has the following HTML attributes: role="remove-file".
 #. TRANSLATORS: This string is inside a <button> element, which is a button / should be concise and as short as possible, follow rules for button text in {{TARGET_LANG}} language.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[2]/button[2])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
 msgctxt "dialog button"

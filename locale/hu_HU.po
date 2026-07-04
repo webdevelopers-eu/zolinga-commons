@@ -21,21 +21,18 @@ msgid "Authorization token created."
 msgstr "Hitelesítési token létrehozva."
 
 #. TRANSLATORS: This string is inside a <button> element, which is a button / should be concise and as short as possible, follow rules for button text in {{TARGET_LANG}} language.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[2]/button[1])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
 msgctxt "dialog button"
 msgid "Cancel"
 msgstr "Mégse"
 
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[2]/span)
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the instruction for the file uploader component, it should encourage users to click to open file picker dialog or drag and drop files to upload.
 msgctxt "File Uploader Component"
 msgid "Click or drag and drop files here"
 msgstr "Kattintson vagy húzza ide a fájlokat"
 
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[1]/span)
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the instruction for the file uploader component
 msgctxt "File Uploader Component"
@@ -63,7 +60,6 @@ msgstr "Fájl feltöltve"
 msgid "No file was uploaded"
 msgstr "Nem lett fájl feltöltve"
 
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[1])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 msgctxt "file removal confirmation"
 msgid "Really remove this file?"
@@ -71,7 +67,6 @@ msgstr "Valóban törli ezt a fájlt?"
 
 #. TRANSLATORS: The text has the following HTML attributes: role="remove-file".
 #. TRANSLATORS: This string is inside a <button> element, which is a button / should be concise and as short as possible, follow rules for button text in {{TARGET_LANG}} language.
-#. TRANSLATORS: SOURCE: <module://zolinga-commons/install/dist/web-components/file-uploader/file-uploader.html> (zolinga-commons:., /html/body/main/div[3]/div[2]/button[2])
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the button choice for the question "Really remove this file?" [Cancel] [Remove]
 msgctxt "dialog button"

@@ -217,12 +217,12 @@ export default class FileUploader extends WebComponent {
      * @returns 
      */
     async #uploadFile(file) {
-        const url = '/dist/zolinga-commons/upload/';
+        const url = '/dist/zolinga-commons/upload';
         const formData = new FormData();
         formData.append('file', file);
 
         try {
-            // Do standard POST file upload to dist/zolinga-commons/upload/
+            // Do standard POST file upload to dist/zolinga-commons/upload
             const response = await fetch(url, {
                 method: 'POST',
                 body: formData

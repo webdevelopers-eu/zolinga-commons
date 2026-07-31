@@ -18,6 +18,7 @@ export default class HamburgerMenu extends WebComponent {
   #popup;
   #resizeObserver;
   #mutationObserver;
+  #hamburgerIcon;
   #picker;
   #updating = false;
 
@@ -41,6 +42,8 @@ export default class HamburgerMenu extends WebComponent {
     this.#createMenuPopup();
     this.#createCanary();
     
+    this.#hamburgerIcon = this.querySelector('.hamburger-icon');
+
     this.#resizeObserver = new ResizeObserver((entries) => this.#onResize());
     this.#resizeObserver.observe(this, { box: 'border-box' });
 
@@ -49,11 +52,7 @@ export default class HamburgerMenu extends WebComponent {
 
     this.#onResize();
 
-    this.#picker.addEventListener('click', (ev) => {
-      if (!ev.target.matches('li, a, .hamburger-icon')) {
-        return;
-      }
-
+    this.#hamburgerIcon.addEventListener('click', (ev) => {
       const isOpen = this.#popup.open;
 
       if (isOpen) {

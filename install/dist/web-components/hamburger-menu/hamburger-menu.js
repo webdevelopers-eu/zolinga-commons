@@ -78,8 +78,8 @@ export default class HamburgerMenu extends WebComponent {
     return promise;
   }
 
-  #onItemClick(ev, state) {
-    const isOpen = state === undefined ? this.#popup.open : !state;
+  #onItemClick(ev, forceMenuState = undefined) {
+    const isOpen = forceMenuState === undefined ? this.#popup.open : !forceMenuState;
 
     if (isOpen) {
       console.log("Closing hamburger menu (click on %o)", ev.target);

@@ -19,6 +19,7 @@ export default class HamburgerMenu extends WebComponent {
   #resizeObserver;
   #mutationObserver;
   #hamburgerIcon;
+  #dialog;
   #picker;
   #updating = false;
 
@@ -43,6 +44,7 @@ export default class HamburgerMenu extends WebComponent {
     this.#createCanary();
     
     this.#hamburgerIcon = this.querySelector('.hamburger-icon');
+    this.#dialog = this.querySelector('dialog');
 
     this.#resizeObserver = new ResizeObserver((entries) => this.#onResize());
     this.#resizeObserver.observe(this, { box: 'border-box' });
@@ -52,20 +54,8 @@ export default class HamburgerMenu extends WebComponent {
 
     this.#onResize();
 
-    this.#hamburgerIcon.addEventListener('click', (ev) => {
-      const isOpen = this.#popup.open;
-
-      if (isOpen) {
-        console.log("Closing hamburger menu");
-        this.#popup.close();
-        this.classList.remove('hamburger-active');
-      } else {
-        console.log("Opening hamburger menu");
-        this.classList.add('hamburger-active');
-        this.#popup.showModal();
-        this.#popup.focus();
-      }
-    });
+    this.#hamburgerIcon.addEventListener('click', (ev) => this.#onItemClick(ev));
+    this.#dialog.addEventListener('click', (ev) => this.#onItemClick(ev, false)); 
   }
 
   async installStyles() {
@@ -86,6 +76,21 @@ export default class HamburgerMenu extends WebComponent {
     }
 
     return promise;
+  }
+
+  #onItemClick(ev, state) {
+    const isOpen = state === undefined ? this.#popup.open : !state;
+
+    if (isOpen) {
+      console.log("Closing hamburger menu (click on %o)", ev.target);
+      this.#popup.close();
+      this.classList.remove('hamburger-active');
+    } else {
+      console.log("Opening hamburger menu (click on %o)", ev.target);
+      this.classList.add('hamburger-active');
+      this.#popup.showModal();
+      this.#popup.focus();
+    }
   }
 
   #createMenuPopup() {

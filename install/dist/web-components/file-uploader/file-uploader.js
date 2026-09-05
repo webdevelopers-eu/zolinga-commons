@@ -50,7 +50,7 @@ export default class FileUploader extends WebComponent {
             inheritStyles: true
         });
 
-        this.#template = this.querySelector('template') || this.#root.querySelector('template');
+        this.#template = this.querySelector("template[name='uploaded-file']") || this.#root.querySelector("template[name='uploaded-file']");
         this.#file = this.#root.querySelector('input[role~="new-file"]');
         this.#file.accept = this.getAttribute('accept') || '*/*';
         this.#dropCover = this.#root.querySelector('.fu-drop-target-cover');

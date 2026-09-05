@@ -56,6 +56,12 @@ msgstr "Chyba při nahrávání souboru: %s"
 msgid "File uploaded"
 msgstr "Soubor nahrán"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "Neplatný typ souboru ${mime}, povolené typy souborů: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "Žádný soubor nebyl nahrán."
@@ -83,11 +89,8 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "Nahraný soubor přesahuje %s MB"
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
-msgstr ""
-"Nahraný soubor překračuje direktivu MAX_FILE_SIZE zadanou v HTML formuláři."
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
+msgstr "Nahraný soubor překračuje direktivu MAX_FILE_SIZE zadanou v HTML formuláři."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
 msgid "The uploaded file was only partially uploaded"

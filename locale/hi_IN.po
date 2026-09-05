@@ -56,6 +56,12 @@ msgstr "फ़ाइल अपलोड त्रुटि: %s"
 msgid "File uploaded"
 msgstr "फ़ाइल अपलोड हो गई"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "अमान्य फ़ाइल प्रकार ${mime}, अनुमत फ़ाइल प्रकार: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "कोई फ़ाइल अपलोड नहीं की गई"
@@ -83,9 +89,7 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "अपलोड की गई फ़ाइल %s MB से अधिक है।"
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
 msgstr "अपलोड की गई फ़ाइल HTML फ़ॉर्म में निर्दिष्ट MAX_FILE_SIZE निर्देश से अधिक है।"
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.

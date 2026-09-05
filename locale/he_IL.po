@@ -56,6 +56,12 @@ msgstr "שגיאה בהעלאת קובץ: %s"
 msgid "File uploaded"
 msgstr "הקובץ הועלה"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "סוג קובץ לא חוקי ${mime}, סוגי הקבצים המותרים: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "לא הועלה קובץ"
@@ -83,9 +89,7 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "הקובץ המועבר חורג ממגבלת ה-%s מ\"ב"
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
 msgstr "גודל הקובץ שהועלה חורג מהמגבלה (MAX_FILE_SIZE) שצוינה בטופס ה-HTML."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.

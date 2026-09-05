@@ -56,6 +56,12 @@ msgstr "Tiedoston latausvirhe: %s"
 msgid "File uploaded"
 msgstr "Tiedosto ladattu"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "Virheellinen tiedostotyyppi ${mime}. Sallitut tiedostotyypit: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "Tiedostoa ei ole ladattu"
@@ -83,11 +89,8 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "Ladattu tiedosto ylittää %s MB rajan."
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
-msgstr ""
-"Ladattu tiedosto ylittää HTML-lomakkeessa määritetyn MAX_FILE_SIZE-rajan."
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
+msgstr "Ladattu tiedosto ylittää HTML-lomakkeessa määritetyn MAX_FILE_SIZE-rajan."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
 msgid "The uploaded file was only partially uploaded"

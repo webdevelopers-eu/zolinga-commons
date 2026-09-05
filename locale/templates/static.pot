@@ -4,6 +4,12 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr ""
+
 #. TRANSLATORS: This is the main web form container for the file uploader component
 #. TRANSLATORS: This is the instruction for the file uploader component
 msgctxt "File Uploader Component"

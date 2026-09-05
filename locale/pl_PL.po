@@ -7,8 +7,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. TRANSLATORS: Button label for adding a new tag in a list of tags.
 msgid "Add tag..."
@@ -57,6 +56,12 @@ msgstr "Błąd przesyłania pliku: %s"
 msgid "File uploaded"
 msgstr "Plik został pomyślnie przesłany"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "Nieprawidłowy typ pliku ${mime}. Dozwolone typy plików: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "Nie przesłano żadnego pliku."
@@ -84,12 +89,8 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "Przesłany plik przekracza %s MB"
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
-msgstr ""
-"Przesłany plik przekracza dyrektywę MAX_FILE_SIZE określoną w formularzu "
-"HTML."
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
+msgstr "Przesłany plik przekracza dyrektywę MAX_FILE_SIZE określoną w formularzu HTML."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
 msgid "The uploaded file was only partially uploaded"

@@ -56,6 +56,12 @@ msgstr "Σφάλμα μεταφόρτωσης αρχείου: %s"
 msgid "File uploaded"
 msgstr "Το αρχείο μεταφορτώθηκε"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "Μη έγκυρος τύπος αρχείου ${mime}. Επιτρεπόμενοι τύποι αρχείων: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "Δεν μεταφορτώθηκε κανένα αρχείο"
@@ -83,12 +89,8 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "Το αρχείο που μεταφορτώθηκε υπερβαίνει το όριο των %s MB."
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
-msgstr ""
-"Το αρχείο που μεταφορτώθηκε υπερβαίνει το όριο MAX_FILE_SIZE που ορίστηκε "
-"στη φόρμα HTML."
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
+msgstr "Το αρχείο που μεταφορτώθηκε υπερβαίνει το όριο MAX_FILE_SIZE που ορίστηκε στη φόρμα HTML."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
 msgid "The uploaded file was only partially uploaded"

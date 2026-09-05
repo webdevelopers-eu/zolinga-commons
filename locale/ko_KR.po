@@ -56,6 +56,12 @@ msgstr "파일 업로드 오류: %s"
 msgid "File uploaded"
 msgstr "파일 업로드 완료"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "잘못된 파일 형식입니다 (${mime}). 허용되는 파일 형식: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "파일이 업로드되지 않았습니다"
@@ -83,9 +89,7 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "업로드된 파일 크기가 %s MB 를 초과합니다."
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
 msgstr "업로드된 파일이 HTML 양식에 지정된 MAX_FILE_SIZE 제한을 초과했습니다."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.

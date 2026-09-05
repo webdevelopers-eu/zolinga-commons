@@ -56,6 +56,12 @@ msgstr "Kesalahan unggah file: %s"
 msgid "File uploaded"
 msgstr "File berhasil diunggah"
 
+#. TRANSLATORS: The text has the following HTML attributes: name="l18n-invalid-file-mime".
+#. TRANSLATORS: This is the main web form container for the file uploader component
+msgctxt "File Uploader Component"
+msgid "Invalid file type ${mime}, allowed file types: ${allowed}"
+msgstr "Tipe file ${mime} tidak valid, tipe file yang diizinkan: ${allowed}"
+
 #. TRANSLATORS: Upload error when no file was provided in the upload request.
 msgid "No file was uploaded"
 msgstr "Tidak ada berkas yang diunggah"
@@ -83,12 +89,8 @@ msgid "The uploaded file exceeds the %s MB"
 msgstr "File yang diunggah melebihi batas %s MB"
 
 #. TRANSLATORS: Upload error when the HTML form MAX_FILE_SIZE directive is exceeded.
-msgid ""
-"The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in "
-"the HTML form"
-msgstr ""
-"File yang diunggah melebihi batas ukuran maksimum (MAX_FILE_SIZE) yang "
-"ditentukan dalam formulir HTML."
+msgid "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form"
+msgstr "File yang diunggah melebihi batas ukuran maksimum (MAX_FILE_SIZE) yang ditentukan dalam formulir HTML."
 
 #. TRANSLATORS: Upload error when the file was only partially uploaded.
 msgid "The uploaded file was only partially uploaded"

@@ -156,6 +156,18 @@ export default class FileUploader extends WebComponent {
         this.dataset.count = this.querySelectorAll(':scope > .fu-file').length;
     }
 
+    #getTranslation(key, params = {}) {
+        const template = this.#root.querySelector(`template[name="${key}"]`);
+        if (!template) {
+            console.warn(`FileUploader: Missing translation template for key "${key}"`);
+            return key;
+        }
+        // Replace all ${param} placeholders in the template with the corresponding values from params
+        return template.innerHTML.replace(/\$\{(\w+)\}/g, (match, p1) => {
+            return params[p1] !== undefined ? params[p1] : match;
+        });
+    }
+
     /**
      * Upload new file
      * 
@@ -172,6 +184,21 @@ export default class FileUploader extends WebComponent {
             lastModified: new Date(file.lastModified).toLocaleString(),
             url: URL.createObjectURL(file)
         };
+
+        // Check against the accept attribute
+        if (!this.#isAllowedMIME(data.type)) {
+            const text = this.#getTranslation('l18n-invalid-file-mime', {
+                mime: data.type.replace(/(image|text)\//g, ''),
+                allowed: (this.getAttribute('accept') || '*/*').replace(/(image|text)\//g, '')
+            });
+            this.broadcast('message', {
+                message: text,
+                type: 'error',
+                timeout: 10000,
+                id: 'file-uploader'
+            });
+            return Promise.reject(new Error(`File type "${data.type}" is not accepted.`));
+        }
 
         const el = this.#createElement(data);
         el.classList.add('fu-loading');
@@ -209,6 +236,26 @@ export default class FileUploader extends WebComponent {
         return el;
     }
 
+
+    /**
+     * Check if the given MIME type is allowed by the accept attribute.
+     * 
+     * @param string mime 
+     * @returns boolean
+     */
+    #isAllowedMIME(mime) {
+        const acceptList = this.getAttribute('accept')?.split(',').map(s => s.trim()).filter(s => s.length > 0) || [];
+        if (acceptList.length === 0) return true;
+
+        return acceptList.some(accept => {
+            if (accept === '*/*') return true;
+            if (accept.endsWith('/*')) {
+                const prefix = accept.slice(0, -2);
+                return mime.startsWith(prefix + '/');
+            }
+            return mime === accept;
+        });
+    }
 
     /**
      * Upload a single file and return Uploader URI identifier.

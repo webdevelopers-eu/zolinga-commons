@@ -6,7 +6,8 @@
         "language": "zh_CN",
         "mime-version": "1.0",
         "content-type": "text/plain; charset=UTF-8",
-        "content-transfer-encoding": "8bit"
+        "content-transfer-encoding": "8bit",
+        "plural-forms": "nplurals=1; plural=0;"
     },
     "Remove?": "确认删除？",
     "Add tag...": "添加标签...",

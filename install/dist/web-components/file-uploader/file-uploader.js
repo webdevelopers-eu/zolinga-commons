@@ -188,8 +188,8 @@ export default class FileUploader extends WebComponent {
         // Check against the accept attribute
         if (!this.#isAllowedMIME(data.type)) {
             const text = this.#getTranslation('l18n-invalid-file-mime', {
-                mime: data.type.replace(/(image|text)\//g, ''),
-                allowed: (this.getAttribute('accept') || '*/*').replace(/(image|text)\//g, '')
+                mime: data.type.replace(/(image|text)\//g, '').replace(/\+[a-z]+/, '').toUpperCase(),
+                allowed: (this.getAttribute('accept') || '*/*').replace(/(image|text)\//g, '').replace(/\+[a-z]+/, '').toUpperCase()
             });
             this.broadcast('message', {
                 message: text,
